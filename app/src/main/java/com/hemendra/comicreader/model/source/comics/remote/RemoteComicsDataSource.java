@@ -1,9 +1,9 @@
-package com.hemendra.comicreader.model.source.remote;
+package com.hemendra.comicreader.model.source.comics.remote;
 
 import android.content.Context;
 
-import com.hemendra.comicreader.model.source.ComicsDataSource;
-import com.hemendra.comicreader.model.source.IComicsDataSourceListener;
+import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
+import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 
 public class RemoteComicsDataSource extends ComicsDataSource {
 
@@ -18,6 +18,11 @@ public class RemoteComicsDataSource extends ComicsDataSource {
 
     @Override
     public void stopLoadingComics() {
+
+    }
+
+    @Override
+    public void dispose() {
 
     }
 }

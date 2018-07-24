@@ -1,11 +1,9 @@
-package com.hemendra.comicreader.model.source.local;
+package com.hemendra.comicreader.model.source.comics.local;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
-import com.hemendra.comicreader.model.data.Comics;
-import com.hemendra.comicreader.model.source.ComicsDataSource;
-import com.hemendra.comicreader.model.source.IComicsDataSourceListener;
+import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
+import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 
 public class LocalComicsDataSource extends ComicsDataSource {
 
@@ -23,4 +21,8 @@ public class LocalComicsDataSource extends ComicsDataSource {
 
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }
