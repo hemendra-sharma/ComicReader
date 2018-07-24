@@ -28,6 +28,7 @@ Thumbs.db
 
 # Android Studio
 *.iml
+*.properties
 .idea
 .idea/workspace.xml
 .gradle
