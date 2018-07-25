@@ -11,4 +11,17 @@ public interface IComicListActivityCallback {
 
     void askForPermissions();
 
+    void onComicDetailsLoadingStarted();
+    void onComicDetailsLoaded(Comic comic);
+    void onFailedToLoadComicDetails(String reason);
+    void onStoppedLoadingComicDetails();
+
+    void onComicsLoadingStarted();
+    void onComicsLoaded(Comics comics);
+    void onFailedToLoadComics(String reason);
+    void onStoppedLoadingComics();
+
+    void onPageDownloaded(String url, Bitmap pageImage);
+    void onFailedToDownloadPage(String url, String reason);
+
 }

@@ -17,9 +17,6 @@ import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource;
 import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource;
 import com.hemendra.comicreader.view.IComicListActivityCallback;
-import com.hemendra.comicreader.view.details.IComicDetailsCallback;
-import com.hemendra.comicreader.view.list.IComicsListCallback;
-import com.hemendra.comicreader.view.reader.IComicReaderCallback;
 
 public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
 
@@ -27,9 +24,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     private Context context;
     private IComicListActivityCallback activityView;
-    private IComicsListCallback listView;
-    private IComicDetailsCallback detailsView;
-    private IComicReaderCallback readerView;
 
     private Comics comics = null;
     private DataSource[] sources;
@@ -42,15 +36,16 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     private Runnable pendingAction = null;
 
-    public static ComicsPresenter getInstance(Context context) {
+    public static ComicsPresenter getInstance(Context context, IComicListActivityCallback activityView) {
         if(presenter == null) {
-            presenter = new ComicsPresenter(context);
+            presenter = new ComicsPresenter(context, activityView);
         }
         return presenter;
     }
 
-    private ComicsPresenter(Context context) {
+    private ComicsPresenter(Context context, IComicListActivityCallback activityView) {
         this.context = context;
+        this.activityView = activityView;
 
         sources = new DataSource[]{
                 localComicsDataSource = new LocalComicsDataSource(context, this),
@@ -58,22 +53,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
                 localImagesDataSource = new LocalImagesDataSource(context, this),
                 remoteImagesDataSource = new RemoteImagesDataSource(context, this)
         };
-    }
-
-    public void setActivityView(IComicListActivityCallback activityView) {
-        this.activityView = activityView;
-    }
-
-    public void setListView(IComicsListCallback listView) {
-        this.listView = listView;
-    }
-
-    public void setDetailsView(IComicDetailsCallback detailsView) {
-        this.detailsView = detailsView;
-    }
-
-    public void setReaderView(IComicReaderCallback readerView) {
-        this.readerView = readerView;
     }
 
     public void permissionGranted() {
@@ -102,16 +81,16 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     @Override
     public void onStartedLoadingComics() {
-        if(listView != null) {
-            listView.onComicsLoadingStarted();
+        if(activityView != null) {
+            activityView.onComicsLoadingStarted();
         }
     }
 
     @Override
     public void onComicsLoaded(@NonNull Comics comics) {
-        if(listView != null) {
+        if(activityView != null) {
             this.comics = comics;
-            listView.onComicsLoaded(comics);
+            activityView.onComicsLoaded(comics);
         }
     }
 
@@ -120,22 +99,22 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         if(reason == FailureReason.NOT_AVAILABLE_LOCALLY) {
             if(remoteComicsDataSource != null) {
                 remoteComicsDataSource.loadComics();
-            } else if(listView != null) {
-                listView.onFailedToLoadComics("App Destroyed");
+            } else if(activityView != null) {
+                activityView.onFailedToLoadComics("App Destroyed");
             }
         } else if(reason == FailureReason.NETWORK_TIMEOUT) {
-            if(listView != null) {
-                listView.onFailedToLoadComics("Network Timeout");
+            if(activityView != null) {
+                activityView.onFailedToLoadComics("Network Timeout");
             }
-        } else if(listView != null) {
-            listView.onFailedToLoadComics("Unknown");
+        } else if(activityView != null) {
+            activityView.onFailedToLoadComics("Unknown");
         }
     }
 
     @Override
     public void onStoppedLoadingComics() {
-        if(listView != null) {
-            listView.onStoppedLoadingComics();
+        if(activityView != null) {
+            activityView.onStoppedLoadingComics();
         }
     }
 
@@ -161,9 +140,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     public void destroy() {
         activityView = null;
-        listView = null;
-        detailsView = null;
-        readerView = null;
 
         for(DataSource source : sources)
             source.dispose();

@@ -11,22 +11,17 @@ import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
-public class AllComicsListFragment extends Fragment implements IComicsListCallback {
+public class AllComicsListFragment extends Fragment {
 
     private ComicsPresenter comicsPresenter;
 
     private static AllComicsListFragment fragment = null;
 
-    public AllComicsListFragment() {
-        super();
-        comicsPresenter = ComicsPresenter.getInstance(getContext());
-        comicsPresenter.setListView(this);
-    }
-
-    public static AllComicsListFragment getFragment() {
+    public static AllComicsListFragment getInstance(ComicsPresenter comicsPresenter) {
         if(fragment == null) {
             fragment = new AllComicsListFragment();
         }
+        fragment.comicsPresenter = comicsPresenter;
         return fragment;
     }
 
@@ -42,22 +37,11 @@ public class AllComicsListFragment extends Fragment implements IComicsListCallba
     }
 
     @Override
-    public void onComicsLoadingStarted() {
-
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
-    @Override
     public void onComicsLoaded(Comics comics) {
-
-    }
-
-    @Override
-    public void onFailedToLoadComics(String reason) {
-
-    }
-
-    @Override
-    public void onStoppedLoadingComics() {
 
     }
 }
