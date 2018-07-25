@@ -13,4 +13,12 @@
 
     </FrameLayout>
 
+    <RelativeLayout
+        android:id="@+id/rlProgress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#44000000">
+
+    </RelativeLayout>
+
 </RelativeLayout>

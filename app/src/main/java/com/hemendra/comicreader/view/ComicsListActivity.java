@@ -1,15 +1,13 @@
 package com.hemendra.comicreader.view;
 
 import android.app.SearchManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,24 +22,17 @@ import com.hemendra.comicreader.view.list.AllComicsListFragment;
 public class ComicsListActivity extends AppCompatActivity implements IComicListActivityCallback {
 
     private RuntimePermissionManager runtimePermissionManager = null;
-
     private ComicsPresenter comicsPresenter = null;
-
     private AllComicsListFragment allComicsListFragment = null;
-
     private SearchView searchView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_list);
-
         runtimePermissionManager = new RuntimePermissionManager(this);
-
         comicsPresenter = ComicsPresenter.getInstance(getApplicationContext(), this);
-
         allComicsListFragment = AllComicsListFragment.getInstance(comicsPresenter);
-
         showComicsListFragment();
     }
 
@@ -96,8 +87,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     private void handleIntent(@Nullable Intent intent) {
         // check if searching or not
         String query = "";
-        if (intent != null
-                && Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if (intent != null && Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // use the query to search comics data
             query = intent.getStringExtra(SearchManager.QUERY);
         }
@@ -113,8 +103,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         runtimePermissionManager.onRequestPermissionsResult(requestCode,
-                permissions, grantResults,
-                ()->comicsPresenter.permissionGranted());
+                permissions, grantResults, ()->comicsPresenter.permissionGranted());
     }
 
     /**
@@ -133,24 +122,6 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         searchView.setVisibility(View.VISIBLE);
         searchView.setIconified(true);
         searchView.clearFocus();
-    }
-
-    /**
-     * Show the {@link AlertDialog} with given message and a single 'OK' option.
-     * @param msg Message to show
-     * @param listener The task to execute when 'OK' is clicked by user
-     */
-    private void showMessageBox(@NonNull String msg,
-                                @Nullable DialogInterface.OnClickListener listener) {
-        if (isDestroyed() || isFinishing()) {
-            return;
-        }
-        //
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setMessage(msg)
-                .setCancelable(false)
-                .setPositiveButton(R.string.ok, listener).create();
-        alertDialog.show();
     }
 
     private void showComicsListFragment() {

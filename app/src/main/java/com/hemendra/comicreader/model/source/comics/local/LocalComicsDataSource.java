@@ -20,18 +20,18 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     public LocalComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                +getContext().getPackageName()+"/cache");
+                + getContext().getPackageName() + "/cache");
         comicsCacheFile = new File(dir, "comics.obj");
     }
 
     private boolean hasComics() {
         return comicsCacheFile.exists() && comicsCacheFile.length() > 0;
     }
-
+    
     @Override
     public void loadComics() {
-        if(hasComics()) {
-            if(loader == null || !loader.isExecuting()) {
+        if (hasComics()) {
+            if (loader == null || !loader.isExecuting()) {
                 (loader = new LocalComicsLoader(this)).execute(comicsCacheFile);
                 listener.onStartedLoadingComics();
             } else {
@@ -44,7 +44,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
 
     @Override
     public void onComicsLoaded(Comics comics) {
-        if(comics != null)
+        if (comics != null)
             listener.onComicsLoaded(comics, SourceType.LOCAL);
         else
             listener.onFailedToLoadComics(FailureReason.NOT_AVAILABLE_LOCALLY);
@@ -52,19 +52,19 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
 
     @Override
     protected void stopLoadingComics() {
-        if(loader != null && loader.isExecuting())
+        if (loader != null && loader.isExecuting())
             loader.cancel(true);
         listener.onStoppedLoadingComics();
     }
 
     public void save(@NonNull Comics comics) {
-        new Thread(()->Utils.writeToFile(comics, comicsCacheFile)).start();
+        new Thread(() -> Utils.writeToFile(comics, comicsCacheFile)).start();
     }
 
     @Override
     public void dispose() {
         stopLoadingComics();
-        if(loader != null && loader.isExecuting())
+        if (loader != null && loader.isExecuting())
             loader.cancel(true);
     }
 }

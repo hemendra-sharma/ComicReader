@@ -21,8 +21,6 @@ import com.hemendra.comicreader.view.IComicListActivityCallback;
 
 public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
 
-    private static final String TAG = "Presenter";
-
     private static ComicsPresenter presenter = null;
 
     private Context context;
