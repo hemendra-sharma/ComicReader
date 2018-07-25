@@ -17,7 +17,7 @@ public class RemoteComicsDataSource extends ComicsDataSource {
     }
 
     @Override
-    public void stopLoadingComics() {
+    protected void stopLoadingComics() {
 
     }
 

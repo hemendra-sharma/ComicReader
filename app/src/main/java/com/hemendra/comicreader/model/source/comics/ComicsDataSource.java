@@ -8,8 +8,15 @@ public abstract class ComicsDataSource extends DataSource {
 
     public enum FailureReason {
         NOT_AVAILABLE_LOCALLY,
+        ALREADY_LOADING,
+        NETWORK_UNAVAILABLE,
         NETWORK_TIMEOUT,
         UNKNOWN
+    }
+
+    public enum SourceType {
+        LOCAL,
+        REMOTE
     }
 
     protected IComicsDataSourceListener listener;
@@ -21,6 +28,6 @@ public abstract class ComicsDataSource extends DataSource {
 
     public abstract void loadComics();
 
-    public abstract void stopLoadingComics();
+    protected abstract void stopLoadingComics();
 
 }

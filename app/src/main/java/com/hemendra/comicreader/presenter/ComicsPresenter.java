@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.source.DataSource;
 import com.hemendra.comicreader.model.source.comics.ComicsDataSource.FailureReason;
+import com.hemendra.comicreader.model.source.comics.ComicsDataSource.SourceType;
 import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 import com.hemendra.comicreader.model.source.comics.local.LocalComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.remote.RemoteComicsDataSource;
@@ -19,6 +20,8 @@ import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSourc
 import com.hemendra.comicreader.view.IComicListActivityCallback;
 
 public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
+
+    private static final String TAG = "Presenter";
 
     private static ComicsPresenter presenter = null;
 
@@ -69,13 +72,20 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     public void startLoadingComics() {
         if(activityView != null
-                && localComicsDataSource != null && remoteImagesDataSource != null) {
+                && localComicsDataSource != null && remoteComicsDataSource != null) {
             if(hasReadWritePermissions()) {
                 localComicsDataSource.loadComics();
             } else {
                 pendingAction = this::startLoadingComics;
                 activityView.askForPermissions();
             }
+        }
+    }
+
+    public void performSearch(String query) {
+        if(activityView != null
+                && localComicsDataSource != null && remoteComicsDataSource != null) {
+
         }
     }
 
@@ -87,10 +97,13 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     }
 
     @Override
-    public void onComicsLoaded(@NonNull Comics comics) {
+    public void onComicsLoaded(@NonNull Comics comics, SourceType sourceType) {
         if(activityView != null) {
             this.comics = comics;
             activityView.onComicsLoaded(comics);
+            if(sourceType == SourceType.REMOTE) {
+                localComicsDataSource.save(comics);
+            }
         }
     }
 
@@ -101,6 +114,14 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
                 remoteComicsDataSource.loadComics();
             } else if(activityView != null) {
                 activityView.onFailedToLoadComics("App Destroyed");
+            }
+        } else if(reason == FailureReason.ALREADY_LOADING) {
+            if(activityView != null) {
+                activityView.onFailedToLoadComics("Comics Already Loading");
+            }
+        } else if(reason == FailureReason.NETWORK_UNAVAILABLE) {
+            if(activityView != null) {
+                activityView.onFailedToLoadComics("No Internet Connection");
             }
         } else if(reason == FailureReason.NETWORK_TIMEOUT) {
             if(activityView != null) {

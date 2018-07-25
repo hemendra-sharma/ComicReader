@@ -3,4 +3,5 @@
     <string name="permission_request_from_app_settings">The app requires permission to save temporary cached data. Please go to application settings and allow all permissions.</string>
     <string name="ok">OK</string>
     <string name="permission_request_rationale">The app requires permission to save temporary cached data locally. Please allow the app permission.</string>
+    <string name="search">Search</string>
 </resources>
