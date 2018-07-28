@@ -95,7 +95,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     }
 
     @Override
-    public void onComicsLoaded(@NonNull Comics comics, SourceType sourceType) {
+    public void onComicsLoaded(@NonNull Comics comics, @NonNull SourceType sourceType) {
         if(activityView != null) {
             this.comics = comics;
             activityView.onComicsLoaded(comics);

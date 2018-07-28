@@ -110,7 +110,8 @@ public abstract class CustomAsyncTask<Params, Progress, Result> implements Handl
      * Start the execution
      * @param params Provide the parameters (if any), or leave empty otherwise.
      */
-    public void execute(final Params... params) {
+    @SafeVarargs
+    public final void execute(Params... params) {
         isCancelled = false;
         onPreExecute();
         //

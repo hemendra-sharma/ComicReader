@@ -14,14 +14,15 @@ import java.io.File;
 
 public class LocalComicsDataSource extends ComicsDataSource implements OnComicsLoadedListener {
 
-    private File comicsCacheFile;
-    private LocalComicsLoader loader = null;
+    public File comicsCacheFile;
+    private LocalComicsLoader loader;
 
     public LocalComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 + getContext().getPackageName() + "/cache");
         comicsCacheFile = new File(dir, "comics.obj");
+        loader = new LocalComicsLoader(this);
     }
 
     private boolean hasComics() {
@@ -31,8 +32,10 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     @Override
     public void loadComics() {
         if (hasComics()) {
-            if (loader == null || !loader.isExecuting()) {
-                (loader = new LocalComicsLoader(this)).execute(comicsCacheFile);
+            if(loader == null) {
+                listener.onFailedToLoadComics(FailureReason.SOURCE_CLOSED);
+            } else if (!loader.isExecuting()) {
+                loader.execute(comicsCacheFile);
                 listener.onStartedLoadingComics();
             } else {
                 listener.onFailedToLoadComics(FailureReason.ALREADY_LOADING);
@@ -47,7 +50,12 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         if (comics != null)
             listener.onComicsLoaded(comics, SourceType.LOCAL);
         else
-            listener.onFailedToLoadComics(FailureReason.NOT_AVAILABLE_LOCALLY);
+            listener.onFailedToLoadComics(FailureReason.UNKNOWN);
+    }
+
+    @Override
+    public void onFailedToLoadComics(FailureReason reason) {
+        listener.onFailedToLoadComics(reason);
     }
 
     @Override
@@ -64,7 +72,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     @Override
     public void dispose() {
         stopLoadingComics();
-        if (loader != null && loader.isExecuting())
-            loader.cancel(true);
+        loader = null;
+        listener = null;
     }
 }

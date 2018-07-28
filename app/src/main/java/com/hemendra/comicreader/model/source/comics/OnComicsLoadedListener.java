@@ -5,5 +5,6 @@ import com.hemendra.comicreader.model.data.Comics;
 public interface OnComicsLoadedListener {
 
     void onComicsLoaded(Comics comics);
+    void onFailedToLoadComics(ComicsDataSource.FailureReason reason);
 
 }
