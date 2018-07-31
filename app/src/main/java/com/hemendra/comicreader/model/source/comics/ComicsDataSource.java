@@ -14,7 +14,8 @@ public abstract class ComicsDataSource extends DataSource {
         NETWORK_TIMEOUT,
         API_MISSING,
         INVALID_RESPONSE_FROM_SERVER,
-        UNKNOWN
+        UNKNOWN_LOCAL_ERROR,
+        UNKNOWN_REMOTE_ERROR
     }
 
     public enum SourceType {

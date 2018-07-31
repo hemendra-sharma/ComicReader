@@ -19,8 +19,8 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
 
     public LocalComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
-        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                + getContext().getPackageName() + "/cache");
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                "/" + getContext().getPackageName() + "/cache");
         comicsCacheFile = new File(dir, "comics.obj");
         loader = new LocalComicsLoader(this);
     }
@@ -50,7 +50,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         if (comics != null)
             listener.onComicsLoaded(comics, SourceType.LOCAL);
         else
-            listener.onFailedToLoadComics(FailureReason.UNKNOWN);
+            listener.onFailedToLoadComics(FailureReason.UNKNOWN_LOCAL_ERROR);
     }
 
     @Override

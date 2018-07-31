@@ -262,11 +262,16 @@ public class Utils {
     public static boolean writeToFile(@NonNull byte[] data, @NonNull File file) {
         FileOutputStream fout = null;
         try {
-            file.createNewFile();
-            fout = new FileOutputStream(file);
-            fout.write(data);
-            fout.close();
-            return true;
+            boolean proceed = file.getParentFile().exists()
+                    || file.getParentFile().mkdirs();
+            if(proceed) {
+                if(file.createNewFile()) {
+                    fout = new FileOutputStream(file);
+                    fout.write(data);
+                    fout.close();
+                    return true;
+                }
+            }
         } catch (Throwable ex) {
             ex.printStackTrace();
         }finally {

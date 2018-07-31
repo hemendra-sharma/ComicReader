@@ -11,7 +11,7 @@ import java.io.File;
 public class LocalComicsLoader extends CustomAsyncTask<File,Void,Comics> {
 
     private OnComicsLoadedListener listener;
-    private ComicsDataSource.FailureReason reason = ComicsDataSource.FailureReason.UNKNOWN;
+    private ComicsDataSource.FailureReason reason = ComicsDataSource.FailureReason.UNKNOWN_LOCAL_ERROR;
 
     public LocalComicsLoader(OnComicsLoadedListener listener) {
         this.listener = listener;

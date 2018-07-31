@@ -107,7 +107,8 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     @Override
     public void onFailedToLoadComics(@NonNull FailureReason reason) {
-        if(reason == FailureReason.NOT_AVAILABLE_LOCALLY) {
+        if(reason == FailureReason.NOT_AVAILABLE_LOCALLY
+                || reason == FailureReason.UNKNOWN_LOCAL_ERROR) {
             if(remoteComicsDataSource != null) {
                 remoteComicsDataSource.loadComics();
             } else if(activityView != null) {
@@ -167,5 +168,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         remoteComicsDataSource = null;
         localImagesDataSource = null;
         remoteImagesDataSource = null;
+
+        presenter = null;
     }
 }

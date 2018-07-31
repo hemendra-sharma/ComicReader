@@ -12,6 +12,7 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comic;
@@ -19,21 +20,26 @@ import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 import com.hemendra.comicreader.view.list.AllComicsListFragment;
 
+import static com.hemendra.comicreader.view.MessageBox.*;
+
 public class ComicsListActivity extends AppCompatActivity implements IComicListActivityCallback {
 
     private RuntimePermissionManager runtimePermissionManager = null;
     private ComicsPresenter comicsPresenter = null;
-    private AllComicsListFragment allComicsListFragment = null;
+
     private SearchView searchView = null;
+    private RelativeLayout rlProgress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_list);
+
+        rlProgress = findViewById(R.id.rlProgress);
+
         runtimePermissionManager = new RuntimePermissionManager(this);
+
         comicsPresenter = ComicsPresenter.getInstance(getApplicationContext(), this);
-        allComicsListFragment = AllComicsListFragment.getInstance(comicsPresenter);
-        showComicsListFragment();
     }
 
     @Override
@@ -64,10 +70,13 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         if (searchManager != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
             searchView.setOnCloseListener(() -> {
-                comicsPresenter.startLoadingComics();
                 return false;
             });
         }
+
+        // show the first fragment after loading the search-view
+        showComicsListFragment();
+
         return true;
     }
 
@@ -109,7 +118,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     /**
      * Hide the search view on the action bar.
      */
-    private void showSearchView() {
+    private void hideSearchView() {
         searchView.setIconified(true);
         searchView.clearFocus();
         searchView.setVisibility(View.GONE);
@@ -118,7 +127,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     /**
      * Show back the search view on the action bar.
      */
-    private void hideSearchView() {
+    private void showSearchView() {
         searchView.setVisibility(View.VISIBLE);
         searchView.setIconified(true);
         searchView.clearFocus();
@@ -126,7 +135,8 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     private void showComicsListFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.place_holder, allComicsListFragment);
+        transaction.replace(R.id.place_holder,
+                AllComicsListFragment.getInstance(comicsPresenter));
         transaction.commit();
     }
 
@@ -141,42 +151,54 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     @Override
     public void onComicsLoadingStarted() {
         hideSearchView();
+        rlProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onComicsLoaded(Comics comics) {
         showSearchView();
-        allComicsListFragment.onComicsLoaded(comics);
+        rlProgress.setVisibility(View.GONE);
+        AllComicsListFragment.getInstance(comicsPresenter).onComicsLoaded(comics);
     }
 
     @Override
     public void onFailedToLoadComics(String reason) {
         showSearchView();
+        rlProgress.setVisibility(View.GONE);
+        showMessage(this, "Failed to Load Comics. Reason: "+reason, null);
     }
 
     @Override
     public void onStoppedLoadingComics() {
         showSearchView();
+        rlProgress.setVisibility(View.GONE);
+        showMessage(this, "Stopped Loading Comics.", null);
     }
 
     @Override
     public void onComicDetailsLoadingStarted() {
         hideSearchView();
+        rlProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onComicDetailsLoaded(Comic comic) {
-
+        rlProgress.setVisibility(View.GONE);
+        showComicDetailsFragment(comic);
     }
 
     @Override
     public void onFailedToLoadComicDetails(String reason) {
         showSearchView();
+        rlProgress.setVisibility(View.GONE);
+        showMessage(this, "Failed to Load Comic Details. Reason: "+reason, null);
     }
 
     @Override
     public void onStoppedLoadingComicDetails() {
         showSearchView();
+        rlProgress.setVisibility(View.GONE);
+        showMessage(this, "Stopped Loading Comic Details.", null);
     }
 
     @Override

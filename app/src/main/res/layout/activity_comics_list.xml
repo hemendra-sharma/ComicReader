@@ -17,7 +17,27 @@
         android:id="@+id/rlProgress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#44000000">
+        android:background="#aa000000"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/pbProgress"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/pbProgress"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:text="@string/please_wait"
+            android:layout_centerHorizontal="true"/>
 
     </RelativeLayout>
 

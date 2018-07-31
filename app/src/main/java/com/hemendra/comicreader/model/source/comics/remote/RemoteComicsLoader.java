@@ -13,7 +13,7 @@ import java.net.HttpURLConnection;
 public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
 
     private OnComicsLoadedListener listener;
-    private ComicsDataSource.FailureReason reason = ComicsDataSource.FailureReason.UNKNOWN;
+    private ComicsDataSource.FailureReason reason = ComicsDataSource.FailureReason.UNKNOWN_REMOTE_ERROR;
 
     public RemoteComicsLoader(OnComicsLoadedListener listener) {
         this.listener = listener;

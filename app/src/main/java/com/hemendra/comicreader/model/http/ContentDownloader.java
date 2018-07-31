@@ -3,8 +3,8 @@ package com.hemendra.comicreader.model.http;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
-import com.tomtom.codechallenge.http.tls.TlsHttp;
-import com.tomtom.codechallenge.utils.CustomAsyncTask;
+import com.hemendra.comicreader.model.http.tls.TlsHttp;
+import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

@@ -4,4 +4,9 @@
     <string name="ok">OK</string>
     <string name="permission_request_rationale">The app requires permission to save temporary cached data locally. Please allow the app permission.</string>
     <string name="search">Search</string>
+    <string name="please_wait">Please Wait…</string>
+    <string name="cover_image">Cover Image</string>
+    <string name="comic_name">Comic Name</string>
+    <string name="last_updated_mmm_dd_yyyy">Last Updated: MMM dd, yyyy</string>
+    <string name="categories_cat1_cat2_cat3_">Categories: Category 1, Category 2, Category 3, Category 4, Category 5...</string>
 </resources>
