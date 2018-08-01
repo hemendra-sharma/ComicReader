@@ -1,4 +1,4 @@
-# Comic Reader ![CI status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+# Comic Reader ![CI status](https://img.shields.io/crates/l/rustc-serialize.svg)
 A comic book reader Android app built using MVP architecture and without using any third party libraries.
 
 ## API
