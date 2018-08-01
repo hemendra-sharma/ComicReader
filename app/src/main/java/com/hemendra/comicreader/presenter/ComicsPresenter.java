@@ -6,10 +6,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.widget.ImageView;
 
+import com.hemendra.comicreader.model.data.Chapter;
+import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.source.DataSource;
-import com.hemendra.comicreader.model.source.comics.ComicsDataSource.FailureReason;
+import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.comics.ComicsDataSource.SourceType;
 import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 import com.hemendra.comicreader.model.source.comics.local.LocalComicsDataSource;
@@ -26,7 +29,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     private Context context;
     private IComicListActivityCallback activityView;
 
-    private Comics comics = null;
     private DataSource[] sources;
 
     private LocalComicsDataSource localComicsDataSource;
@@ -83,7 +85,20 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     public void performSearch(String query) {
         if(activityView != null
                 && localComicsDataSource != null && remoteComicsDataSource != null) {
+            if(hasReadWritePermissions()) {
+                localComicsDataSource.searchComics(query);
+            } else {
+                pendingAction = () -> performSearch(query);
+                activityView.askForPermissions();
+            }
+        }
+    }
 
+    public void invalidateCacheAndLoadComicsAgain() {
+        if(activityView != null
+                && localComicsDataSource != null && remoteComicsDataSource != null) {
+            localComicsDataSource.deleteCache();
+            startLoadingComics();
         }
     }
 
@@ -97,7 +112,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     @Override
     public void onComicsLoaded(@NonNull Comics comics, @NonNull SourceType sourceType) {
         if(activityView != null) {
-            this.comics = comics;
             activityView.onComicsLoaded(comics);
             if(sourceType == SourceType.REMOTE) {
                 localComicsDataSource.save(comics);
@@ -107,54 +121,85 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     @Override
     public void onFailedToLoadComics(@NonNull FailureReason reason) {
+        if(activityView != null) {
+            if (reason == FailureReason.NOT_AVAILABLE_LOCALLY
+                    || reason == FailureReason.UNKNOWN_LOCAL_ERROR) {
+                if (remoteComicsDataSource != null) {
+                    remoteComicsDataSource.loadComics();
+                } else {
+                    activityView.onFailedToLoadComics("App Destroyed");
+                }
+            } else if (reason == FailureReason.NETWORK_UNAVAILABLE) {
+                activityView.onFailedToLoadComics("No Internet Connection");
+            } else if (reason == FailureReason.NETWORK_TIMEOUT) {
+                activityView.onFailedToLoadComics("Network Timeout");
+            } else if (reason == FailureReason.ALREADY_LOADING) {
+                // ignore
+            } else {
+                activityView.onFailedToLoadComics("Unknown");
+            }
+        }
+    }
+
+    public void loadImage(@NonNull String url, ImageView iv) {
+        if(activityView != null
+                && localImagesDataSource != null) {
+            localImagesDataSource.loadImage(url, iv);
+        }
+    }
+
+    @Override
+    public void onImageLoaded(String url, Bitmap bmp) {
+        if(localImagesDataSource != null) {
+            localImagesDataSource.saveImage(url, bmp);
+        }
+    }
+
+    @Override
+    public void onFailedToLoadImage(@NonNull FailureReason reason, @NonNull String url,
+                                    @NonNull ImageView iv) {
         if(reason == FailureReason.NOT_AVAILABLE_LOCALLY
                 || reason == FailureReason.UNKNOWN_LOCAL_ERROR) {
-            if(remoteComicsDataSource != null) {
-                remoteComicsDataSource.loadComics();
-            } else if(activityView != null) {
-                activityView.onFailedToLoadComics("App Destroyed");
-            }
-        } else if(reason == FailureReason.ALREADY_LOADING) {
-            if(activityView != null) {
-                activityView.onFailedToLoadComics("Comics Already Loading");
-            }
-        } else if(reason == FailureReason.NETWORK_UNAVAILABLE) {
-            if(activityView != null) {
-                activityView.onFailedToLoadComics("No Internet Connection");
-            }
-        } else if(reason == FailureReason.NETWORK_TIMEOUT) {
-            if(activityView != null) {
-                activityView.onFailedToLoadComics("Network Timeout");
-            }
-        } else if(activityView != null) {
-            activityView.onFailedToLoadComics("Unknown");
+            remoteImagesDataSource.loadImage(url, iv);
+        }
+    }
+
+    public void loadComicDetails(Comic comic) {
+        if(activityView != null && remoteComicsDataSource != null) {
+            remoteComicsDataSource.loadComicDetails(comic);
         }
     }
 
     @Override
-    public void onStoppedLoadingComics() {
+    public void onStartedLoadingComicDetails() {
         if(activityView != null) {
-            activityView.onStoppedLoadingComics();
+            activityView.onComicDetailsLoadingStarted();
         }
     }
 
     @Override
-    public void onImageLoadingStarted(@NonNull String url) {
-
+    public void onComicDetailsLoaded(Comic comic) {
+        if(activityView != null) {
+            activityView.onComicDetailsLoaded(comic);
+        }
     }
 
     @Override
-    public void onImageLoaded(@NonNull String url, @NonNull Bitmap image) {
-
+    public void onFailedToLoadComicDetails(FailureReason reason) {
+        if(activityView != null) {
+            if(reason == FailureReason.NETWORK_UNAVAILABLE) {
+                activityView.onFailedToLoadComicDetails("No Internet Connection");
+            } else if(reason == FailureReason.NETWORK_TIMEOUT) {
+                activityView.onFailedToLoadComicDetails("Network Timeout");
+            } else if(reason == FailureReason.ALREADY_LOADING) {
+                // ignore
+            } else {
+                activityView.onFailedToLoadComicDetails("Unknown");
+            }
+        }
     }
 
-    @Override
-    public void onFailedToLoadImage(@NonNull int reason) {
-
-    }
-
-    @Override
-    public void onStoppedLoadingImage(@NonNull String url) {
+    public void loadChapterPages(Chapter chapter) {
 
     }
 

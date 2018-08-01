@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -13,12 +15,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
+import com.hemendra.comicreader.view.details.ComicDetailsFragment;
 import com.hemendra.comicreader.view.list.AllComicsListFragment;
+
+import java.util.List;
 
 import static com.hemendra.comicreader.view.MessageBox.*;
 
@@ -26,6 +32,9 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     private RuntimePermissionManager runtimePermissionManager = null;
     private ComicsPresenter comicsPresenter = null;
+
+    private AllComicsListFragment allComicsListFragment;
+    private ComicDetailsFragment comicDetailsFragment;
 
     private SearchView searchView = null;
     private RelativeLayout rlProgress = null;
@@ -40,11 +49,20 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         runtimePermissionManager = new RuntimePermissionManager(this);
 
         comicsPresenter = ComicsPresenter.getInstance(getApplicationContext(), this);
+
+        allComicsListFragment = AllComicsListFragment.getFragment(comicsPresenter);
+        comicDetailsFragment = ComicDetailsFragment.getFragment(comicsPresenter);
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            if(getSupportFragmentManager().getBackStackEntryCount() == 1)
+                showSearchView();
+            getSupportFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -69,9 +87,6 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         if (searchManager != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setOnCloseListener(() -> {
-                return false;
-            });
         }
 
         // show the first fragment after loading the search-view
@@ -100,7 +115,10 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
             // use the query to search comics data
             query = intent.getStringExtra(SearchManager.QUERY);
         }
-        comicsPresenter.performSearch(query);
+        if(query.length() > 0)
+            comicsPresenter.performSearch(query);
+        else
+            comicsPresenter.startLoadingComics();
     }
 
     @Override
@@ -134,14 +152,18 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicsListFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.place_holder,
-                AllComicsListFragment.getInstance(comicsPresenter));
-        transaction.commit();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.place_holder, allComicsListFragment)
+                .commit();
     }
 
     private void showComicDetailsFragment(Comic comic) {
-
+        comicDetailsFragment.setComic(comic);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.place_holder, comicDetailsFragment)
+                .addToBackStack(null)
+                .commit();
+        hideSearchView();
     }
 
     private void showComicReaderFragment(Comic comic) {
@@ -158,7 +180,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     public void onComicsLoaded(Comics comics) {
         showSearchView();
         rlProgress.setVisibility(View.GONE);
-        AllComicsListFragment.getInstance(comicsPresenter).onComicsLoaded(comics);
+        allComicsListFragment.onComicsLoaded(comics);
     }
 
     @Override
@@ -166,13 +188,6 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         showSearchView();
         rlProgress.setVisibility(View.GONE);
         showMessage(this, "Failed to Load Comics. Reason: "+reason, null);
-    }
-
-    @Override
-    public void onStoppedLoadingComics() {
-        showSearchView();
-        rlProgress.setVisibility(View.GONE);
-        showMessage(this, "Stopped Loading Comics.", null);
     }
 
     @Override
@@ -192,13 +207,6 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         showSearchView();
         rlProgress.setVisibility(View.GONE);
         showMessage(this, "Failed to Load Comic Details. Reason: "+reason, null);
-    }
-
-    @Override
-    public void onStoppedLoadingComicDetails() {
-        showSearchView();
-        rlProgress.setVisibility(View.GONE);
-        showMessage(this, "Stopped Loading Comic Details.", null);
     }
 
     @Override

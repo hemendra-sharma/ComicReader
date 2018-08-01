@@ -173,14 +173,18 @@ public class Utils {
             return obj;
         } catch (EOFException ignore) {
             // 'null' was written to the file, so returning null
+            deleteFile(file);
             return null;
         } catch (StreamCorruptedException ignore) {
             // the Class structure has been changed
+            deleteFile(file);
             return null;
         } catch (OptionalDataException ignore) {
             // the Class structure has been changed
+            deleteFile(file);
             return null;
         } catch (Throwable ex) {
+            deleteFile(file);
             ex.printStackTrace();
         }finally {
             try {

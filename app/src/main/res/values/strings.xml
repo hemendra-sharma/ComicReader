@@ -7,6 +7,10 @@
     <string name="please_wait">Please Wait…</string>
     <string name="cover_image">Cover Image</string>
     <string name="comic_name">Comic Name</string>
-    <string name="last_updated_mmm_dd_yyyy">Last Updated: MMM dd, yyyy</string>
-    <string name="categories_cat1_cat2_cat3_">Categories: Category 1, Category 2, Category 3, Category 4, Category 5...</string>
+    <string name="mmm_dd_yyyy">MMM dd, yyyy</string>
+    <string name="cat1_cat2_">Category 1, Category 2…</string>
+    <string name="the_comic_description_goes_here">The Comic Description Goes Here…</string>
+    <string name="released_in_1990">Released in 1990</string>
+    <string name="_1234_hits">1234 Hits</string>
+    <string name="_10_chapters">10 Chapters:</string>
 </resources>

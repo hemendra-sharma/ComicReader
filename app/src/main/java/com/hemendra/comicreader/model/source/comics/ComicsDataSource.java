@@ -6,18 +6,6 @@ import com.hemendra.comicreader.model.source.DataSource;
 
 public abstract class ComicsDataSource extends DataSource {
 
-    public enum FailureReason {
-        NOT_AVAILABLE_LOCALLY,
-        ALREADY_LOADING,
-        SOURCE_CLOSED,
-        NETWORK_UNAVAILABLE,
-        NETWORK_TIMEOUT,
-        API_MISSING,
-        INVALID_RESPONSE_FROM_SERVER,
-        UNKNOWN_LOCAL_ERROR,
-        UNKNOWN_REMOTE_ERROR
-    }
-
     public enum SourceType {
         LOCAL,
         REMOTE

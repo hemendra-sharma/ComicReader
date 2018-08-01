@@ -1,6 +1,9 @@
 package com.hemendra.comicreader.model.data;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Chapter implements Serializable {
 
@@ -14,5 +17,10 @@ public class Chapter implements Serializable {
         this.number = number;
         this.title = title;
         this.dateUpdated = dateUpdated;
+    }
+
+    public String getLastUpdatedString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        return sdf.format(new Date(dateUpdated));
     }
 }

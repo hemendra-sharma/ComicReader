@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comic;
+import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
+import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
 
@@ -19,21 +21,38 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
 
         ImageView ivCover;
         TextView tvTitle, tvLastUpdated, tvCategories;
+        Comic comic;
 
-        public ComicViewHolder(@NonNull View itemView) {
+        public ComicViewHolder(@NonNull View itemView,
+                               OnComicItemClickListener listener) {
             super(itemView);
 
             ivCover = itemView.findViewById(R.id.ivCover);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvLastUpdated = itemView.findViewById(R.id.tvLastUpdated);
             tvCategories = itemView.findViewById(R.id.tvCategories);
+
+            itemView.setOnClickListener(view -> listener.onItemClicked(comic));
         }
     }
 
     private ArrayList<Comic> comics;
+    private ComicsPresenter presenter;
+    private OnComicItemClickListener onComicItemClickListener;
 
-    public ComicsListAdapter(ArrayList<Comic> comics) {
+    public ComicsListAdapter(ArrayList<Comic> comics, ComicsPresenter presenter,
+                             OnComicItemClickListener onComicItemClickListener) {
         this.comics = comics;
+        this.presenter = presenter;
+        this.onComicItemClickListener = onComicItemClickListener;
+    }
+
+    public void setComics(ArrayList<Comic> comics) {
+        this.comics = comics;
+    }
+
+    public void clearItems() {
+        this.comics.clear();
     }
 
     @NonNull
@@ -41,14 +60,20 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
     public ComicViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_list_item,
                 viewGroup, false);
-        return new ComicViewHolder(view);
+        return new ComicViewHolder(view, onComicItemClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ComicViewHolder comicViewHolder, int position) {
+        comicViewHolder.comic = comics.get(position);
         comicViewHolder.tvTitle.setText(comics.get(position).title);
+        comicViewHolder.tvCategories.setText(comics.get(position).getCategoriesString(2));
         comicViewHolder.tvLastUpdated.setText(comics.get(position).getLastUpdatedString());
-        comicViewHolder.tvCategories.setText(comics.get(position).getCategoriesString(5));
+        comicViewHolder.ivCover.setImageResource(R.drawable.no_cover);
+        String url = comics.get(position).getImageUrl();
+        if(url != null) {
+            presenter.loadImage(url, comicViewHolder.ivCover);
+        }
     }
 
     @Override

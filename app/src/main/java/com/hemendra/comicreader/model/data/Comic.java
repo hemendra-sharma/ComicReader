@@ -1,5 +1,9 @@
 package com.hemendra.comicreader.model.data;
 
+import android.support.annotation.Nullable;
+
+import com.hemendra.comicreader.model.source.RemoteConfig;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,9 +14,14 @@ public class Comic implements Serializable {
 
     public String id;
     public String title;
-    public String image;
-    public long lastUpdated;
-    public ArrayList<String> categories;
+    private String image;
+    private long lastUpdated;
+    private ArrayList<String> categories;
+
+    public String description = "";
+    public String author = "";
+    public String hits = "";
+    public String released = "";
     public ArrayList<Chapter> chapters = new ArrayList<>();
 
     public Comic(String id, String title, String image,
@@ -39,6 +48,14 @@ public class Comic implements Serializable {
         if(max < categories.size())
             cat.append("...");
         return cat.toString();
+    }
+
+    @Nullable
+    public String getImageUrl() {
+        if(image.length() > 0) {
+            return RemoteConfig.buildImageUrl(image);
+        }
+        return null;
     }
 
 }

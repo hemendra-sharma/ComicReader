@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/rlCoverAndTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivCover"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:src="@drawable/no_thumbnail"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/cover_image"/>
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/ivCover"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="@string/comic_name"/>
+
+            <TextView
+                android:id="@+id/tvLastUpdated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/ivCover"
+                android:layout_below="@+id/tvTitle"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:textSize="14sp"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/mmm_dd_yyyy"/>
+
+            <TextView
+                android:id="@+id/tvCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/ivCover"
+                android:layout_below="@+id/tvLastUpdated"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:textSize="14sp"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/cat1_cat2_"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rlCoverAndTitle"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/the_comic_description_goes_here"/>
+
+        <TextView
+            android:id="@+id/tvReleasedYear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvDescription"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/released_in_1990"/>
+
+        <TextView
+            android:id="@+id/tvHits"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvReleasedYear"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/_1234_hits"/>
+
+        <TextView
+            android:id="@+id/tvChapters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvHits"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/_10_chapters"/>
+
+        <LinearLayout
+            android:id="@+id/llChapters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/tvChapters"
+            android:paddingBottom="20dp">
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

@@ -7,4 +7,8 @@ public class Comics implements Serializable {
 
     public ArrayList<Comic> comics = new ArrayList<>();
 
+    public int count() {
+        return comics.size();
+    }
+
 }
