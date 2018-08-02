@@ -1,5 +1,5 @@
-# Comic Reader ![CI status](https://img.shields.io/badge/build-passing-brightgreen.svg)
-A comic book reader Android app built using MVP architecture and without using any third party libraries.
+# Comic Reader ![Crates.io](https://img.shields.io/crates/l/rustc-serialize.svg)
+A comic book reader Android app built using MVP architecture.
 
 ## API
 The app uses free public API from mangeeden.com ([API](https://www.mangaeden.com/api/))
