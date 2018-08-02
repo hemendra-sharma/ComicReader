@@ -7,7 +7,7 @@ import com.hemendra.comicreader.model.source.FailureReason;
 
 public interface OnComicsLoadedListener {
 
-    void onComicsLoaded(Comics comics);
+    void onComicsLoaded(Comics comics, ComicsDataSource.SourceType sourceType);
     void onFailedToLoadComics(FailureReason reason);
 
     void onComicDetailsLoaded(Comic comic);

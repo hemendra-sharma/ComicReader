@@ -20,7 +20,7 @@
                 android:id="@+id/ivCover"
                 android:layout_width="100dp"
                 android:layout_height="150dp"
-                android:src="@drawable/no_thumbnail"
+                android:src="@drawable/no_cover"
                 android:scaleType="fitCenter"
                 android:contentDescription="@string/cover_image"/>
 

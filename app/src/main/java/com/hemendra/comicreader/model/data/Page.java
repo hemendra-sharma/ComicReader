@@ -4,7 +4,9 @@ import android.support.annotation.Nullable;
 
 import com.hemendra.comicreader.model.source.RemoteConfig;
 
-public class Page {
+import java.io.Serializable;
+
+public class Page implements Serializable {
 
     public int number = 0;
     public String id = "";

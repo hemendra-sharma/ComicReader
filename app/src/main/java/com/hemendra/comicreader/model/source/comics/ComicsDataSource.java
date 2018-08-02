@@ -7,7 +7,8 @@ import com.hemendra.comicreader.model.source.DataSource;
 public abstract class ComicsDataSource extends DataSource {
 
     public enum SourceType {
-        LOCAL,
+        LOCAL_FULL,
+        LOCAL_SEARCH,
         REMOTE
     }
 

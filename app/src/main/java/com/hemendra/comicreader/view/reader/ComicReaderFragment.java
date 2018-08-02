@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -31,6 +32,7 @@ public class ComicReaderFragment extends Fragment {
 
     public void setChapter(Chapter chapter) {
         this.chapter = chapter;
+        this.currentPosition = 0;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class ComicReaderFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        view.setBackgroundColor(Color.DKGRAY);
+        view.setBackgroundColor(Color.BLACK);
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -75,7 +77,12 @@ public class ComicReaderFragment extends Fragment {
     }
 
     public void refreshFlipView() {
-        flipView.refreshPage(currentPosition);
+        if(currentPosition > 0)
+            flipView.refreshPage(currentPosition-1);
+        if(currentPosition < adapter.getCount())
+            flipView.refreshPage(currentPosition);
+        if(currentPosition < adapter.getCount()-1)
+            flipView.refreshPage(currentPosition+1);
     }
 
     @Override

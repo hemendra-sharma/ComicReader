@@ -3,6 +3,7 @@ package com.hemendra.comicreader.model.source.comics.local;
 import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
@@ -38,7 +39,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     public void loadComics() {
         if (hasComics()) {
             if(comics != null) {
-                listener.onComicsLoaded(comics, SourceType.LOCAL);
+                listener.onComicsLoaded(comics, SourceType.LOCAL_FULL);
             } else if(loader == null) {
                 listener.onFailedToLoadComics(FailureReason.SOURCE_CLOSED);
             } else if (!loader.isExecuting()) {
@@ -67,10 +68,11 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     }
 
     @Override
-    public void onComicsLoaded(Comics comics) {
+    public void onComicsLoaded(Comics comics, SourceType sourceType) {
         if (comics != null) {
-            this.comics = comics;
-            listener.onComicsLoaded(comics, SourceType.LOCAL);
+            if(sourceType == SourceType.LOCAL_FULL)
+                this.comics = comics;
+            listener.onComicsLoaded(comics, sourceType);
         } else
             listener.onFailedToLoadComics(FailureReason.UNKNOWN_LOCAL_ERROR);
     }
@@ -113,7 +115,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
 
     public void save(@NonNull Comics comics) {
         this.comics = comics;
-        new Thread(() -> Utils.writeToFile(comics, comicsCacheFile)).start();
+        new Thread(() -> Utils.writeToFile(this.comics, comicsCacheFile)).start();
     }
 
     public void updateComic(@NonNull Comic comic) {
@@ -122,6 +124,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
             if(comics.comics.get(i).id.equals(comic.id)) {
                 comics.comics.set(i, comic);
                 updated = true;
+                break;
             }
         }
         if(updated)
@@ -135,6 +138,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
                 if(comic.chapters.get(i).id.equals(chapter.id)) {
                     comic.chapters.set(i, chapter);
                     updated = true;
+                    break;
                 }
             }
         }

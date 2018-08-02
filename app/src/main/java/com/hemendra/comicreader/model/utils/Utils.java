@@ -269,16 +269,15 @@ public class Utils {
             boolean proceed = file.getParentFile().exists()
                     || file.getParentFile().mkdirs();
             if(proceed) {
-                if(file.createNewFile()) {
+                if(file.exists() || file.createNewFile()) {
                     fout = new FileOutputStream(file);
                     fout.write(data);
-                    fout.close();
                     return true;
                 }
             }
         } catch (Throwable ex) {
             ex.printStackTrace();
-        }finally {
+        } finally {
             try {
                 if(fout != null)
                     fout.close();

@@ -39,9 +39,9 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
     }
 
     @Override
-    public void onComicsLoaded(Comics comics) {
+    public void onComicsLoaded(Comics comics, SourceType sourceType) {
         if(comics != null)
-            listener.onComicsLoaded(comics, SourceType.REMOTE);
+            listener.onComicsLoaded(comics, sourceType);
         else
             listener.onFailedToLoadComics(FailureReason.UNKNOWN_REMOTE_ERROR);
     }

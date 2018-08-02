@@ -2,6 +2,7 @@ package com.hemendra.comicreader.model.source.comics.local;
 
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
+import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
@@ -31,6 +32,6 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
 
     @Override
     protected void onPostExecute(Comics comics) {
-        listener.onComicsLoaded(comics);
+        listener.onComicsLoaded(comics, ComicsDataSource.SourceType.LOCAL_SEARCH);
     }
 }

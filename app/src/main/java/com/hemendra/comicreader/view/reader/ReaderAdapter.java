@@ -78,7 +78,7 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
         iv.setLayoutParams(params);
         iv.setMaxZoom(4);
-        iv.setBackgroundColor(Color.DKGRAY);
+        iv.setBackgroundColor(Color.TRANSPARENT);
         iv.setImageResource(R.drawable.loading_text);
 
         iv.setOnTouchListener((v, event) -> {

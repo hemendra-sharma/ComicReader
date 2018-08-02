@@ -2,6 +2,7 @@ package com.hemendra.comicreader.model.source.comics.local;
 
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.source.FailureReason;
+import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import com.hemendra.comicreader.model.utils.Utils;
@@ -29,7 +30,7 @@ public class LocalComicsLoader extends CustomAsyncTask<File,Void,Comics> {
     @Override
     protected void onPostExecute(Comics comics) {
         if(comics != null)
-            listener.onComicsLoaded(comics);
+            listener.onComicsLoaded(comics, ComicsDataSource.SourceType.LOCAL_FULL);
         else
             listener.onFailedToLoadComics(reason);
     }

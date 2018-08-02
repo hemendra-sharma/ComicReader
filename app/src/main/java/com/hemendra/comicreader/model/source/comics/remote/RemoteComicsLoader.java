@@ -5,6 +5,7 @@ import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.RemoteConfig;
+import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
@@ -43,7 +44,7 @@ public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
     @Override
     protected void onPostExecute(Comics comics) {
         if(comics != null)
-            listener.onComicsLoaded(comics);
+            listener.onComicsLoaded(comics, ComicsDataSource.SourceType.REMOTE);
         else
             listener.onFailedToLoadComics(reason);
     }
