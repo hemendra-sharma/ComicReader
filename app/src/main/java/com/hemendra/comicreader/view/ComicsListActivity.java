@@ -18,11 +18,13 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.hemendra.comicreader.R;
+import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 import com.hemendra.comicreader.view.details.ComicDetailsFragment;
 import com.hemendra.comicreader.view.list.AllComicsListFragment;
+import com.hemendra.comicreader.view.reader.ComicReaderFragment;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     private AllComicsListFragment allComicsListFragment;
     private ComicDetailsFragment comicDetailsFragment;
+    private ComicReaderFragment comicReaderFragment;
 
     private SearchView searchView = null;
     private RelativeLayout rlProgress = null;
@@ -52,6 +55,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
         allComicsListFragment = AllComicsListFragment.getFragment(comicsPresenter);
         comicDetailsFragment = ComicDetailsFragment.getFragment(comicsPresenter);
+        comicReaderFragment = ComicReaderFragment.getFragment(comicsPresenter);
     }
 
     @Override
@@ -166,8 +170,13 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         hideSearchView();
     }
 
-    private void showComicReaderFragment(Comic comic) {
-
+    private void showComicReaderFragment(Chapter chapter) {
+        comicReaderFragment.setChapter(chapter);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.place_holder, comicReaderFragment)
+                .addToBackStack(null)
+                .commit();
+        hideSearchView();
     }
 
     @Override
@@ -210,13 +219,26 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     @Override
-    public void onPageDownloaded(String url, Bitmap pageImage) {
-
+    public void onChapterLoadingStarted() {
+        hideSearchView();
+        rlProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onFailedToDownloadPage(String url, String reason) {
+    public void onChapterLoaded(Chapter chapter) {
+        rlProgress.setVisibility(View.GONE);
+        showComicReaderFragment(chapter);
+    }
 
+    @Override
+    public void onFailedToLoadChapter(String reason) {
+        rlProgress.setVisibility(View.GONE);
+        showMessage(this, "Failed to Load Chapter. Reason: "+reason, null);
+    }
+
+    @Override
+    public void onPageLoaded() {
+        comicReaderFragment.refreshFlipView();
     }
 
 }

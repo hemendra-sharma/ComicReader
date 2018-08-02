@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
+import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,6 +30,19 @@ public class LocalImagesDataSource extends ImagesDataSource {
                 iv.setImageBitmap(bmp);
             } else {
                 listener.onFailedToLoadImage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
+            }
+        }
+    }
+
+    @Override
+    public void loadPage(String url, TouchImageView iv) {
+        if(listener != null) {
+            Bitmap bmp = getImageFromCache(url);
+            if (bmp != null) {
+                iv.setImageBitmap(bmp);
+                listener.onPageLoaded();
+            } else {
+                listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
             }
         }
     }

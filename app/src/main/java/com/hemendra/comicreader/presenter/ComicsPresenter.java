@@ -21,6 +21,7 @@ import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource;
 import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource;
 import com.hemendra.comicreader.view.IComicListActivityCallback;
+import com.hemendra.comicreader.view.reader.TouchImageView;
 
 public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
 
@@ -141,7 +142,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
-    public void loadImage(@NonNull String url, ImageView iv) {
+    public void loadImage(@NonNull String url, @NonNull ImageView iv) {
         if(activityView != null
                 && localImagesDataSource != null) {
             localImagesDataSource.loadImage(url, iv);
@@ -164,9 +165,36 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    public void loadPage(@NonNull String url, @NonNull TouchImageView iv) {
+        if(activityView != null
+                && localImagesDataSource != null) {
+            localImagesDataSource.loadPage(url, iv);
+        }
+    }
+
+    @Override
+    public void onPageLoaded() {
+        if(activityView != null) {
+            activityView.onPageLoaded();
+        }
+    }
+
+    @Override
+    public void onFailedToLoadPage(@NonNull FailureReason reason, @NonNull String url,
+                                   @NonNull TouchImageView iv) {
+        if(reason == FailureReason.NOT_AVAILABLE_LOCALLY
+                || reason == FailureReason.UNKNOWN_LOCAL_ERROR) {
+            remoteImagesDataSource.loadPage(url, iv);
+        }
+    }
+
     public void loadComicDetails(Comic comic) {
         if(activityView != null && remoteComicsDataSource != null) {
-            remoteComicsDataSource.loadComicDetails(comic);
+            if(comic.chapters.size() > 0) {
+                activityView.onComicDetailsLoaded(comic);
+            } else {
+                remoteComicsDataSource.loadComicDetails(comic);
+            }
         }
     }
 
@@ -179,8 +207,10 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     @Override
     public void onComicDetailsLoaded(Comic comic) {
-        if(activityView != null) {
+        if(activityView != null
+                && localComicsDataSource != null) {
             activityView.onComicDetailsLoaded(comic);
+            localComicsDataSource.updateComic(comic);
         }
     }
 
@@ -199,8 +229,46 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
-    public void loadChapterPages(Chapter chapter) {
+    public void loadPages(Chapter chapter) {
+        if(activityView != null
+                && remoteComicsDataSource != null) {
+            if(chapter.pages.size() > 0) {
+                activityView.onChapterLoaded(chapter);
+            } else {
+                remoteComicsDataSource.loadPages(chapter);
+            }
+        }
+    }
 
+    @Override
+    public void onStartedLoadingPages() {
+        if(activityView != null) {
+            activityView.onChapterLoadingStarted();
+        }
+    }
+
+    @Override
+    public void onPagesLoaded(Chapter chapter) {
+        if(activityView != null
+                && localComicsDataSource != null) {
+            activityView.onChapterLoaded(chapter);
+            localComicsDataSource.updateChapter(chapter);
+        }
+    }
+
+    @Override
+    public void onFailedToLoadPages(FailureReason reason) {
+        if(activityView != null) {
+            if(reason == FailureReason.NETWORK_UNAVAILABLE) {
+                activityView.onFailedToLoadComicDetails("No Internet Connection");
+            } else if(reason == FailureReason.NETWORK_TIMEOUT) {
+                activityView.onFailedToLoadComicDetails("Network Timeout");
+            } else if(reason == FailureReason.ALREADY_LOADING) {
+                // ignore
+            } else {
+                activityView.onFailedToLoadComicDetails("Unknown");
+            }
+        }
     }
 
     public void destroy() {

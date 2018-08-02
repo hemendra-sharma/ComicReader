@@ -7,9 +7,8 @@ import android.widget.ImageView;
 import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
 import com.hemendra.comicreader.model.source.FailureReason;
-import com.hemendra.comicreader.model.source.RemoteConfig;
-import com.hemendra.comicreader.model.source.comics.remote.ComicsParser;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
+import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.net.HttpURLConnection;
 
@@ -20,14 +19,16 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     private OnImageDownloadedListener listener;
     public String imgUrl;
     private ImageView iv;
+    private TouchImageView tiv;
     public long startedAt = 0;
     private FailureReason reason = FailureReason.UNKNOWN_REMOTE_ERROR;
 
     public ImageDownloader(OnImageDownloadedListener listener,
-                           String imgUrl, ImageView iv) {
+                           String imgUrl, ImageView iv, TouchImageView tiv) {
         this.listener = listener;
         this.imgUrl = imgUrl;
         this.iv = iv;
+        this.tiv = tiv;
     }
 
     @Override
@@ -74,9 +75,13 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if(bitmap != null) {
-            iv.setImageBitmap(bitmap);
+            if(iv != null)
+                iv.setImageBitmap(bitmap);
+            else if(tiv != null)
+                tiv.setImageBitmap(bitmap);
+            //
             if (listener != null)
-                listener.onImageDownloaded(imgUrl, bitmap);
+                listener.onImageDownloaded(imgUrl, bitmap, iv != null, tiv != null);
         }
     }
 }

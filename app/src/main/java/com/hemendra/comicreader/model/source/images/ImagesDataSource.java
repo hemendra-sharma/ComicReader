@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.source.DataSource;
+import com.hemendra.comicreader.view.reader.TouchImageView;
 
 public abstract class ImagesDataSource extends DataSource {
 
@@ -15,6 +16,8 @@ public abstract class ImagesDataSource extends DataSource {
     }
 
     public abstract void loadImage(String url, ImageView iv);
+
+    public abstract void loadPage(String url, TouchImageView iv);
 
     public abstract void stopLoadingImage(String url);
 

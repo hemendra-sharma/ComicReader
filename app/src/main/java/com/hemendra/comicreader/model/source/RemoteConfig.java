@@ -6,6 +6,7 @@ public final class RemoteConfig {
 
     private static final String COMICS_LIST_URL = "https://www.mangaeden.com/api/list/0/";
     private static final String COMIC_DETAILS_URL = "https://www.mangaeden.com/api/manga/";
+    private static final String CHAPTER_URL = "https://www.mangaeden.com/api/chapter/";
     private static final String IMAGE_URL = "https://cdn.mangaeden.com/mangasimg/";
 
     public static final int COMICS_PER_PAGE = 500;
@@ -24,6 +25,12 @@ public final class RemoteConfig {
     public static String buildComicDetailsUrl(@NonNull String comic_id) {
         return COMIC_DETAILS_URL +
                 comic_id + "/";
+    }
+
+    @NonNull
+    public static String buildChapterUrl(@NonNull String chapter_id) {
+        return CHAPTER_URL +
+                chapter_id + "/";
     }
 
     @NonNull

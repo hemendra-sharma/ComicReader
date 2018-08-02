@@ -2,6 +2,7 @@ package com.hemendra.comicreader.view;
 
 import android.graphics.Bitmap;
 
+import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 
@@ -19,7 +20,10 @@ public interface IComicListActivityCallback {
     void onComicsLoaded(Comics comics);
     void onFailedToLoadComics(String reason);
 
-    void onPageDownloaded(String url, Bitmap pageImage);
-    void onFailedToDownloadPage(String url, String reason);
+    void onChapterLoadingStarted();
+    void onChapterLoaded(Chapter chapter);
+    void onFailedToLoadChapter(String reason);
+
+    void onPageLoaded();
 
 }

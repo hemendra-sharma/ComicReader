@@ -2,6 +2,7 @@ package com.hemendra.comicreader.model.source.comics.remote;
 
 import android.content.Context;
 
+import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.source.FailureReason;
@@ -14,11 +15,13 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
 
     private RemoteComicsLoader comicsLoader;
     private RemoteComicDetailsLoader detailsLoader;
+    private RemoteChapterPagesLoader chapterLoader;
 
     public RemoteComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
         comicsLoader = new RemoteComicsLoader(this);
         detailsLoader = new RemoteComicDetailsLoader(this);
+        chapterLoader = new RemoteChapterPagesLoader(this);
     }
 
     @Override
@@ -75,6 +78,29 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
     @Override
     public void onFailedToLoadComicDetails(FailureReason reason) {
         listener.onFailedToLoadComicDetails(reason);
+    }
+
+    public void loadPages(Chapter chapter) {
+        if(Utils.isNetworkAvailable(getContext())) {
+            if(!chapterLoader.isExecuting()) {
+                chapterLoader.execute(chapter);
+                listener.onStartedLoadingPages();
+            } else {
+                listener.onFailedToLoadComicDetails(FailureReason.ALREADY_LOADING);
+            }
+        } else {
+            listener.onFailedToLoadComicDetails(FailureReason.NETWORK_UNAVAILABLE);
+        }
+    }
+
+    @Override
+    public void onPagesLoaded(Chapter chapter) {
+        listener.onPagesLoaded(chapter);
+    }
+
+    @Override
+    public void onFailedToLoadPages(FailureReason reason) {
+        listener.onFailedToLoadPages(reason);
     }
 
     @Override

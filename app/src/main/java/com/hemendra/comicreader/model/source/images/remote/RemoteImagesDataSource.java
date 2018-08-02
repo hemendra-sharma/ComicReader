@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
+import com.hemendra.comicreader.view.reader.TouchImageView;
 
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
@@ -25,8 +26,8 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     public void loadImage(String url, ImageView iv) {
         if(listener != null) {
             if(!alreadyDownloading(url)) {
-                if(!fitIntoAnyFreeSlot(url, iv)) {
-                    if(!removeOldestAndAddNewDownload(url, iv)) {
+                if(!fitIntoAnyFreeSlot(url, iv, null)) {
+                    if(!removeOldestAndAddNewDownload(url, iv, null)) {
                         listener.onFailedToLoadImage(FailureReason.UNKNOWN_REMOTE_ERROR, url, iv);
                     }
                 }
@@ -37,9 +38,26 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     }
 
     @Override
-    public void onImageDownloaded(String url, Bitmap bmp) {
+    public void loadPage(String url, TouchImageView iv) {
+        if(listener != null) {
+            if(!alreadyDownloading(url)) {
+                if(!fitIntoAnyFreeSlot(url, null, iv)) {
+                    if(!removeOldestAndAddNewDownload(url, null, iv)) {
+                        listener.onFailedToLoadPage(FailureReason.UNKNOWN_REMOTE_ERROR, url, iv);
+                    }
+                }
+            } else {
+                listener.onFailedToLoadPage(FailureReason.ALREADY_LOADING, url, iv);
+            }
+        }
+    }
+
+    @Override
+    public void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page) {
         if(listener != null) {
             listener.onImageLoaded(url, bmp);
+            if(page)
+                listener.onPageLoaded();
         }
     }
 
@@ -54,10 +72,10 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         return false;
     }
 
-    private boolean fitIntoAnyFreeSlot(String url, ImageView iv) {
+    private boolean fitIntoAnyFreeSlot(String url, ImageView iv, TouchImageView tiv) {
         for(int i = 0; i< downloadingSlots.length; i++) {
             if(downloadingSlots[i] == null || !downloadingSlots[i].isExecuting()) {
-                downloadingSlots[i] = new ImageDownloader(this, url, iv);
+                downloadingSlots[i] = new ImageDownloader(this, url, iv, tiv);
                 downloadingSlots[i].execute(i);
                 return true;
             }
@@ -65,7 +83,7 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         return false;
     }
 
-    private boolean removeOldestAndAddNewDownload(String url, ImageView iv) {
+    private boolean removeOldestAndAddNewDownload(String url, ImageView iv, TouchImageView tiv) {
         int index = -1;
         long oldestTimestamp = System.currentTimeMillis();
         for(int i = 0; i< downloadingSlots.length; i++) {
@@ -81,7 +99,7 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
                 downloadingSlots[index].cancel(true);
             }
             // replace the slot with new download
-            downloadingSlots[index] = new ImageDownloader(this, url, iv);
+            downloadingSlots[index] = new ImageDownloader(this, url, iv, tiv);
             downloadingSlots[index].execute(index);
             return true;
         }

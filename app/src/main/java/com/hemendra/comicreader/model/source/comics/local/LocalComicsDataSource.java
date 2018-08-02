@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
+import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.source.FailureReason;
@@ -90,6 +91,16 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     }
 
     @Override
+    public void onPagesLoaded(Chapter chapter) {
+
+    }
+
+    @Override
+    public void onFailedToLoadPages(FailureReason reason) {
+
+    }
+
+    @Override
     protected void stopLoadingComics() {
         if (loader != null && loader.isExecuting())
             loader.cancel(true);
@@ -103,6 +114,32 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     public void save(@NonNull Comics comics) {
         this.comics = comics;
         new Thread(() -> Utils.writeToFile(comics, comicsCacheFile)).start();
+    }
+
+    public void updateComic(@NonNull Comic comic) {
+        boolean updated = false;
+        for(int i=0; i<comics.comics.size(); i++) {
+            if(comics.comics.get(i).id.equals(comic.id)) {
+                comics.comics.set(i, comic);
+                updated = true;
+            }
+        }
+        if(updated)
+            save(comics);
+    }
+
+    public void updateChapter(@NonNull Chapter chapter) {
+        boolean updated = false;
+        for(Comic comic : comics.comics) {
+            for(int i=0; i<comic.chapters.size(); i++) {
+                if(comic.chapters.get(i).id.equals(chapter.id)) {
+                    comic.chapters.set(i, chapter);
+                    updated = true;
+                }
+            }
+        }
+        if(updated)
+            save(comics);
     }
 
     @Override

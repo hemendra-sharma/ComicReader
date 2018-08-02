@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
+import com.hemendra.comicreader.model.data.Page;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +14,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 public class ComicsParser {
@@ -114,6 +114,39 @@ public class ComicsParser {
                 comic.chapters.sort(Comparator.comparingInt(ch -> ch.number));
 
                 return comic;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Chapter parseChapterPagesFromJSON(@NonNull Chapter chapter, @NonNull String json) {
+        try {
+            if(new JSONTokener(json).nextValue() instanceof JSONObject) {
+                JSONObject jsonObject = new JSONObject(json);
+                if(jsonObject.has("images")
+                        && new JSONTokener(jsonObject.getString("images")).nextValue() instanceof JSONArray) {
+                    JSONArray imagesArray = jsonObject.getJSONArray("images");
+                    int count = imagesArray.length();
+                    chapter.pages.clear();
+                    for(int i=0; i<count; i++) {
+                        if(new JSONTokener(imagesArray.getString(i)).nextValue()
+                                instanceof JSONArray) {
+                            JSONArray arr = imagesArray.getJSONArray(i);
+                            if(arr.length() >= 4) {
+                                int number = arr.getInt(0);
+                                String id = arr.getString(1);
+                                chapter.pages.add(new Page(number, id));
+                            }
+                        }
+                    }
+                }
+
+                chapter.pages.sort(Comparator.comparingInt(pg -> pg.number));
+
+                return chapter;
             }
         } catch (JSONException e) {
             e.printStackTrace();

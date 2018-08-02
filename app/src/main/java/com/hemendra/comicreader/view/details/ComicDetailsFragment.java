@@ -15,7 +15,6 @@ import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
-import com.hemendra.comicreader.view.list.AllComicsListFragment;
 
 import java.util.Locale;
 
@@ -84,7 +83,7 @@ public class ComicDetailsFragment extends Fragment {
             tvChapterDate.setText(String.format(Locale.getDefault(),
                     "Updated: %s", chapter.getLastUpdatedString()));
 
-            chapterView.setOnClickListener(v-> comicsPresenter.loadChapterPages(chapter));
+            chapterView.setOnClickListener(v-> comicsPresenter.loadPages(chapter));
 
             llChapters.addView(chapterView, params);
         }
