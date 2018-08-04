@@ -18,7 +18,7 @@ public class Chapter implements Serializable {
         this.id = id;
         this.number = number;
         this.title = title;
-        this.dateUpdated = dateUpdated;
+        this.dateUpdated = dateUpdated * 1000L;
     }
 
     public String getLastUpdatedString() {

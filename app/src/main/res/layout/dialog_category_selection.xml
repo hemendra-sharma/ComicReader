@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainRL"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#bbc2e4"
+    android:padding="3dp">
+
+    <LinearLayout
+        android:id="@+id/llAllNone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarButtonStyle">
+
+        <Button
+            android:id="@+id/btnAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:background="@drawable/btn_selector"
+            android:text="@string/all"/>
+
+        <Button
+            android:id="@+id/btnNone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:background="@drawable/btn_selector"
+            android:text="@string/none"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/llAllNone"
+        android:layout_above="@+id/btn"
+        android:background="#ffffff"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp">
+
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="3dp"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:background="@drawable/btn_selector"
+        android:text="@string/apply"/>
+
+</RelativeLayout>

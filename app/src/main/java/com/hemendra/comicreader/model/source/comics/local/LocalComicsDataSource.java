@@ -3,7 +3,6 @@ package com.hemendra.comicreader.model.source.comics.local;
 import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
@@ -13,15 +12,21 @@ import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.model.utils.Utils;
+import com.hemendra.comicreader.view.list.SortingOption;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class LocalComicsDataSource extends ComicsDataSource implements OnComicsLoadedListener {
 
     public File comicsCacheFile;
     private LocalComicsLoader loader;
     private ComicsSearcher searcher = null;
+    private ComicsSorter sorter = null;
+    private ComicsFilterer filterer = null;
     private Comics comics = null;
+    private SortingOption sortingOption = SortingOption.POPULARITY;
+    private ArrayList<String> selectedCategories = new ArrayList<>();
 
     public LocalComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
@@ -42,7 +47,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
                 listener.onComicsLoaded(comics, SourceType.LOCAL_FULL);
             } else if(loader == null) {
                 listener.onFailedToLoadComics(FailureReason.SOURCE_CLOSED);
-            } else if (!loader.isExecuting()) {
+            } else if (isNotAlreadyLoading()) {
                 loader.execute(comicsCacheFile);
                 listener.onStartedLoadingComics();
             } else {
@@ -55,8 +60,8 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
 
     public void searchComics(String query) {
         if(comics != null) {
-            if(searcher == null || !searcher.isExecuting()) {
-                searcher = new ComicsSearcher(comics, this);
+            if(isNotAlreadyLoading()) {
+                searcher = new ComicsSearcher(comics, this, selectedCategories, sortingOption);
                 searcher.execute(query);
                 listener.onStartedLoadingComics();
             } else {
@@ -67,11 +72,56 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         }
     }
 
+    public void sortComics(Comics comics, SortingOption option) {
+        sortingOption = option;
+        if(comics != null) {
+            if(isNotAlreadyLoading()) {
+                sorter = new ComicsSorter(this, option);
+                sorter.execute(comics);
+                listener.onStartedLoadingComics();
+            } else {
+                listener.onFailedToLoadComics(FailureReason.ALREADY_LOADING);
+            }
+        } else {
+            listener.onFailedToLoadComics(FailureReason.UNKNOWN_LOCAL_ERROR);
+        }
+    }
+
+    public void filterComics(ArrayList<String> selectedCategories) {
+        this.selectedCategories = selectedCategories;
+        if(comics != null) {
+            if(isNotAlreadyLoading()) {
+                if(selectedCategories.size() == comics.categories.size()) {
+                    // selected all... return all
+                    listener.onComicsLoaded(comics, SourceType.LOCAL_FILTER);
+                } else {
+                    filterer = new ComicsFilterer(comics, this, selectedCategories, sortingOption);
+                    filterer.execute();
+                    listener.onStartedLoadingComics();
+                }
+            } else {
+                listener.onFailedToLoadComics(FailureReason.ALREADY_LOADING);
+            }
+        } else {
+            listener.onFailedToLoadComics(FailureReason.UNKNOWN_LOCAL_ERROR);
+        }
+    }
+
+    private boolean isNotAlreadyLoading() {
+        return (loader == null || !loader.isExecuting())
+                && (searcher == null || !searcher.isExecuting())
+                && (sorter == null || !sorter.isExecuting())
+                && (filterer == null || !filterer.isExecuting());
+    }
+
     @Override
     public void onComicsLoaded(Comics comics, SourceType sourceType) {
         if (comics != null) {
-            if(sourceType == SourceType.LOCAL_FULL)
+            if(sourceType == SourceType.LOCAL_FULL) {
                 this.comics = comics;
+                this.sortingOption = SortingOption.POPULARITY;
+                this.selectedCategories = this.comics.categories;
+            }
             listener.onComicsLoaded(comics, sourceType);
         } else
             listener.onFailedToLoadComics(FailureReason.UNKNOWN_LOCAL_ERROR);
@@ -106,6 +156,12 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     protected void stopLoadingComics() {
         if (loader != null && loader.isExecuting())
             loader.cancel(true);
+        if (searcher != null && searcher.isExecuting())
+            searcher.cancel(true);
+        if (sorter != null && sorter.isExecuting())
+            sorter.cancel(true);
+        if (filterer != null && filterer.isExecuting())
+            filterer.cancel(true);
     }
 
     public void deleteCache() {

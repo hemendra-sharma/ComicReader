@@ -9,6 +9,8 @@ public abstract class ComicsDataSource extends DataSource {
     public enum SourceType {
         LOCAL_FULL,
         LOCAL_SEARCH,
+        LOCAL_SORT,
+        LOCAL_FILTER,
         REMOTE
     }
 

@@ -6,15 +6,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.aphidmobile.flip.FlipViewController;
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
+
+import java.util.Locale;
 
 public class ComicReaderFragment extends Fragment {
 
@@ -22,7 +25,10 @@ public class ComicReaderFragment extends Fragment {
     private Chapter chapter = null;
     private FlipViewController flipView;
     private ReaderAdapter adapter;
+    private TextView tvPageProgress;
+    private ImageView ivPageProgress;
     private int currentPosition = 0;
+    private int progressColor = Color.DKGRAY;
 
     public static ComicReaderFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicReaderFragment fragment = new ComicReaderFragment();
@@ -45,6 +51,10 @@ public class ComicReaderFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         view.setBackgroundColor(Color.BLACK);
 
+        RelativeLayout container = view.findViewById(R.id.container);
+        tvPageProgress = view.findViewById(R.id.tvPageProgress);
+        ivPageProgress = view.findViewById(R.id.ivPageProgress);
+
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -52,7 +62,8 @@ public class ComicReaderFragment extends Fragment {
                 FlipViewController.HORIZONTAL);
         flipView.setLayoutParams(params);
         flipView.setAnimationBitmapFormat(Bitmap.Config.RGB_565);
-        ((RelativeLayout) view).addView(flipView);
+        flipView.setOverFlipEnabled(false);
+        container.addView(flipView);
 
         adapter = new ReaderAdapter(getContext(), chapter.pages,
                 comicsPresenter, flipView);
@@ -61,7 +72,26 @@ public class ComicReaderFragment extends Fragment {
 
         flipView.setOnViewFlipListener((view1, position) -> {
             currentPosition = position;
+            updateProgress();
         });
+
+        updateProgress();
+    }
+
+    private void updateProgress() {
+        int totalPages = adapter.getCount();
+        int currentPage = currentPosition+1;
+        int percent = (int)(((float) currentPage / (float) totalPages) * 100f);
+        Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
+        for(int i=0; i<100; i++) {
+            if(i <= percent)
+                bmp.setPixel(i, 0, progressColor);
+            else
+                bmp.setPixel(i, 0, Color.BLACK);
+        }
+        tvPageProgress.setText(String.format(Locale.getDefault(),
+                "Page %d/%d", currentPage, totalPages));
+        ivPageProgress.setImageBitmap(bmp);
     }
 
     @Override

@@ -13,4 +13,22 @@
     <string name="released_in_1990">Released in 1990</string>
     <string name="_1234_hits">1234 Hits</string>
     <string name="_10_chapters">10 Chapters:</string>
+    <string name="sort_by">Sort By</string>
+
+    <string name="popularity">Popularity</string>
+    <string name="latest_first">Latest First</string>
+    <string name="a_to_z">A-to-Z</string>
+    <string name="categories">Categories</string>
+    <string name="apply">Apply</string>
+    <string name="all">All</string>
+    <string name="none">None</string>
+    <string name="found_0_comics">Found 0 Comics</string>
+    <string name="page_progress">Page Progress</string>
+    <string name="page_0_0">Page 0/0</string>
+
+    <string-array name="sorting_options">
+        <item>@string/popularity</item>
+        <item>@string/latest_first</item>
+        <item>@string/a_to_z</item>
+    </string-array>
 </resources>

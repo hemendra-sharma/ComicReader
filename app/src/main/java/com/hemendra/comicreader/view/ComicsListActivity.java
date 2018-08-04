@@ -2,14 +2,17 @@ package com.hemendra.comicreader.view;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.hemendra.comicreader.R;
@@ -35,6 +38,9 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     private SearchView searchView = null;
     private RelativeLayout rlProgress = null;
 
+    private int savedSystemUiVisibility = 0;
+    private int savedNavigationBarColor = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +60,11 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     @Override
     public void onBackPressed() {
         if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            if(getSupportFragmentManager().getBackStackEntryCount() == 1)
+            if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
+                recoverFromFullScreen();
+            } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 showSearchView();
+            }
             getSupportFragmentManager().popBackStack();
         } else {
             super.onBackPressed();
@@ -164,12 +173,38 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicReaderFragment(Chapter chapter) {
+        makeFullScreen();
         comicReaderFragment.setChapter(chapter);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, comicReaderFragment)
                 .addToBackStack(null)
                 .commit();
         hideSearchView();
+    }
+
+
+    private void makeFullScreen() {
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.hide();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        savedNavigationBarColor = getWindow().getNavigationBarColor();
+        getWindow().setNavigationBarColor(Color.BLACK);
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        savedSystemUiVisibility = decorView.getSystemUiVisibility();
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+
+    private void recoverFromFullScreen() {
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.show();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setNavigationBarColor(savedNavigationBarColor);
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(savedSystemUiVisibility);
     }
 
     @Override

@@ -10,16 +10,15 @@ import com.hemendra.comicreader.view.list.SortingOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
+public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
 
     private OnComicsLoadedListener listener;
     private Comics comics;
     private ArrayList<String> selectedCategories;
     private SortingOption sortingOption;
 
-    public ComicsSearcher(Comics comics, OnComicsLoadedListener listener,
-                          ArrayList<String> selectedCategories,
-                          SortingOption sortingOption) {
+    public ComicsFilterer(Comics comics, OnComicsLoadedListener listener,
+                          ArrayList<String> selectedCategories, SortingOption sortingOption) {
         this.comics = comics;
         this.listener = listener;
         this.selectedCategories = selectedCategories;
@@ -27,32 +26,17 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
     }
 
     @Override
-    protected Comics doInBackground(String... strings) {
-        String query = strings[0];
-        query = query.trim().toLowerCase();
-        while(query.contains("  "))
-            query = query.replace("  ", " ");
-        String[] parts;
-        if(query.contains(" "))
-            parts = query.split(" ");
-        else
-            parts = new String[]{query};
-        //
-        // search by query
+    protected Comics doInBackground(Void... params) {
         Comics filteredComics = new Comics();
-        for(String part : parts) {
+        for(String category : selectedCategories) {
             for(Comic comic : comics.comics) {
                 if(filteredComics.comics.contains(comic))
                     continue;
-                if(categoryMatch(comic)) {
-                    if (comic.title.toLowerCase().contains(part)
-                            || comic.description.toLowerCase().contains(part)) {
-                        filteredComics.comics.add(comic);
-                    }
+                if(comic.categories.contains(category)) {
+                    filteredComics.comics.add(comic);
                 }
             }
         }
-        //
         if(sortingOption == SortingOption.POPULARITY)
             filteredComics.comics.sort((c1, c2) -> Integer.compare(c2.hits, c1.hits));
         else if(sortingOption == SortingOption.LATEST_FIRST)
@@ -62,16 +46,8 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
         return filteredComics;
     }
 
-    private boolean categoryMatch(Comic comic) {
-        for(String category : selectedCategories) {
-            if(comic.categories.contains(category))
-                return true;
-        }
-        return false;
-    }
-
     @Override
     protected void onPostExecute(Comics comics) {
-        listener.onComicsLoaded(comics, ComicsDataSource.SourceType.LOCAL_SEARCH);
+        listener.onComicsLoaded(comics, ComicsDataSource.SourceType.LOCAL_FILTER);
     }
 }

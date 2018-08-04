@@ -2,17 +2,13 @@ package com.hemendra.comicreader.view.reader;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 
 import com.aphidmobile.flip.FlipViewController;
 import com.hemendra.comicreader.R;
@@ -77,9 +73,10 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         TouchImageView iv = new TouchImageView(getContext());
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
         iv.setLayoutParams(params);
-        iv.setMaxZoom(4);
+        iv.setMaxZoom(3);
         iv.setBackgroundColor(Color.TRANSPARENT);
         iv.setImageResource(R.drawable.loading_text);
+        iv.setTag(i);
 
         iv.setOnTouchListener((v, event) -> {
             v.invalidate();
@@ -92,11 +89,17 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
             return false;
         });
 
-        String url = pages.get(i).getImageUrl();
-        if(url != null)
-            presenter.loadPage(url, iv);
+        setImage(pages.get(i), iv);
+
+        iv.setOnClickListener(v->setImage(pages.get((Integer)v.getTag()), ((TouchImageView)v)));
 
         return iv;
+    }
+
+    private void setImage(Page page, TouchImageView iv) {
+        String url = page.getImageUrl();
+        if(url != null)
+            presenter.loadPage(url, iv);
     }
 
     @Override

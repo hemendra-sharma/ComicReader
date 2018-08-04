@@ -2,6 +2,7 @@ package com.hemendra.comicreader.view.list;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comic;
+import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
@@ -36,23 +38,27 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
         }
     }
 
-    private ArrayList<Comic> comics;
+    private Comics comics;
     private ComicsPresenter presenter;
     private OnComicItemClickListener onComicItemClickListener;
 
-    public ComicsListAdapter(ArrayList<Comic> comics, ComicsPresenter presenter,
+    public ComicsListAdapter(Comics comics, ComicsPresenter presenter,
                              OnComicItemClickListener onComicItemClickListener) {
         this.comics = comics;
         this.presenter = presenter;
         this.onComicItemClickListener = onComicItemClickListener;
     }
 
-    public void setComics(ArrayList<Comic> comics) {
+    public Comics getComics() {
+        return comics;
+    }
+
+    public void setComics(Comics comics) {
         this.comics = comics;
     }
 
     public void clearItems() {
-        this.comics.clear();
+        this.comics.comics.clear();
     }
 
     @NonNull
@@ -65,12 +71,12 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
 
     @Override
     public void onBindViewHolder(@NonNull ComicViewHolder comicViewHolder, int position) {
-        comicViewHolder.comic = comics.get(position);
-        comicViewHolder.tvTitle.setText(comics.get(position).title);
-        comicViewHolder.tvCategories.setText(comics.get(position).getCategoriesString(2));
-        comicViewHolder.tvLastUpdated.setText(comics.get(position).getLastUpdatedString());
+        comicViewHolder.comic = comics.comics.get(position);
+        comicViewHolder.tvTitle.setText(Html.fromHtml(comics.comics.get(position).title));
+        comicViewHolder.tvCategories.setText(comics.comics.get(position).getCategoriesString(2));
+        comicViewHolder.tvLastUpdated.setText(comics.comics.get(position).getLastUpdatedString());
         comicViewHolder.ivCover.setImageResource(R.drawable.no_cover);
-        String url = comics.get(position).getImageUrl();
+        String url = comics.comics.get(position).getImageUrl();
         if(url != null) {
             presenter.loadImage(url, comicViewHolder.ivCover);
         }
@@ -78,7 +84,7 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
 
     @Override
     public int getItemCount() {
-        return comics.size();
+        return comics.comics.size();
     }
 
 }

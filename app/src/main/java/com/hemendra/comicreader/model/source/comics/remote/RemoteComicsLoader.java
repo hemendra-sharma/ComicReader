@@ -36,7 +36,11 @@ public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
                     }
                 });
         if(json != null) {
-            return ComicsParser.parseComicsFromJSON(json);
+            Comics comics = ComicsParser.parseComicsFromJSON(json);
+            if(comics != null) {
+                comics.comics.sort((c1, c2) -> Integer.compare(c2.hits, c1.hits));
+                return comics;
+            }
         }
         return null;
     }

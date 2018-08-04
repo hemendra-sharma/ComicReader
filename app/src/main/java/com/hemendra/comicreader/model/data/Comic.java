@@ -15,12 +15,12 @@ public class Comic implements Serializable {
     public String id;
     public String title;
     private String image;
-    private long lastUpdated;
-    private ArrayList<String> categories;
+    public long lastUpdated;
+    public ArrayList<String> categories;
 
     public String description = "";
     public String author = "";
-    public String hits = "";
+    public int hits = 0;
     public String released = "";
     public ArrayList<Chapter> chapters = new ArrayList<>();
 
@@ -29,7 +29,7 @@ public class Comic implements Serializable {
         this.id = id;
         this.title = title;
         this.image = image;
-        this.lastUpdated = lastUpdated;
+        this.lastUpdated = lastUpdated * 1000L;
         this.categories = categories;
     }
 
@@ -56,6 +56,13 @@ public class Comic implements Serializable {
             return RemoteConfig.buildImageUrl(image);
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null
+                && obj instanceof Comic
+                && ((Comic)obj).id.equals(this.id);
     }
 
 }

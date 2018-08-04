@@ -20,9 +20,13 @@ public class LocalComicsLoader extends CustomAsyncTask<File,Void,Comics> {
 
     @Override
     protected Comics doInBackground(File... files) {
-        if(files.length > 0 && files[0] != null && files[0].exists() && files[0].length() > 0)
-            return (Comics) Utils.readObjectFromFile(files[0]);
-        else
+        if(files.length > 0 && files[0] != null && files[0].exists() && files[0].length() > 0) {
+            Comics comics = (Comics) Utils.readObjectFromFile(files[0]);
+            if(comics != null) {
+                comics.comics.sort((c1, c2) -> Integer.compare(c2.hits, c1.hits));
+                return comics;
+            }
+        } else
             reason = FailureReason.NOT_AVAILABLE_LOCALLY;
         return null;
     }

@@ -21,7 +21,10 @@ import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource;
 import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource;
 import com.hemendra.comicreader.view.IComicListActivityCallback;
+import com.hemendra.comicreader.view.list.SortingOption;
 import com.hemendra.comicreader.view.reader.TouchImageView;
+
+import java.util.ArrayList;
 
 public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
 
@@ -90,6 +93,30 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
                 localComicsDataSource.searchComics(query);
             } else {
                 pendingAction = () -> performSearch(query);
+                activityView.askForPermissions();
+            }
+        }
+    }
+
+    public void performSort(Comics comics, SortingOption sortingOption) {
+        if(activityView != null
+                && localComicsDataSource != null) {
+            if(hasReadWritePermissions()) {
+                localComicsDataSource.sortComics(comics, sortingOption);
+            } else {
+                pendingAction = () -> performSort(comics, sortingOption);
+                activityView.askForPermissions();
+            }
+        }
+    }
+
+    public void performFilter(ArrayList<String> selectedCategories) {
+        if(activityView != null
+                && localComicsDataSource != null) {
+            if(hasReadWritePermissions()) {
+                localComicsDataSource.filterComics(selectedCategories);
+            } else {
+                pendingAction = () -> performFilter(selectedCategories);
                 activityView.askForPermissions();
             }
         }

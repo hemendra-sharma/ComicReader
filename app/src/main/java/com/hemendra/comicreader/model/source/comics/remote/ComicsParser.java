@@ -27,6 +27,7 @@ public class ComicsParser {
                     if(new JSONTokener(jsonObject.getString("manga")).nextValue()
                             instanceof JSONArray) {
                         Comics comics = new Comics();
+                        ArrayList<String> allCategories = new ArrayList<>();
                         JSONArray mangaArray = jsonObject.getJSONArray("manga");
                         int count = mangaArray.length();
                         for(int i=0; i<count; i++) {
@@ -37,8 +38,8 @@ public class ComicsParser {
                                 String id = mangaObject.optString("i");
                                 String title = mangaObject.optString("t");
                                 String image = mangaObject.optString("im");
-                                long lastUpdated = (long) mangaObject.optDouble("ld",
-                                        System.currentTimeMillis());
+                                int hits = mangaObject.optInt("h");
+                                long lastUpdated = (long) mangaObject.optDouble("ld", 0);
 
                                 ArrayList<String> categories = new ArrayList<>();
                                 if(mangaObject.has("c")) {
@@ -47,7 +48,11 @@ public class ComicsParser {
                                         JSONArray categoriesArray = mangaObject.getJSONArray("c");
                                         int len = categoriesArray.length();
                                         for (int x = 0; x < len; x++) {
-                                            categories.add(categoriesArray.getString(x));
+                                            String str = categoriesArray.getString(x).toLowerCase();
+                                            categories.add(str);
+                                            if(!allCategories.contains(str)) {
+                                                allCategories.add(str);
+                                            }
                                         }
                                     }
                                 }
@@ -56,9 +61,12 @@ public class ComicsParser {
                                 image = image.equalsIgnoreCase("null") ? "" : image;
 
                                 Comic comic = new Comic(id, title, image, lastUpdated, categories);
+                                comic.hits = hits;
                                 comics.comics.add(comic);
                             }
                         }
+                        allCategories.sort(Comparator.naturalOrder());
+                        comics.categories = allCategories;
                         return comics;
                     }
                 }
@@ -104,7 +112,7 @@ public class ComicsParser {
                 }
 
                 if(jsonObject.has("hits")) {
-                    comic.hits = jsonObject.getString("hits");
+                    comic.hits = jsonObject.getInt("hits");
                 }
 
                 if(jsonObject.has("released")) {
