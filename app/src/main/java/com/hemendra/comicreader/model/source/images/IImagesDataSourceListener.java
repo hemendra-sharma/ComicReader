@@ -13,7 +13,7 @@ public interface IImagesDataSourceListener {
     void onFailedToLoadImage(@NonNull FailureReason reason,
                              @NonNull String url, @NonNull ImageView iv);
 
-    void onPageLoaded();
+    void onPageLoaded(String url, Bitmap bmp);
     void onFailedToLoadPage(@NonNull FailureReason reason,
                             @NonNull String url, @NonNull TouchImageView iv);
 

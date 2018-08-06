@@ -64,7 +64,8 @@ public class CategorySelectionDialog {
             cb.setLayoutParams(cbParams);
             cb.setChecked(true);
             cb.setTag(i);
-            cb.setText(String.format(Locale.getDefault(), "   %s", categories.get(i)));
+            cb.setText(String.format(Locale.getDefault(),
+                    "   %s", getPersonifiedName(categories.get(i))));
             cb.setOnCheckedChangeListener((compoundButton, checked) ->
                     selection.set(((Integer)compoundButton.getTag()), checked));
             ll.addView(cb);
@@ -95,6 +96,14 @@ public class CategorySelectionDialog {
         btnNone.setOnClickListener(v-> selectNone());
 
         return dialog;
+    }
+
+    private String getPersonifiedName(String str) {
+        if(str.length() > 1)
+            str = str.substring(0, 1).toUpperCase() + str.substring(1);
+        else
+            str = str.toUpperCase();
+        return str;
     }
 
     public void selectAll() {

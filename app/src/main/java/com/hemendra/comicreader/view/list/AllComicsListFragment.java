@@ -3,7 +3,6 @@ package com.hemendra.comicreader.view.list;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -26,12 +26,11 @@ public class AllComicsListFragment extends Fragment {
     private ComicsPresenter comicsPresenter;
     private TextView tvInfo;
     private RecyclerView recycler = null;
-    private SwipeRefreshLayout swipeRefreshLayout = null;
     private String[] sorting_options;
     private TextView tvCategoriesSelector = null;
 
     private CategorySelectionDialog categorySelectionDialog = null;
-    private ComicsListAdapter mAdapter = null;
+    private AllComicsListAdapter mAdapter = null;
 
     public static AllComicsListFragment getFragment(ComicsPresenter comicsPresenter) {
         AllComicsListFragment fragment = new AllComicsListFragment();
@@ -51,18 +50,9 @@ public class AllComicsListFragment extends Fragment {
 
         tvInfo = view.findViewById(R.id.tvInfo);
         recycler = view.findViewById(R.id.recycler);
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         Spinner spinnerSorting = view.findViewById(R.id.spinnerSorting);
         tvCategoriesSelector = view.findViewById(R.id.tvCategoriesSelector);
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            mAdapter.clearItems();
-            mAdapter.notifyDataSetChanged();
-            comicsPresenter.invalidateCacheAndLoadComicsAgain();
-            swipeRefreshLayout.setRefreshing(false);
-            spinnerSorting.setSelection(0);
-            categorySelectionDialog.selectAll();
-        });
+        CheckBox cbFavoritesOnly = view.findViewById(R.id.cbFavoritesOnly);
 
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         recycler.setLayoutManager(gridLayoutManager);
@@ -91,12 +81,28 @@ public class AllComicsListFragment extends Fragment {
             if(categorySelectionDialog != null)
                 categorySelectionDialog.show();
         });
+
+        cbFavoritesOnly.setOnCheckedChangeListener((b, checked) -> {
+            if(mAdapter != null) {
+                if (checked)
+                    mAdapter.setType(AllComicsListAdapter.TYPE_FAVORITES);
+                else
+                    mAdapter.setType(AllComicsListAdapter.TYPE_ALL);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void refreshCurrentView() {
+        if(mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     public void onComicsLoaded(Comics comics) {
         if(recycler != null) {
             if(mAdapter == null) {
-                mAdapter = new ComicsListAdapter(comics, comicsPresenter, listener);
+                mAdapter = new AllComicsListAdapter(comics, comicsPresenter, listener);
                 recycler.setAdapter(mAdapter);
                 categorySelectionDialog = new CategorySelectionDialog(getContext(),
                         comics.categories, categorySelectionListener);
@@ -105,6 +111,7 @@ public class AllComicsListFragment extends Fragment {
                 mAdapter.setComics(comics);
                 mAdapter.notifyDataSetChanged();
             }
+            recycler.smoothScrollToPosition(0);
             setInfo();
         }
     }

@@ -4,10 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
 import com.hemendra.comicreader.view.reader.TouchImageView;
+
+import java.util.ArrayList;
 
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
@@ -16,6 +19,8 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     private IImagesDataSourceListener listener;
 
     private ImageDownloader[] downloadingSlots = new ImageDownloader[MAX_PARALLEL_DOWNLOADS];
+
+    private ArrayList<ChapterPagesDownloader> chapterPagesDownloaders = new ArrayList<>();
 
     public RemoteImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
@@ -52,12 +57,30 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
+    public synchronized void loadPages(Chapter chapter, ImageView iv, OnPagesDownloadedListener listener) {
+        for(int i=0; i<chapterPagesDownloaders.size(); i++) {
+            ChapterPagesDownloader downloader = chapterPagesDownloaders.get(i);
+            if(!downloader.isExecuting()) {
+                chapterPagesDownloaders.remove(i);
+                i--;
+            } else if(downloader.isForChapter(chapter)) {
+                listener.onAlreadyLoading(chapter, iv);
+                return;
+            }
+        }
+        //
+        ChapterPagesDownloader downloader = new ChapterPagesDownloader(getContext(),
+                listener, chapter, iv);
+        downloader.execute();
+        chapterPagesDownloaders.add(downloader);
+    }
+
     @Override
     public void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page) {
         if(listener != null) {
             listener.onImageLoaded(url, bmp);
             if(page)
-                listener.onPageLoaded();
+                listener.onPageLoaded(url, bmp);
         }
     }
 

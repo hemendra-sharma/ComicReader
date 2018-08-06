@@ -8,11 +8,13 @@
     <RelativeLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rlPageProgress">
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rlPageProgress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -33,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textColor="#ffffff"
             android:text="@string/page_0_0"/>
 

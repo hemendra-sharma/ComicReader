@@ -12,6 +12,8 @@ import java.util.Locale;
 
 public class Comic implements Serializable {
 
+    private static final long serialVersionUID = 4515267587540133954L;
+
     public String id;
     public String title;
     private String image;
@@ -23,6 +25,8 @@ public class Comic implements Serializable {
     public int hits = 0;
     public String released = "";
     public ArrayList<Chapter> chapters = new ArrayList<>();
+
+    public boolean isFavorite = false;
 
     public Comic(String id, String title, String image,
                  long lastUpdated, ArrayList<String> categories) {

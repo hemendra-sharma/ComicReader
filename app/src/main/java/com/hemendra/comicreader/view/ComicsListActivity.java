@@ -38,7 +38,6 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     private SearchView searchView = null;
     private RelativeLayout rlProgress = null;
 
-    private int savedSystemUiVisibility = 0;
     private int savedNavigationBarColor = 0;
 
     @Override
@@ -64,6 +63,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
                 recoverFromFullScreen();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 showSearchView();
+                allComicsListFragment.refreshCurrentView();
             }
             getSupportFragmentManager().popBackStack();
         } else {
@@ -158,12 +158,16 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicsListFragment() {
+        if(allComicsListFragment.isAdded())
+            return;
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, allComicsListFragment)
                 .commit();
     }
 
     private void showComicDetailsFragment(Comic comic) {
+        if(comicDetailsFragment.isAdded())
+            return;
         comicDetailsFragment.setComic(comic);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, comicDetailsFragment)
@@ -173,6 +177,8 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicReaderFragment(Chapter chapter) {
+        if(comicReaderFragment.isAdded())
+            return;
         makeFullScreen();
         comicReaderFragment.setChapter(chapter);
         getSupportFragmentManager().beginTransaction()
@@ -182,29 +188,29 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         hideSearchView();
     }
 
-
     private void makeFullScreen() {
+        // hide action bar
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null)
             actionBar.hide();
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        // go full screen
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
+                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         savedNavigationBarColor = getWindow().getNavigationBarColor();
+        // navigation bar dark color
         getWindow().setNavigationBarColor(Color.BLACK);
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        savedSystemUiVisibility = decorView.getSystemUiVisibility();
-        decorView.setSystemUiVisibility(uiOptions);
     }
 
     private void recoverFromFullScreen() {
+        // show action bar
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null)
             actionBar.show();
+        // no full screen
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // reset navigation bar color
         getWindow().setNavigationBarColor(savedNavigationBarColor);
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(savedSystemUiVisibility);
     }
 
     @Override

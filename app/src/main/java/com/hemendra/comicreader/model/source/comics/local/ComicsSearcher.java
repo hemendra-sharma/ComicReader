@@ -40,6 +40,14 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
         //
         // search by query
         Comics filteredComics = new Comics();
+        for (Comic comic : comics.comics) {
+            if (filteredComics.comics.contains(comic))
+                continue;
+            if(categoryMatch(comic)
+                    && comic.title.toLowerCase().contains(query.toLowerCase())) {
+                filteredComics.comics.add(comic);
+            }
+        }
         for(String part : parts) {
             for(Comic comic : comics.comics) {
                 if(filteredComics.comics.contains(comic))

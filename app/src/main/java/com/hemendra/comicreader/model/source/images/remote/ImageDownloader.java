@@ -77,8 +77,10 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
         if(bitmap != null) {
             if(iv != null)
                 iv.setImageBitmap(bitmap);
-            else if(tiv != null)
+            else if(tiv != null) {
                 tiv.setImageBitmap(bitmap);
+                tiv.setTag(-1);
+            }
             //
             if (listener != null)
                 listener.onImageDownloaded(imgUrl, bitmap, iv != null, tiv != null);

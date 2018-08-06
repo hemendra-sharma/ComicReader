@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
+import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
@@ -19,6 +20,8 @@ import com.hemendra.comicreader.model.source.comics.local.LocalComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.remote.RemoteComicsDataSource;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource;
+import com.hemendra.comicreader.model.source.images.remote.OnChapterDownloadListener;
+import com.hemendra.comicreader.model.source.images.remote.OnPagesDownloadedListener;
 import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource;
 import com.hemendra.comicreader.view.IComicListActivityCallback;
 import com.hemendra.comicreader.view.list.SortingOption;
@@ -200,8 +203,11 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     }
 
     @Override
-    public void onPageLoaded() {
-        if(activityView != null) {
+    public void onPageLoaded(String url, Bitmap bmp) {
+        if(activityView != null
+                && localImagesDataSource != null) {
+            if(url != null && bmp != null)
+                localImagesDataSource.savePage(url, bmp);
             activityView.onPageLoaded();
         }
     }
@@ -215,6 +221,75 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    public boolean hasAllPagesOffline(Chapter chapter) {
+        return localImagesDataSource != null
+                && localImagesDataSource.isChapterAvailableOffline(chapter);
+    }
+
+    public void downloadAllPages(Chapter chapter, ImageView iv) {
+        if(activityView != null
+                && localImagesDataSource != null
+                && remoteImagesDataSource != null
+                && remoteComicsDataSource != null) {
+            if(hasAllPagesOffline(chapter)) {
+                if(chapter.equals(iv.getTag()))
+                    iv.setImageResource(R.drawable.ic_check);
+            } else if(chapter.pages.size() == 0){
+                if(chapter.equals(iv.getTag())) {
+                    iv.setImageResource(R.drawable.ic_wait);
+                    remoteComicsDataSource.loadPagesSilent(chapter, iv, onChapterDownloadListener);
+                }
+            }
+        }
+    }
+
+    private OnChapterDownloadListener onChapterDownloadListener = new OnChapterDownloadListener() {
+        @Override
+        public void onChapterDownloaded(Chapter chapter, ImageView iv) {
+            if(activityView != null && chapter.equals(iv.getTag())) {
+                if(localComicsDataSource != null)
+                    localComicsDataSource.updateChapter(chapter);
+                if(hasAllPagesOffline(chapter))
+                    iv.setImageResource(R.drawable.ic_check);
+                else
+                    remoteImagesDataSource.loadPages(chapter, iv,
+                            onPagesDownloadedListener);
+            }
+        }
+
+        @Override
+        public void onAlreadyLoading(Chapter chapter, ImageView iv) {
+            if(activityView != null && chapter.equals(iv.getTag()))
+                iv.setImageResource(R.drawable.ic_wait);
+        }
+
+        @Override
+        public void onFailedToDownloadChapter(Chapter chapter, ImageView iv) {
+            if(activityView != null && chapter.equals(iv.getTag()))
+                iv.setImageResource(R.drawable.ic_download);
+        }
+    };
+
+    private OnPagesDownloadedListener onPagesDownloadedListener = new OnPagesDownloadedListener() {
+        @Override
+        public void onPagesDownloaded(Chapter chapter, ImageView iv) {
+            if(activityView != null && chapter.equals(iv.getTag()))
+                iv.setImageResource(R.drawable.ic_check);
+        }
+
+        @Override
+        public void onAlreadyLoading(Chapter chapter, ImageView iv) {
+            if(activityView != null && chapter.equals(iv.getTag()))
+                iv.setImageResource(R.drawable.ic_wait);
+        }
+
+        @Override
+        public void onFailedToDownloadPages(Chapter chapter, ImageView iv) {
+            if(activityView != null && chapter.equals(iv.getTag()))
+                iv.setImageResource(R.drawable.ic_download);
+        }
+    };
+
     public void loadComicDetails(Comic comic) {
         if(activityView != null && remoteComicsDataSource != null) {
             if(comic.chapters.size() > 0) {
@@ -222,6 +297,13 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
             } else {
                 remoteComicsDataSource.loadComicDetails(comic);
             }
+        }
+    }
+
+    public void setComicFavorite(Comic comic, boolean isFavorite) {
+        if(activityView != null && localComicsDataSource != null) {
+            comic.isFavorite = isFavorite;
+            localComicsDataSource.updateComic(comic);
         }
     }
 

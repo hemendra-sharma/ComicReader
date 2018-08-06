@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -161,14 +162,17 @@ public class Utils {
     @Nullable
     public static Object readObjectFromFile(@NonNull File file) {
         FileInputStream instr = null;
+        BufferedInputStream bufferIn = null;
         ObjectInput in = null;
         try {
             if (!file.exists())
                 return null;
             instr = new FileInputStream(file);
-            in = new ObjectInputStream(instr);
+            bufferIn = new BufferedInputStream(instr);
+            in = new ObjectInputStream(bufferIn);
             Object obj = in.readObject();
             instr.close();
+            bufferIn.close();
             in.close();
             return obj;
         } catch (EOFException ignore) {
@@ -191,6 +195,8 @@ public class Utils {
                 //releasing the FileInputStream and ObjectInput
                 if(instr != null)
                     instr.close();
+                if(bufferIn != null)
+                    bufferIn.close();
                 if(in != null)
                     in.close();
             } catch (IOException e) {

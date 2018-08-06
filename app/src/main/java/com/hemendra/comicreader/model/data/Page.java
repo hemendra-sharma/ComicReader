@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 public class Page implements Serializable {
 
+    private static final long serialVersionUID = -5997692223648746465L;
+
     public int number = 0;
     public String id = "";
 

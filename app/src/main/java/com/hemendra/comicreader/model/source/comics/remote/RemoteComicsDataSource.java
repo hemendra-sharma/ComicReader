@@ -1,6 +1,7 @@
 package com.hemendra.comicreader.model.source.comics.remote;
 
 import android.content.Context;
+import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
@@ -9,6 +10,7 @@ import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
+import com.hemendra.comicreader.model.source.images.remote.OnChapterDownloadListener;
 import com.hemendra.comicreader.model.utils.Utils;
 
 public class RemoteComicsDataSource extends ComicsDataSource implements OnComicsLoadedListener {
@@ -78,6 +80,19 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
     @Override
     public void onFailedToLoadComicDetails(FailureReason reason) {
         listener.onFailedToLoadComicDetails(reason);
+    }
+
+    public void loadPagesSilent(Chapter chapter, ImageView iv,
+                                OnChapterDownloadListener listener) {
+        if(Utils.isNetworkAvailable(getContext())) {
+            if(!chapterLoader.isExecuting()) {
+                chapterLoader.execute(chapter);
+            } else {
+                listener.onAlreadyLoading(chapter, iv);
+            }
+        } else {
+            listener.onFailedToDownloadChapter(chapter, iv);
+        }
     }
 
     public void loadPages(Chapter chapter) {

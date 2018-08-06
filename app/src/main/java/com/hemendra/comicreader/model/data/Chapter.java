@@ -8,6 +8,8 @@ import java.util.Locale;
 
 public class Chapter implements Serializable {
 
+    private static final long serialVersionUID = -11016580311731648L;
+
     public String id;
     public int number;
     public String title;
@@ -24,5 +26,12 @@ public class Chapter implements Serializable {
     public String getLastUpdatedString() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         return sdf.format(new Date(dateUpdated));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null
+                && obj instanceof Chapter
+                && ((Chapter)obj).id.equals(id);
     }
 }

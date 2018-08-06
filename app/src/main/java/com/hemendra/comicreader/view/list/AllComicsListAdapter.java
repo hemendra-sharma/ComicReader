@@ -12,16 +12,15 @@ import android.widget.TextView;
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
-import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
 
-public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.ComicViewHolder> {
+public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdapter.ComicViewHolder> {
 
     public class ComicViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView ivCover;
+        ImageView ivCover, ivStar;
         TextView tvTitle, tvLastUpdated, tvCategories;
         Comic comic;
 
@@ -30,6 +29,7 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
             super(itemView);
 
             ivCover = itemView.findViewById(R.id.ivCover);
+            ivStar = itemView.findViewById(R.id.ivStar);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvLastUpdated = itemView.findViewById(R.id.tvLastUpdated);
             tvCategories = itemView.findViewById(R.id.tvCategories);
@@ -39,26 +39,52 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
     }
 
     private Comics comics;
+    private Comics favoriteComics = new Comics();
     private ComicsPresenter presenter;
     private OnComicItemClickListener onComicItemClickListener;
 
-    public ComicsListAdapter(Comics comics, ComicsPresenter presenter,
-                             OnComicItemClickListener onComicItemClickListener) {
+    private int type = TYPE_ALL;
+
+    public static final int TYPE_ALL = 0, TYPE_FAVORITES = 1;
+
+    public AllComicsListAdapter(Comics comics, ComicsPresenter presenter,
+                                OnComicItemClickListener onComicItemClickListener) {
         this.comics = comics;
         this.presenter = presenter;
         this.onComicItemClickListener = onComicItemClickListener;
+        for(Comic comic : this.comics.comics) {
+            if(comic.isFavorite)
+                favoriteComics.comics.add(comic);
+        }
     }
 
     public Comics getComics() {
-        return comics;
+        if(type == TYPE_ALL)
+            return comics;
+        else
+            return favoriteComics;
     }
 
     public void setComics(Comics comics) {
-        this.comics = comics;
+        if(type == TYPE_ALL) {
+            this.comics = comics;
+            favoriteComics = new Comics();
+            for (Comic comic : this.comics.comics) {
+                if (comic.isFavorite)
+                    favoriteComics.comics.add(comic);
+            }
+        } else {
+            favoriteComics = comics;
+        }
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public void clearItems() {
         this.comics.comics.clear();
+        this.favoriteComics.comics.clear();
     }
 
     @NonNull
@@ -71,20 +97,34 @@ public class ComicsListAdapter extends RecyclerView.Adapter<ComicsListAdapter.Co
 
     @Override
     public void onBindViewHolder(@NonNull ComicViewHolder comicViewHolder, int position) {
-        comicViewHolder.comic = comics.comics.get(position);
-        comicViewHolder.tvTitle.setText(Html.fromHtml(comics.comics.get(position).title));
-        comicViewHolder.tvCategories.setText(comics.comics.get(position).getCategoriesString(2));
-        comicViewHolder.tvLastUpdated.setText(comics.comics.get(position).getLastUpdatedString());
+        comicViewHolder.comic = getComic(position);
+        comicViewHolder.tvTitle.setText(Html.fromHtml(getComic(position).title, 0));
+        comicViewHolder.tvCategories.setText(getComic(position).getCategoriesString(2));
+        comicViewHolder.tvLastUpdated.setText(getComic(position).getLastUpdatedString());
         comicViewHolder.ivCover.setImageResource(R.drawable.no_cover);
-        String url = comics.comics.get(position).getImageUrl();
-        if(url != null) {
+        if(getComic(position).isFavorite)
+            comicViewHolder.ivStar.setVisibility(View.VISIBLE);
+        else
+            comicViewHolder.ivStar.setVisibility(View.GONE);
+        String url = getComic(position).getImageUrl();
+        if (url != null) {
             presenter.loadImage(url, comicViewHolder.ivCover);
         }
     }
 
+    private Comic getComic(int position) {
+        if(type == TYPE_ALL)
+            return comics.comics.get(position);
+        else
+            return favoriteComics.comics.get(position);
+    }
+
     @Override
     public int getItemCount() {
-        return comics.comics.size();
+        if(type == TYPE_ALL)
+            return comics.comics.size();
+        else
+            return favoriteComics.comics.size();
     }
 
 }

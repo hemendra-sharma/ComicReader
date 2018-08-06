@@ -104,6 +104,7 @@ public class ComicReaderFragment extends Fragment {
     public void onResume() {
         super.onResume();
         flipView.onResume();
+        refreshFlipView();
     }
 
     public void refreshFlipView() {

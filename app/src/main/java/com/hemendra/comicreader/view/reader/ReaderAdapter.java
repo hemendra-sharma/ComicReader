@@ -77,6 +77,7 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         iv.setBackgroundColor(Color.TRANSPARENT);
         iv.setImageResource(R.drawable.loading_text);
         iv.setTag(i);
+        //iv.setColorFilter(Color.parseColor("#88000000"));
 
         iv.setOnTouchListener((v, event) -> {
             v.invalidate();
@@ -91,7 +92,10 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
 
         setImage(pages.get(i), iv);
 
-        iv.setOnClickListener(v->setImage(pages.get((Integer)v.getTag()), ((TouchImageView)v)));
+        iv.setOnClickListener(v->{
+            if(((Integer) v.getTag()) >= 0)
+                setImage(pages.get((Integer)v.getTag()), ((TouchImageView)v));
+        });
 
         return iv;
     }

@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/ivDownload"
             android:textSize="18sp"
             android:textColor="@color/colorPrimaryDark"
             android:text="@string/comic_name"/>
@@ -27,10 +28,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvChapterName"
+            android:layout_toStartOf="@+id/ivDownload"
             android:layout_marginTop="5dp"
             android:textSize="14sp"
             android:textColor="@color/colorPrimaryDark"
             android:text="@string/mmm_dd_yyyy"/>
+
+        <ImageView
+            android:id="@+id/ivDownload"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/tvChapterName"
+            android:layout_alignParentEnd="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_download"
+            android:contentDescription="@string/download"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"/>
 
     </RelativeLayout>
 

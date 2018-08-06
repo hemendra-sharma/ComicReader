@@ -34,11 +34,23 @@
             android:ellipsize="end"
             android:text="@string/comic_name"/>
 
+        <ImageView
+            android:id="@+id/ivStar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/tvTitle"
+            android:layout_alignParentEnd="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/star_on"
+            android:contentDescription="@string/favorite"
+            android:visibility="gone"/>
+
         <TextView
             android:id="@+id/tvCategories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvTitle"
+            android:layout_toStartOf="@+id/ivStar"
             android:textSize="12sp"
             android:textColor="@color/colorPrimary"
             android:text="@string/cat1_cat2_"/>
@@ -48,6 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvCategories"
+            android:layout_toStartOf="@+id/ivStar"
             android:textSize="12sp"
             android:textColor="#aaaaaa"
             android:text="@string/mmm_dd_yyyy"/>

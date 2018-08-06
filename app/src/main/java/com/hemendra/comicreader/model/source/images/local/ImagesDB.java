@@ -11,20 +11,27 @@ import android.database.sqlite.SQLiteOpenHelper;
  * always going to have small data sizes. So, instead of saving the images on disk, we are
  * going to convert them in blob (byte array) and save them into the database itself.
  * This way we can query and manage the images more easily and efficiently.
- *
- * Another benefit of doing this? We won't need to implement the Runtime-Permission thing.
  */
 public class ImagesDB {
 
     private static final int MAX_CACHED_IMAGES = 500;
+    private static final int MAX_CACHED_PAGES = 100;
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "ImagesDB";
 
     private static final String TAB_IMAGES = "tab_images";
+    private static final String TAB_PAGES = "tab_pages";
 
     private static final String CREATE_TAB_IMAGES = "create table if not exists  "
             + TAB_IMAGES
+            + " ("
+            + "_id integer primary key autoincrement,"  // primary key ID
+            + "url text, "                              // the URL can be assumed unique
+            + "data blob );";                           // byte array image data
+
+    private static final String CREATE_TAB_PAGES = "create table if not exists  "
+            + TAB_PAGES
             + " ("
             + "_id integer primary key autoincrement,"  // primary key ID
             + "url text, "                              // the URL can be assumed unique
@@ -48,6 +55,7 @@ public class ImagesDB {
             try {
                 db.execSQL("PRAGMA foreign_keys=ON");
                 db.execSQL(CREATE_TAB_IMAGES);
+                db.execSQL(CREATE_TAB_PAGES);
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
@@ -73,6 +81,7 @@ public class ImagesDB {
                 // because this app is going to have only this version.
                 //
                 db.execSQL("DROP TABLE IF EXISTS " + TAB_IMAGES);
+                db.execSQL("DROP TABLE IF EXISTS " + TAB_PAGES);
                 onCreate(db);
             } catch (Throwable ex) {
                 ex.printStackTrace();
@@ -148,8 +157,8 @@ public class ImagesDB {
      */
     private void keepLastMaxImagesOnly() {
         try {
-            String countQyery = "SELECT count(*) FROM "+TAB_IMAGES;
-            Cursor c = db.rawQuery(countQyery, null);
+            String countQuery = "SELECT count(*) FROM "+TAB_IMAGES;
+            Cursor c = db.rawQuery(countQuery, null);
             if(c != null) {
                 if(c.moveToFirst()) {
                     int totalImages = c.getInt(0);
@@ -198,6 +207,119 @@ public class ImagesDB {
             ex.printStackTrace();
         }
         return bytes;
+    }
+
+    /**
+     * Insert the new image data byte array, if it does not exist already.
+     * @param url the URL from where this image was downloaded.
+     * @param data image byte array
+     * @return the row ID of the newly inserted row, or -1 if an error occurred
+     */
+    public long insertPage(String url, byte[] data) {
+        try {
+            if (url != null && url.trim().length() > 0) {
+                int count = 0;
+                String countQuery = "SELECT count(*) FROM " + TAB_PAGES + " WHERE url='" + url.trim() + "'";
+                Cursor c = db.rawQuery(countQuery, null);
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        count = c.getInt(0);
+                    }
+                    c.close();
+                }
+                //
+                if(count <= 0) {
+                    ContentValues values = new ContentValues();
+                    if (data != null && data.length > 0) {
+                        values.put("url", url);
+                        values.put("data", data);
+                        long ret = db.insert(TAB_PAGES, null, values);
+                        if (ret > 0) {
+                            keepLastMaxPagesOnly();
+                            return ret;
+                        }
+                    }
+                }
+            }
+        } catch(Throwable ex){
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    /**
+     * Keep the latest MAX_CACHED_IMAGES images and delete all other old images.
+     */
+    private void keepLastMaxPagesOnly() {
+        try {
+            String countQuery = "SELECT count(*) FROM "+TAB_PAGES;
+            Cursor c = db.rawQuery(countQuery, null);
+            if(c != null) {
+                if(c.moveToFirst()) {
+                    int totalImages = c.getInt(0);
+                    c.close();
+                    if(totalImages > MAX_CACHED_PAGES) {
+                        String query = "SELECT _id FROM " + TAB_PAGES + " ORDER BY _id ASC";
+                        c = db.rawQuery(query, null);
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                int diff = totalImages - MAX_CACHED_IMAGES;
+                                int count = 0;
+                                do {
+                                    db.delete(TAB_PAGES, "_id="+c.getInt(0), null);
+                                    count++;
+                                } while (c.moveToNext() && count < diff);
+                            }
+                            c.close();
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ex){
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Check if the image with the given URL exists in the DB or not,
+     * and return the image byte array.
+     * @param url the URL which is supposed to be used to download image from server.
+     * @return the image byte array if exists. NULL otherwise.
+     */
+    public byte[] getPage(String url) {
+        byte[] bytes = null;
+        try {
+            if(url != null && url.trim().length() > 0) {
+                Cursor c = db.rawQuery("select * from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        bytes = c.getBlob(2);
+                    }
+                    c.close();
+                }
+            }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        return bytes;
+    }
+
+    public boolean hasPage(String url) {
+        int count = 0;
+        try {
+            if(url != null && url.trim().length() > 0) {
+                Cursor c = db.rawQuery("select count(*) from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        count = c.getInt(0);
+                    }
+                    c.close();
+                }
+            }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        return count > 0;
     }
 
 }

@@ -25,6 +25,9 @@
     <string name="found_0_comics">Found 0 Comics</string>
     <string name="page_progress">Page Progress</string>
     <string name="page_0_0">Page 0/0</string>
+    <string name="view_all">View All</string>
+    <string name="favorite">Favorite</string>
+    <string name="download">Download</string>
 
     <string-array name="sorting_options">
         <item>@string/popularity</item>

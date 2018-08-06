@@ -1,15 +1,21 @@
 package com.hemendra.comicreader.view.details;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
@@ -18,10 +24,13 @@ import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.Locale;
 
+@SuppressLint("ClickableViewAccessibility")
 public class ComicDetailsFragment extends Fragment {
 
     private ComicsPresenter comicsPresenter;
     private Comic comic = null;
+
+    private ImageView ivStar;
 
     public static ComicDetailsFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicDetailsFragment fragment = new ComicDetailsFragment();
@@ -42,6 +51,7 @@ public class ComicDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         ImageView ivCover = view.findViewById(R.id.ivCover);
+        ivStar = view.findViewById(R.id.ivStar);
         TextView tvTitle = view.findViewById(R.id.tvTitle);
         TextView tvLastUpdated = view.findViewById(R.id.tvLastUpdated);
         TextView tvCategories = view.findViewById(R.id.tvCategories);
@@ -49,16 +59,27 @@ public class ComicDetailsFragment extends Fragment {
         TextView tvReleasedYear = view.findViewById(R.id.tvReleasedYear);
         TextView tvHits = view.findViewById(R.id.tvHits);
         TextView tvChapters = view.findViewById(R.id.tvChapters);
-        LinearLayout llChapters = view.findViewById(R.id.llChapters);
+        RecyclerView recycler = view.findViewById(R.id.recycler);
+
+        recycler.getLayoutParams().height = (int) (getResources()
+                .getDisplayMetrics().heightPixels * 0.50);
 
         String url = comic.getImageUrl();
         if(url != null)
             comicsPresenter.loadImage(url, ivCover);
 
+        if(comic.isFavorite)
+            ivStar.setImageResource(R.drawable.star_on);
+        else
+            ivStar.setImageResource(R.drawable.star_off);
+
+        ivStar.setOnTouchListener(doFocus);
+        ivStar.setOnClickListener(onStarClicked);
+
         tvTitle.setText(comic.title);
         tvLastUpdated.setText(comic.getLastUpdatedString());
         tvCategories.setText(comic.getCategoriesString(10));
-        tvDescription.setText(Html.fromHtml(comic.description));
+        tvDescription.setText(Html.fromHtml(comic.description, 0));
         tvReleasedYear.setText(String.format(Locale.getDefault(),
                 "Released in %s", comic.released));
         tvHits.setText(String.format(Locale.getDefault(),
@@ -66,28 +87,35 @@ public class ComicDetailsFragment extends Fragment {
         tvChapters.setText(String.format(Locale.getDefault(),
                 "%s Chapters", comic.chapters.size()));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(10, 20, 10, 20);
+        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        recycler.setItemAnimator(new DefaultItemAnimator());
 
-        for(Chapter chapter : comic.chapters) {
-            View chapterView = View.inflate(getContext(), R.layout.chapter_list_item, null);
+        ChaptersListAdapter adapter = new ChaptersListAdapter(comic,
+                comicsPresenter, listener);
+        recycler.setAdapter(adapter);
 
-            TextView tvChapterName = chapterView.findViewById(R.id.tvChapterName);
-            tvChapterName.setText(String.format(Locale.getDefault(),
-                    "%d. %s", chapter.number, chapter.title));
-
-            TextView tvChapterDate = chapterView.findViewById(R.id.tvChapterDate);
-            tvChapterDate.setText(String.format(Locale.getDefault(),
-                    "Updated: %s", chapter.getLastUpdatedString()));
-
-            chapterView.setOnClickListener(v-> comicsPresenter.loadPages(chapter));
-
-            llChapters.addView(chapterView, params);
-        }
+        recycler.smoothScrollToPosition(0);
     }
+
+    private View.OnTouchListener doFocus = (view, motionEvent) -> {
+        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+            view.requestFocus();
+        return false;
+    };
+
+    private View.OnClickListener onStarClicked = v -> {
+        if(comic.isFavorite) {
+            ivStar.setImageResource(R.drawable.star_off);
+            comicsPresenter.setComicFavorite(comic, false);
+            Toast.makeText(getContext(), "Removed From Favorites", Toast.LENGTH_SHORT).show();
+        } else {
+            ivStar.setImageResource(R.drawable.star_on);
+            comicsPresenter.setComicFavorite(comic, true);
+            Toast.makeText(getContext(), "Marked As Favorite", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private OnChapterItemClickListener listener = chapter -> comicsPresenter.loadPages(chapter);
 
     @Override
     public void onDestroyView() {
