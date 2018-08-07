@@ -8,19 +8,17 @@ import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
+import com.hemendra.comicreader.model.source.images.local.ImagesDB;
 import com.hemendra.comicreader.view.reader.TouchImageView;
-
-import java.util.ArrayList;
 
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
     public static final int MAX_PARALLEL_DOWNLOADS = 10;
 
     private IImagesDataSourceListener listener;
+    private ChapterPagesDownloader chapterPagesDownloader = null;
 
     private ImageDownloader[] downloadingSlots = new ImageDownloader[MAX_PARALLEL_DOWNLOADS];
-
-    private ArrayList<ChapterPagesDownloader> chapterPagesDownloaders = new ArrayList<>();
 
     public RemoteImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
@@ -57,22 +55,21 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
-    public synchronized void loadPages(Chapter chapter, ImageView iv, OnPagesDownloadedListener listener) {
-        for(int i=0; i<chapterPagesDownloaders.size(); i++) {
-            ChapterPagesDownloader downloader = chapterPagesDownloaders.get(i);
-            if(!downloader.isExecuting()) {
-                chapterPagesDownloaders.remove(i);
-                i--;
-            } else if(downloader.isForChapter(chapter)) {
-                listener.onAlreadyLoading(chapter, iv);
-                return;
-            }
+    public void downloadChapter(Chapter chapter, OnChapterDownloadListener listener) {
+        if(chapterPagesDownloader == null
+                || !chapterPagesDownloader.isExecuting()) {
+            chapterPagesDownloader = new ChapterPagesDownloader(getContext(), listener, chapter);
+            chapterPagesDownloader.execute();
+        } else {
+            listener.onFailedToDownloadChapter(FailureReason.ALREADY_LOADING);
         }
-        //
-        ChapterPagesDownloader downloader = new ChapterPagesDownloader(getContext(),
-                listener, chapter, iv);
-        downloader.execute();
-        chapterPagesDownloaders.add(downloader);
+    }
+
+
+    public void stopDownloadingChapter() {
+        if(chapterPagesDownloader != null && chapterPagesDownloader.isExecuting()) {
+            chapterPagesDownloader.cancel(true);
+        }
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.hemendra.comicreader.view.reader;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -22,14 +24,17 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
     private ComicsPresenter presenter;
     private ArrayList<Page> pages;
     private FlipViewController flipView;
+    private Runnable onClicked;
 
     public ReaderAdapter(Context context,
                          ArrayList<Page> pages, ComicsPresenter presenter,
-                         FlipViewController flipView) {
+                         FlipViewController flipView,
+                         Runnable onClicked) {
         super(context, 0);
         this.pages = pages;
         this.presenter = presenter;
         this.flipView = flipView;
+        this.onClicked = onClicked;
     }
 
     @Override
@@ -93,6 +98,7 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         setImage(pages.get(i), iv);
 
         iv.setOnClickListener(v->{
+            onClicked.run();
             if(((Integer) v.getTag()) >= 0)
                 setImage(pages.get((Integer)v.getTag()), ((TouchImageView)v));
         });
@@ -101,8 +107,20 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
     }
 
     private void setImage(Page page, TouchImageView iv) {
+        if(page.rawImageData != null && page.rawImageData.length > 0) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;
+            options.inSampleSize = 1;
+            Bitmap bmp = BitmapFactory.decodeByteArray(page.rawImageData,
+                    0, page.rawImageData.length, options);
+            if(bmp != null) {
+                iv.setImageBitmap(bmp);
+                return;
+            }
+        }
+
         String url = page.getImageUrl();
-        if(url != null)
+        if (url != null)
             presenter.loadPage(url, iv);
     }
 

@@ -12,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ public class ComicDetailsFragment extends Fragment {
     private ComicsPresenter comicsPresenter;
     private Comic comic = null;
 
+    private RecyclerView recycler;
+    private RelativeLayout rlDetails;
     private ImageView ivStar;
 
     public static ComicDetailsFragment getFragment(ComicsPresenter comicsPresenter) {
@@ -59,10 +63,9 @@ public class ComicDetailsFragment extends Fragment {
         TextView tvReleasedYear = view.findViewById(R.id.tvReleasedYear);
         TextView tvHits = view.findViewById(R.id.tvHits);
         TextView tvChapters = view.findViewById(R.id.tvChapters);
-        RecyclerView recycler = view.findViewById(R.id.recycler);
-
-        recycler.getLayoutParams().height = (int) (getResources()
-                .getDisplayMetrics().heightPixels * 0.50);
+        recycler = view.findViewById(R.id.recycler);
+        Button btnView = view.findViewById(R.id.btnView);
+        rlDetails = view.findViewById(R.id.rlDetails);
 
         String url = comic.getImageUrl();
         if(url != null)
@@ -75,6 +78,8 @@ public class ComicDetailsFragment extends Fragment {
 
         ivStar.setOnTouchListener(doFocus);
         ivStar.setOnClickListener(onStarClicked);
+
+        btnView.setTransformationMethod(null);
 
         tvTitle.setText(comic.title);
         tvLastUpdated.setText(comic.getLastUpdatedString());
@@ -90,11 +95,23 @@ public class ComicDetailsFragment extends Fragment {
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setItemAnimator(new DefaultItemAnimator());
 
-        ChaptersListAdapter adapter = new ChaptersListAdapter(comic,
+        ChaptersListAdapter adapter = new ChaptersListAdapter(getContext(), comic,
                 comicsPresenter, listener);
         recycler.setAdapter(adapter);
 
         recycler.smoothScrollToPosition(0);
+
+        btnView.setOnClickListener(v->{
+            if(recycler.getVisibility() == View.VISIBLE) {
+                btnView.setText("View Chapters List");
+                recycler.setVisibility(View.GONE);
+                rlDetails.setVisibility(View.VISIBLE);
+            } else {
+                btnView.setText("View Comic Details");
+                recycler.setVisibility(View.VISIBLE);
+                rlDetails.setVisibility(View.GONE);
+            }
+        });
     }
 
     private View.OnTouchListener doFocus = (view, motionEvent) -> {

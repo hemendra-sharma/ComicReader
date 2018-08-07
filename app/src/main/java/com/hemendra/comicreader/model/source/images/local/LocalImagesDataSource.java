@@ -3,6 +3,7 @@ package com.hemendra.comicreader.model.source.images.local;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.data.Chapter;
@@ -10,18 +11,23 @@ import com.hemendra.comicreader.model.data.Page;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
+import com.hemendra.comicreader.model.utils.Utils;
 import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 
 public class LocalImagesDataSource extends ImagesDataSource {
 
     private ImagesDB db;
+    private File chaptersDirectory;
 
     public LocalImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
         db = new ImagesDB(context).open();
+        chaptersDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                "/" + getContext().getPackageName() + "/cache/chapters");
     }
 
     @Override
@@ -48,18 +54,6 @@ public class LocalImagesDataSource extends ImagesDataSource {
                 listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
             }
         }
-    }
-
-    public boolean isChapterAvailableOffline(Chapter chapter) {
-        if(listener != null && chapter.pages.size() > 0) {
-            for(Page page : chapter.pages) {
-                if(!db.hasPage(page.getImageUrl())) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -121,6 +115,33 @@ public class LocalImagesDataSource extends ImagesDataSource {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isChapterOffline(Chapter chapter) {
+        if(listener != null) {
+            File file = new File(chaptersDirectory, chapter.id+".obj");
+            return file.exists() && file.length() > 0;
+        }
+        return false;
+    }
+
+    public Chapter getOfflineChapter(Chapter chapter) {
+        if(listener != null && chapter.pages.size() > 0) {
+            File file = new File(chaptersDirectory, chapter.id+".obj");
+            chapter = (Chapter) Utils.readObjectFromFile(file);
+            if(chapter != null) {
+                boolean allPagesAvailable = true;
+                for (Page page : chapter.pages) {
+                    if (page.rawImageData == null
+                            || page.rawImageData.length == 0) {
+                        allPagesAvailable = false;
+                    }
+                }
+                if(allPagesAvailable)
+                    return chapter;
+            }
+        }
+        return null;
     }
 
     @Override

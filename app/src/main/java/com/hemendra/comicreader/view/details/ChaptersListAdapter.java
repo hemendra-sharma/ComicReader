@@ -1,6 +1,7 @@
 package com.hemendra.comicreader.view.details;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,26 +35,25 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
             tvChapterName = itemView.findViewById(R.id.tvChapterName);
             tvChapterDate = itemView.findViewById(R.id.tvChapterDate);
 
-            ivDownload.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
-                        view.requestFocus();
-                    return false;
-                }
+            ivDownload.setOnTouchListener((view, motionEvent) -> {
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+                    view.requestFocus();
+                return false;
             });
 
             itemView.setOnClickListener(view -> listener.onItemClicked(chapter));
         }
     }
 
+    private Context context;
     private Comic comic;
     private ComicsPresenter presenter;
     private OnChapterItemClickListener listener;
 
-    public ChaptersListAdapter(Comic comic,
+    public ChaptersListAdapter(Context context, Comic comic,
                                ComicsPresenter presenter,
                                OnChapterItemClickListener listener) {
+        this.context = context;
         this.comic = comic;
         this.presenter = presenter;
         this.listener = listener;
@@ -77,16 +77,21 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
         chapterViewHolder.tvChapterDate.setText(String.format(Locale.getDefault(),
                 "Last Updated: %s", comic.chapters.get(i).getLastUpdatedString()));
 
-        if(presenter.hasAllPagesOffline(comic.chapters.get(i)))
+        if(presenter.isChapterOffline(comic.chapters.get(i))) {
             chapterViewHolder.ivDownload.setImageResource(R.drawable.ic_check);
-        /*else {
+            chapterViewHolder.ivDownload.setOnClickListener(null);
+            chapterViewHolder.ivDownload.setTag(null);
+        } else {
             chapterViewHolder.ivDownload.setTag(comic.chapters.get(i));
+            chapterViewHolder.ivDownload.setImageResource(R.drawable.ic_download);
             chapterViewHolder.ivDownload.setOnClickListener(v->{
                 if(v.getTag() != null) {
-                    presenter.downloadAllPages((Chapter) v.getTag(), (ImageView) v);
+                    ChapterDownloaderDialog dialog = new ChapterDownloaderDialog(context,
+                            (Chapter) v.getTag(), presenter, (ImageView) v);
+                    dialog.show();
                 }
             });
-        }*/
+        }
     }
 
     @Override

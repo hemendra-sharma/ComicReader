@@ -58,6 +58,8 @@ public class ContentDownloader {
                 if(callback != null)
                     callback.onResponseCode(conn.getResponseCode());
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    int total = conn.getContentLength();
+                    int totalRead = 0;
                     input = new BufferedInputStream(conn.getInputStream());
                     output = new ByteArrayOutputStream();
                     byte data[] = new byte[1024];
@@ -66,6 +68,11 @@ public class ContentDownloader {
                         callback.onStartedReadingResponse();
                     while ((read = input.read(data)) != -1 && !Thread.interrupted()) {
                         output.write(data, 0, read);
+                        if(callback != null && total > 0) {
+                            totalRead += read;
+                            float percent = ((float) totalRead / (float) total) * 100f;
+                            callback.onProgress(percent);
+                        }
                     }
                     response = new String(output.toByteArray());
                     if(callback != null)
@@ -223,6 +230,8 @@ public class ContentDownloader {
                 if(callback != null)
                     callback.onResponseCode(conn.getResponseCode());
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    int total = conn.getContentLength();
+                    int totalRead = 0;
                     reader = new BufferedInputStream(conn.getInputStream());
                     outStream = new ByteArrayOutputStream();
                     int read;
@@ -232,6 +241,11 @@ public class ContentDownloader {
                     while ((read = reader.read(buff)) > 0
                             && !Thread.interrupted()) {
                         outStream.write(buff, 0, read);
+                        if(callback != null && total > 0) {
+                            totalRead += read;
+                            float percent = ((float) totalRead / (float) total) * 100f;
+                            callback.onProgress(percent);
+                        }
                     }
                     bytes = outStream.toByteArray();
                     if(callback != null)

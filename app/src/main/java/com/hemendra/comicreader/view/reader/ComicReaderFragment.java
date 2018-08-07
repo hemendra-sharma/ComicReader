@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ public class ComicReaderFragment extends Fragment {
     private Chapter chapter = null;
     private FlipViewController flipView;
     private ReaderAdapter adapter;
-    private TextView tvPageProgress;
+    private TextView tvPageProgress, tvTitle;
     private ImageView ivPageProgress;
     private int currentPosition = 0;
     private int progressColor = Color.DKGRAY;
@@ -52,6 +53,7 @@ public class ComicReaderFragment extends Fragment {
         view.setBackgroundColor(Color.BLACK);
 
         RelativeLayout container = view.findViewById(R.id.container);
+        tvTitle = view.findViewById(R.id.tvTitle);
         tvPageProgress = view.findViewById(R.id.tvPageProgress);
         ivPageProgress = view.findViewById(R.id.ivPageProgress);
 
@@ -65,18 +67,32 @@ public class ComicReaderFragment extends Fragment {
         flipView.setOverFlipEnabled(false);
         container.addView(flipView);
 
+        Chapter ch = comicsPresenter.getOfflineChapter(chapter);
+        if(ch != null)
+            chapter = ch;
+
+        tvTitle.setText(Html.fromHtml(chapter.title, 0));
+
         adapter = new ReaderAdapter(getContext(), chapter.pages,
-                comicsPresenter, flipView);
+                comicsPresenter, flipView, overlaysVisibility);
 
         flipView.setAdapter(adapter);
 
         flipView.setOnViewFlipListener((view1, position) -> {
+            tvTitle.setVisibility(View.GONE);
             currentPosition = position;
             updateProgress();
         });
 
         updateProgress();
     }
+
+    private Runnable overlaysVisibility = () -> {
+        if(tvTitle.getVisibility() == View.VISIBLE)
+            tvTitle.setVisibility(View.GONE);
+        else
+            tvTitle.setVisibility(View.VISIBLE);
+    };
 
     private void updateProgress() {
         int totalPages = adapter.getCount();

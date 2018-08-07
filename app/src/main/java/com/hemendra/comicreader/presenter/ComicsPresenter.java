@@ -21,7 +21,6 @@ import com.hemendra.comicreader.model.source.comics.remote.RemoteComicsDataSourc
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource;
 import com.hemendra.comicreader.model.source.images.remote.OnChapterDownloadListener;
-import com.hemendra.comicreader.model.source.images.remote.OnPagesDownloadedListener;
 import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource;
 import com.hemendra.comicreader.view.IComicListActivityCallback;
 import com.hemendra.comicreader.view.list.SortingOption;
@@ -221,74 +220,36 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
-    public boolean hasAllPagesOffline(Chapter chapter) {
+    public boolean isChapterOffline(Chapter chapter) {
         return localImagesDataSource != null
-                && localImagesDataSource.isChapterAvailableOffline(chapter);
+                && localImagesDataSource.isChapterOffline(chapter);
     }
 
-    public void downloadAllPages(Chapter chapter, ImageView iv) {
+    public Chapter getOfflineChapter(Chapter chapter) {
+        if(localImagesDataSource != null) {
+            return localImagesDataSource.getOfflineChapter(chapter);
+        }
+        return null;
+    }
+
+    public void downloadChapter(Chapter chapter, OnChapterDownloadListener listener) {
         if(activityView != null
                 && localImagesDataSource != null
-                && remoteImagesDataSource != null
-                && remoteComicsDataSource != null) {
-            if(hasAllPagesOffline(chapter)) {
-                if(chapter.equals(iv.getTag()))
-                    iv.setImageResource(R.drawable.ic_check);
-            } else if(chapter.pages.size() == 0){
-                if(chapter.equals(iv.getTag())) {
-                    iv.setImageResource(R.drawable.ic_wait);
-                    remoteComicsDataSource.loadPagesSilent(chapter, iv, onChapterDownloadListener);
-                }
+                && remoteImagesDataSource != null) {
+            Chapter ch;
+            if((ch = getOfflineChapter(chapter)) != null) {
+                listener.onChapterDownloaded(ch);
+            } else {
+                remoteImagesDataSource.downloadChapter(chapter, listener);
             }
         }
     }
 
-    private OnChapterDownloadListener onChapterDownloadListener = new OnChapterDownloadListener() {
-        @Override
-        public void onChapterDownloaded(Chapter chapter, ImageView iv) {
-            if(activityView != null && chapter.equals(iv.getTag())) {
-                if(localComicsDataSource != null)
-                    localComicsDataSource.updateChapter(chapter);
-                if(hasAllPagesOffline(chapter))
-                    iv.setImageResource(R.drawable.ic_check);
-                else
-                    remoteImagesDataSource.loadPages(chapter, iv,
-                            onPagesDownloadedListener);
-            }
+    public void stopDownloadingChapter() {
+        if(remoteImagesDataSource != null) {
+            remoteImagesDataSource.stopDownloadingChapter();
         }
-
-        @Override
-        public void onAlreadyLoading(Chapter chapter, ImageView iv) {
-            if(activityView != null && chapter.equals(iv.getTag()))
-                iv.setImageResource(R.drawable.ic_wait);
-        }
-
-        @Override
-        public void onFailedToDownloadChapter(Chapter chapter, ImageView iv) {
-            if(activityView != null && chapter.equals(iv.getTag()))
-                iv.setImageResource(R.drawable.ic_download);
-        }
-    };
-
-    private OnPagesDownloadedListener onPagesDownloadedListener = new OnPagesDownloadedListener() {
-        @Override
-        public void onPagesDownloaded(Chapter chapter, ImageView iv) {
-            if(activityView != null && chapter.equals(iv.getTag()))
-                iv.setImageResource(R.drawable.ic_check);
-        }
-
-        @Override
-        public void onAlreadyLoading(Chapter chapter, ImageView iv) {
-            if(activityView != null && chapter.equals(iv.getTag()))
-                iv.setImageResource(R.drawable.ic_wait);
-        }
-
-        @Override
-        public void onFailedToDownloadPages(Chapter chapter, ImageView iv) {
-            if(activityView != null && chapter.equals(iv.getTag()))
-                iv.setImageResource(R.drawable.ic_download);
-        }
-    };
+    }
 
     public void loadComicDetails(Comic comic) {
         if(activityView != null && remoteComicsDataSource != null) {

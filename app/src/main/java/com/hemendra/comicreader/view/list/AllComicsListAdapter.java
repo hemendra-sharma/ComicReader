@@ -53,9 +53,15 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
         this.presenter = presenter;
         this.onComicItemClickListener = onComicItemClickListener;
         for(Comic comic : this.comics.comics) {
-            if(comic.isFavorite)
+            if (comic.isFavorite)
                 favoriteComics.comics.add(comic);
         }
+        if(favoriteComics.comics.size() > 0)
+            type = TYPE_FAVORITES;
+    }
+
+    public boolean hasFavorites() {
+        return favoriteComics.comics.size() > 0;
     }
 
     public Comics getComics() {

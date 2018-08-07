@@ -28,6 +28,12 @@ public abstract class ConnectionCallback {
     public void onResponseCode(int code){}
 
     /**
+     * Gets called when the download progress has changed
+     * @param progress Float progress value in percentage
+     */
+    public void onProgress(float progress){}
+
+    /**
      * Gets called to acknowledge that it has started reading the response now.
      */
     public void onStartedReadingResponse(){}

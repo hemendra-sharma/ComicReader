@@ -28,6 +28,7 @@ public class AllComicsListFragment extends Fragment {
     private RecyclerView recycler = null;
     private String[] sorting_options;
     private TextView tvCategoriesSelector = null;
+    private CheckBox cbFavoritesOnly;
 
     private CategorySelectionDialog categorySelectionDialog = null;
     private AllComicsListAdapter mAdapter = null;
@@ -52,7 +53,7 @@ public class AllComicsListFragment extends Fragment {
         recycler = view.findViewById(R.id.recycler);
         Spinner spinnerSorting = view.findViewById(R.id.spinnerSorting);
         tvCategoriesSelector = view.findViewById(R.id.tvCategoriesSelector);
-        CheckBox cbFavoritesOnly = view.findViewById(R.id.cbFavoritesOnly);
+        cbFavoritesOnly = view.findViewById(R.id.cbFavoritesOnly);
 
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         recycler.setLayoutManager(gridLayoutManager);
@@ -107,6 +108,9 @@ public class AllComicsListFragment extends Fragment {
                 categorySelectionDialog = new CategorySelectionDialog(getContext(),
                         comics.categories, categorySelectionListener);
                 setSelectedCategoriesCount(comics.categories);
+                if(mAdapter.hasFavorites()) {
+                    cbFavoritesOnly.setChecked(true);
+                }
             } else {
                 mAdapter.setComics(comics);
                 mAdapter.notifyDataSetChanged();
