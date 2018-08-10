@@ -2,6 +2,8 @@ package com.hemendra.comicreader.view.details;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,8 +24,8 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
 
     public class ChapterViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView ivDownload;
-        TextView tvChapterName, tvChapterDate;
+        ImageView ivDownload, ivProgress;
+        TextView tvChapterName, tvProgress;
         Chapter chapter;
 
         @SuppressLint("ClickableViewAccessibility")
@@ -33,7 +35,8 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
 
             ivDownload = itemView.findViewById(R.id.ivDownload);
             tvChapterName = itemView.findViewById(R.id.tvChapterName);
-            tvChapterDate = itemView.findViewById(R.id.tvChapterDate);
+            tvProgress = itemView.findViewById(R.id.tvProgress);
+            ivProgress = itemView.findViewById(R.id.ivProgress);
 
             ivDownload.setOnTouchListener((view, motionEvent) -> {
                 if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
@@ -49,6 +52,10 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
     private Comic comic;
     private ComicsPresenter presenter;
     private OnChapterItemClickListener listener;
+    private int progressColor;
+    private int textColor;
+    private int darkGreen;
+    private int darkRed;
 
     public ChaptersListAdapter(Context context, Comic comic,
                                ComicsPresenter presenter,
@@ -57,6 +64,10 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
         this.comic = comic;
         this.presenter = presenter;
         this.listener = listener;
+        this.progressColor = context.getResources().getColor(R.color.progressColor);
+        this.textColor = context.getResources().getColor(R.color.textColor);
+        this.darkGreen = context.getResources().getColor(R.color.textColorDarkGreen);
+        this.darkRed = context.getResources().getColor(R.color.textColorDarkRed);
     }
 
     @NonNull
@@ -74,8 +85,24 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
         chapterViewHolder.tvChapterName.setText(String.format(Locale.getDefault(),
                 "%d. %s", comic.chapters.get(i).number, comic.chapters.get(i).title));
 
-        chapterViewHolder.tvChapterDate.setText(String.format(Locale.getDefault(),
-                "Last Updated: %s", comic.chapters.get(i).getLastUpdatedString()));
+        chapterViewHolder.ivProgress.setImageBitmap(
+                getProgressBitmap(comic.chapters.get(i).readingProgress,
+                        comic.chapters.get(i).pages.size()));
+
+        if(comic.chapters.get(i).pages.size() == 0) {
+            chapterViewHolder.tvProgress.setText("Not Started Yet");
+            chapterViewHolder.tvProgress.setTextColor(darkRed);
+        } else if(comic.chapters.get(i).readingProgress+1
+                >= comic.chapters.get(i).pages.size()) {
+            chapterViewHolder.tvProgress.setText("Finished Reading");
+            chapterViewHolder.tvProgress.setTextColor(darkGreen);
+        } else {
+            chapterViewHolder.tvProgress.setText(String.format(Locale.getDefault(),
+                    "Reading Page No. %d out of %d Pages",
+                    comic.chapters.get(i).readingProgress+1,
+                    comic.chapters.get(i).pages.size()));
+            chapterViewHolder.tvProgress.setTextColor(textColor);
+        }
 
         if(presenter.isChapterOffline(comic.chapters.get(i))) {
             chapterViewHolder.ivDownload.setImageResource(R.drawable.ic_check);
@@ -92,6 +119,22 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
                 }
             });
         }
+    }
+
+    private Bitmap getProgressBitmap(int currentPage, int totalPages) {
+        float progress = 0;
+        if(totalPages > 0) {
+            progress = ((float) (currentPage + 1) / (float) totalPages) * 100f;
+        }
+        int p = (int) Math.ceil(progress);
+        Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
+        for(int i=0; i<100; i++) {
+            if(i <= p)
+                bmp.setPixel(i, 0, progressColor);
+            else
+                bmp.setPixel(i, 0, Color.LTGRAY);
+        }
+        return bmp;
     }
 
     @Override

@@ -26,4 +26,9 @@ public interface IComicListActivityCallback {
 
     void onPageLoaded();
 
+    Chapter getNextChapterFromDetailsFragment(Chapter ch);
+
+    void showProgress();
+    void hideProgress();
+
 }

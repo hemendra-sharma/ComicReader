@@ -8,6 +8,7 @@ import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import com.hemendra.comicreader.view.list.SortingOption;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
@@ -62,11 +63,11 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
         }
         //
         if(sortingOption == SortingOption.POPULARITY)
-            filteredComics.comics.sort((c1, c2) -> Integer.compare(c2.hits, c1.hits));
+            Collections.sort(filteredComics.comics, (c1, c2) -> Integer.compare(c2.hits, c1.hits));
         else if(sortingOption == SortingOption.LATEST_FIRST)
-            filteredComics.comics.sort((c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
+            Collections.sort(filteredComics.comics, (c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
         else if(sortingOption == SortingOption.A_TO_Z)
-            filteredComics.comics.sort(Comparator.comparing(c -> c.title));
+            Collections.sort(filteredComics.comics, (c1, c2) -> c1.title.compareTo(c2.title));
         return filteredComics;
     }
 

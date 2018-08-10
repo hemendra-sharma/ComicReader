@@ -19,18 +19,18 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@+id/ivDownload"
-            android:textSize="18sp"
+            android:textSize="@dimen/textSize18"
             android:textColor="@color/colorPrimaryDark"
             android:text="@string/comic_name"/>
 
         <TextView
-            android:id="@+id/tvChapterDate"
+            android:id="@+id/tvProgress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvChapterName"
             android:layout_toStartOf="@+id/ivDownload"
             android:layout_marginTop="5dp"
-            android:textSize="14sp"
+            android:textSize="@dimen/textSize14"
             android:textColor="@color/colorPrimaryDark"
             android:text="@string/mmm_dd_yyyy"/>
 
@@ -46,6 +46,15 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:clickable="true"/>
+
+        <ImageView
+            android:id="@+id/ivProgress"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/tvProgress"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/progress"/>
 
     </RelativeLayout>
 

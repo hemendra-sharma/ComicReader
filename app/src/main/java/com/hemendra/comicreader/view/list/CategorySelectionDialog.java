@@ -2,6 +2,7 @@ package com.hemendra.comicreader.view.list;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -20,6 +21,7 @@ public class CategorySelectionDialog {
     private Context context;
     private ArrayList<String> categories;
     private ArrayList<Boolean> selection;
+    private ArrayList<Boolean> savedSelection;
     private CategorySelectionListener listener;
 
     private RelativeLayout mainRL;
@@ -27,6 +29,7 @@ public class CategorySelectionDialog {
 
     private Runnable selectAll = null;
     private Runnable selectNone = null;
+    private Runnable restoreSelection = null;
 
     public CategorySelectionDialog(Context context,
                                    ArrayList<String> categories,
@@ -36,8 +39,11 @@ public class CategorySelectionDialog {
         this.listener = listener;
         //
         this.selection = new ArrayList<>();
-        for(int i=0; i<this.categories.size(); i++)
+        this.savedSelection = new ArrayList<>();
+        for(int i=0; i<this.categories.size(); i++) {
             selection.add(true);
+            savedSelection.add(true);
+        }
         //
         dialog = prepareLayout();
     }
@@ -73,7 +79,7 @@ public class CategorySelectionDialog {
 
         Dialog dialog = new Dialog(context, R.style.CategorySelectionDialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
         dialog.setContentView(view);
 
         btn.setOnClickListener(v->{
@@ -91,9 +97,17 @@ public class CategorySelectionDialog {
                 ((CheckBox)ll.getChildAt(i)).setChecked(false);
         };
 
+        restoreSelection = ()->{
+            for(int i=0; i<selection.size(); i++) {
+                ((CheckBox)ll.getChildAt(i)).setChecked(savedSelection.get(i));
+            }
+        };
+
         btnAll.setOnClickListener(v-> selectAll());
 
         btnNone.setOnClickListener(v-> selectNone());
+
+        dialog.setOnCancelListener(dialogInterface -> restoreSelection.run());
 
         return dialog;
     }
@@ -124,6 +138,7 @@ public class CategorySelectionDialog {
         if(listener != null) {
             ArrayList<String> selectedCategories = new ArrayList<>();
             for(int i=0; i<selection.size(); i++) {
+                savedSelection.set(i, selection.get(i));
                 if(selection.get(i)) {
                     selectedCategories.add(categories.get(i));
                 }
@@ -141,6 +156,10 @@ public class CategorySelectionDialog {
 
     public void show() {
         if(dialog != null) {
+            for(int i=0; i<selection.size(); i++) {
+                savedSelection.set(i, selection.get(i));
+            }
+
             dialog.show();
 
             int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.80);

@@ -61,7 +61,10 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
             if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
                 recoverFromFullScreen();
+                comicDetailsFragment.refreshChaptersList();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
+                if(comicDetailsFragment.onBackPressed())
+                    return;
                 showSearchView();
                 allComicsListFragment.refreshCurrentView();
             }
@@ -216,63 +219,78 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     @Override
     public void onComicsLoadingStarted() {
         hideSearchView();
-        rlProgress.setVisibility(View.VISIBLE);
+        showProgress();
     }
 
     @Override
     public void onComicsLoaded(Comics comics) {
         showSearchView();
-        rlProgress.setVisibility(View.GONE);
+        hideProgress();
         allComicsListFragment.onComicsLoaded(comics);
     }
 
     @Override
     public void onFailedToLoadComics(String reason) {
         showSearchView();
-        rlProgress.setVisibility(View.GONE);
+        hideProgress();
         showMessage(this, "Failed to Load Comics. Reason: "+reason, null);
     }
 
     @Override
     public void onComicDetailsLoadingStarted() {
         hideSearchView();
-        rlProgress.setVisibility(View.VISIBLE);
+        showProgress();
     }
 
     @Override
     public void onComicDetailsLoaded(Comic comic) {
-        rlProgress.setVisibility(View.GONE);
+        hideProgress();
         showComicDetailsFragment(comic);
     }
 
     @Override
     public void onFailedToLoadComicDetails(String reason) {
         showSearchView();
-        rlProgress.setVisibility(View.GONE);
+        hideProgress();
         showMessage(this, "Failed to Load Comic Details. Reason: "+reason, null);
     }
 
     @Override
     public void onChapterLoadingStarted() {
         hideSearchView();
-        rlProgress.setVisibility(View.VISIBLE);
+        showProgress();
     }
 
     @Override
     public void onChapterLoaded(Chapter chapter) {
-        rlProgress.setVisibility(View.GONE);
+        hideProgress();
         showComicReaderFragment(chapter);
     }
 
     @Override
     public void onFailedToLoadChapter(String reason) {
-        rlProgress.setVisibility(View.GONE);
+        hideProgress();
         showMessage(this, "Failed to Load Chapter. Reason: "+reason, null);
     }
 
     @Override
     public void onPageLoaded() {
         comicReaderFragment.refreshFlipView();
+    }
+
+    @Override
+    public Chapter getNextChapterFromDetailsFragment(Chapter ch) {
+        return comicDetailsFragment.getNextChapterFrom(ch);
+    }
+
+    @Override
+    public void showProgress() {
+        rlProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        rlProgress.setVisibility(View.GONE);
     }
 
 }

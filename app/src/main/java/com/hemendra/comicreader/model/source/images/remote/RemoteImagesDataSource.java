@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
@@ -13,7 +14,7 @@ import com.hemendra.comicreader.view.reader.TouchImageView;
 
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
-    public static final int MAX_PARALLEL_DOWNLOADS = 10;
+    public static int MAX_PARALLEL_DOWNLOADS = 10;
 
     private IImagesDataSourceListener listener;
     private ChapterPagesDownloader chapterPagesDownloader = null;

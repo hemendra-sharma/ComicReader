@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,8 +54,6 @@ public class AllComicsListFragment extends Fragment {
         tvCategoriesSelector = view.findViewById(R.id.tvCategoriesSelector);
         cbFavoritesOnly = view.findViewById(R.id.cbFavoritesOnly);
 
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
-        recycler.setLayoutManager(gridLayoutManager);
         recycler.setItemAnimator(new DefaultItemAnimator());
 
         sorting_options = getResources().getStringArray(R.array.sorting_options);

@@ -1,5 +1,7 @@
 package com.hemendra.comicreader.model.source.comics.remote;
 
+import android.os.Build;
+
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
@@ -9,7 +11,9 @@ import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Collections;
 
 public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
 
@@ -22,7 +26,27 @@ public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
 
     @Override
     protected Comics doInBackground(Void... voids) {
-        String json = ContentDownloader.downloadAsString(RemoteConfig.buildComicsUrl(-1),
+        InputStream in = ContentDownloader.downloadAsStream(RemoteConfig.buildComicsUrl(-1),
+                new ConnectionCallback() {
+                    @Override
+                    public void onResponseCode(int code) {
+                        switch (code) {
+                            case HttpURLConnection.HTTP_NOT_FOUND:
+                                reason = FailureReason.API_MISSING;
+                                break;
+                            default:
+                                reason = FailureReason.INVALID_RESPONSE_FROM_SERVER;
+                        }
+                    }
+                });
+        if(in != null) {
+            Comics comics = ComicsParser.parseComicsFromJSON(in);
+            if(comics != null) {
+                return comics;
+            }
+        }
+
+        /*String json = ContentDownloader.downloadAsString(RemoteConfig.buildComicsUrl(-1),
                 new ConnectionCallback() {
                     @Override
                     public void onResponseCode(int code) {
@@ -41,7 +65,7 @@ public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
                 comics.comics.sort((c1, c2) -> Integer.compare(c2.hits, c1.hits));
                 return comics;
             }
-        }
+        }*/
         return null;
     }
 

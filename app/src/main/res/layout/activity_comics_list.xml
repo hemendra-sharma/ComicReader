@@ -17,7 +17,7 @@
         android:id="@+id/rlProgress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#aa000000"
+        android:background="#cc000000"
         android:focusableInTouchMode="true"
         android:focusable="true"
         android:clickable="true"
@@ -34,8 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/pbProgress"
-            android:textColor="#ffffff"
-            android:textSize="18sp"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/textSize18"
             android:text="@string/please_wait"
             android:layout_centerHorizontal="true"/>
 

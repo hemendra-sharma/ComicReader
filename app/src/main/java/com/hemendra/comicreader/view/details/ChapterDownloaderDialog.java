@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.text.Html;
 import android.view.View;
 import android.view.Window;
@@ -42,7 +43,7 @@ public class ChapterDownloaderDialog {
 
         dialog = prepareLayout();
 
-        progressColor = context.getResources().getColor(R.color.colorAccent, null);
+        progressColor = context.getResources().getColor(R.color.progressColor, null);
     }
 
     private Dialog prepareLayout() {
@@ -57,7 +58,11 @@ public class ChapterDownloaderDialog {
         Button btnCancel = view.findViewById(R.id.btnCancel);
 
         btnCancel.setTransformationMethod(null);
-        tvInfo.setText(Html.fromHtml("Downloading Chapter<br><br><b>\""+chapter.title+"\"</b>", 0));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tvInfo.setText(Html.fromHtml("Downloading Chapter<br><br><b>\""+chapter.title+"\"</b>", 0));
+        } else {
+            tvInfo.setText(Html.fromHtml("Downloading Chapter<br><br><b>\""+chapter.title+"\"</b>"));
+        }
 
         Dialog dialog = new Dialog(context, R.style.CategorySelectionDialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -79,7 +84,7 @@ public class ChapterDownloaderDialog {
             if(i <= p)
                 bmp.setPixel(i, 0, progressColor);
             else
-                bmp.setPixel(i, 0, Color.GRAY);
+                bmp.setPixel(i, 0, Color.LTGRAY);
         }
         return bmp;
     }
@@ -99,12 +104,19 @@ public class ChapterDownloaderDialog {
                 }
 
                 @Override
-                public void onProgressUpdate(Float... progress) {
+                public void onProgressUpdate(Integer... progress) {
+                    int chapterProgress = progress[0];
+                    int downloadedPages = progress[1];
+                    int totalPages = progress[2];
+                    int pageProgress = progress[3];
+                    int currentPageNumber = progress[4];
+
                     tvProgress1.setText(String.format(Locale.getDefault(),
-                            "%02.1f%%", progress[0]));
+                            "Downloaded %d out of %d Pages (%d%%)",
+                            downloadedPages, totalPages, chapterProgress));
                     ivProgress1.setImageBitmap(getProgressBitmap(progress[0]));
                     tvProgress2.setText(String.format(Locale.getDefault(),
-                            "%02.1f%%", progress[1]));
+                            "Downloading Page No. %d (%d%%)", currentPageNumber, pageProgress));
                     ivProgress2.setImageBitmap(getProgressBitmap(progress[1]));
                 }
 

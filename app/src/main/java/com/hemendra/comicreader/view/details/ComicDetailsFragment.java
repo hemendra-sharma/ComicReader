@@ -1,6 +1,7 @@
 package com.hemendra.comicreader.view.details;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,9 @@ public class ComicDetailsFragment extends Fragment {
     private RecyclerView recycler;
     private RelativeLayout rlDetails;
     private ImageView ivStar;
+    private Button btnStartReading1, btnStartReading2;
+
+    private ChaptersListAdapter adapter = null;
 
     public static ComicDetailsFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicDetailsFragment fragment = new ComicDetailsFragment();
@@ -64,7 +68,8 @@ public class ComicDetailsFragment extends Fragment {
         TextView tvHits = view.findViewById(R.id.tvHits);
         TextView tvChapters = view.findViewById(R.id.tvChapters);
         recycler = view.findViewById(R.id.recycler);
-        Button btnView = view.findViewById(R.id.btnView);
+        btnStartReading1 = view.findViewById(R.id.btnStartReading1);
+        btnStartReading2 = view.findViewById(R.id.btnStartReading2);
         rlDetails = view.findViewById(R.id.rlDetails);
 
         String url = comic.getImageUrl();
@@ -79,12 +84,17 @@ public class ComicDetailsFragment extends Fragment {
         ivStar.setOnTouchListener(doFocus);
         ivStar.setOnClickListener(onStarClicked);
 
-        btnView.setTransformationMethod(null);
+        btnStartReading1.setTransformationMethod(null);
+        btnStartReading2.setTransformationMethod(null);
 
         tvTitle.setText(comic.title);
         tvLastUpdated.setText(comic.getLastUpdatedString());
         tvCategories.setText(comic.getCategoriesString(10));
-        tvDescription.setText(Html.fromHtml(comic.description, 0));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tvDescription.setText(Html.fromHtml(comic.description, 0));
+        } else {
+            tvDescription.setText(Html.fromHtml(comic.description));
+        }
         tvReleasedYear.setText(String.format(Locale.getDefault(),
                 "Released in %s", comic.released));
         tvHits.setText(String.format(Locale.getDefault(),
@@ -92,26 +102,53 @@ public class ComicDetailsFragment extends Fragment {
         tvChapters.setText(String.format(Locale.getDefault(),
                 "%s Chapters", comic.chapters.size()));
 
-        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setItemAnimator(new DefaultItemAnimator());
 
-        ChaptersListAdapter adapter = new ChaptersListAdapter(getContext(), comic,
+        adapter = new ChaptersListAdapter(getContext(), comic,
                 comicsPresenter, listener);
         recycler.setAdapter(adapter);
 
-        recycler.smoothScrollToPosition(0);
-
-        btnView.setOnClickListener(v->{
-            if(recycler.getVisibility() == View.VISIBLE) {
-                btnView.setText("View Chapters List");
-                recycler.setVisibility(View.GONE);
-                rlDetails.setVisibility(View.VISIBLE);
-            } else {
-                btnView.setText("View Comic Details");
-                recycler.setVisibility(View.VISIBLE);
-                rlDetails.setVisibility(View.GONE);
+        int lastReadIndex = 0;
+        for(int i=comic.chapters.size()-1; i>=0; i--) {
+            if(comic.chapters.get(i).readingProgress > 0) {
+                lastReadIndex = i;
+                break;
             }
-        });
+        }
+        recycler.getLayoutManager().scrollToPosition(lastReadIndex);
+
+        btnStartReading1.setOnClickListener(onStartReadingClicked);
+        btnStartReading2.setOnClickListener(onStartReadingClicked);
+    }
+
+    public Chapter getNextChapterFrom(Chapter ch) {
+        for(int i=0; i<comic.chapters.size(); i++) {
+            if(comic.chapters.get(i).id.equals(ch.id)) {
+                if(i+1 < comic.chapters.size()) {
+                    return comic.chapters.get(i+1);
+                }
+                break;
+            }
+        }
+        return null;
+    }
+
+    private View.OnClickListener onStartReadingClicked = v->{
+        if(adapter.getItemCount() > 0) {
+            recycler.setVisibility(View.VISIBLE);
+            rlDetails.setVisibility(View.GONE);
+        } else {
+            Toast.makeText(getContext(), "No Chapters Available Right Now !", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    public boolean onBackPressed() {
+        if(recycler.getVisibility() == View.VISIBLE) {
+            recycler.setVisibility(View.GONE);
+            rlDetails.setVisibility(View.VISIBLE);
+            return true;
+        }
+        return false;
     }
 
     private View.OnTouchListener doFocus = (view, motionEvent) -> {
@@ -133,6 +170,12 @@ public class ComicDetailsFragment extends Fragment {
     };
 
     private OnChapterItemClickListener listener = chapter -> comicsPresenter.loadPages(chapter);
+
+    public void refreshChaptersList() {
+        if(adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
 
     @Override
     public void onDestroyView() {

@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 
@@ -201,6 +202,51 @@ public class ContentDownloader {
             }
         }
         return response;
+    }
+
+    /**
+     * Fetches the web content of given URL as String
+     * @param url web url
+     * @param callback HTTP Connection callback methods
+     * @return null if interrupted, any network errors occurred, or not 200 OK.
+     * Else returns the web content as String.
+     */
+    @WorkerThread
+    public static InputStream downloadAsStream(String url, ConnectionCallback callback) {
+        HttpURLConnection conn = null;
+        try {
+            if(url != null && url.trim().length() > 0)
+                url = url.replace(" ", "%20");
+
+            Log.d("downloading string", ">> " + url);
+
+            conn = TlsHttp.getConnection("GET", url);
+            if(conn != null) {
+                if(callback != null)
+                    callback.onConnectionInitialized(conn);
+                conn.connect();
+                if(callback != null)
+                    callback.onResponseCode(conn.getResponseCode());
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    return conn.getInputStream();
+                } else {
+                    Log.d(TAG,
+                            "Failed to Download URL as String. Response code: " + conn.getResponseCode());
+                }
+            } else {
+                if(callback != null)
+                    callback.onFailedToInitialize();
+                Log.d(TAG,
+                        "Failed to Download URL as String. 'conn' is null.");
+            }
+        } catch (InterruptedIOException ignore) {
+            // ignore
+            Log.d(TAG,"Interrupted while downloading URL '"+url+"'");
+        } catch(Throwable ex){
+            Log.d(TAG,"Failed to download content as String. Requested URL '"+url+"'");
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     /**

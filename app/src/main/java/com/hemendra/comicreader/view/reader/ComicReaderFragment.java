@@ -2,6 +2,7 @@ package com.hemendra.comicreader.view.reader;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -68,17 +69,35 @@ public class ComicReaderFragment extends Fragment {
         container.addView(flipView);
 
         Chapter ch = comicsPresenter.getOfflineChapter(chapter);
-        if(ch != null)
-            chapter = ch;
+        if(ch == null) {
+            ch = chapter;
+        }
 
-        tvTitle.setText(Html.fromHtml(chapter.title, 0));
-
-        adapter = new ReaderAdapter(getContext(), chapter.pages,
-                comicsPresenter, flipView, overlaysVisibility);
-
+        adapter = new ReaderAdapter(getContext(), this, ch.pages,
+                comicsPresenter, flipView, overlaysVisibility,
+                comicsPresenter.getNextChapterFrom(chapter));
         flipView.setAdapter(adapter);
 
+        refreshUI();
+    }
+
+    public void refreshUI() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tvTitle.setText(Html.fromHtml(chapter.title, 0));
+        } else {
+            tvTitle.setText(Html.fromHtml(chapter.title));
+        }
+
+        if(chapter.readingProgress > 0) {
+            flipView.setSelection(chapter.readingProgress);
+            currentPosition = chapter.readingProgress;
+            updateProgress();
+        }
+
         flipView.setOnViewFlipListener((view1, position) -> {
+            if(position > chapter.readingProgress) {
+                chapter.readingProgress = position;
+            }
             tvTitle.setVisibility(View.GONE);
             currentPosition = position;
             updateProgress();
@@ -114,6 +133,13 @@ public class ComicReaderFragment extends Fragment {
     public void onPause() {
         super.onPause();
         flipView.onPause();
+        updateChapterProgress();
+    }
+
+    public void updateChapterProgress() {
+        if(chapter.readingProgress > 0) {
+            comicsPresenter.updateChapter(chapter);
+        }
     }
 
     @Override

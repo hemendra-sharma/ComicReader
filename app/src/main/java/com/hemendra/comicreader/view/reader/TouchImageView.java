@@ -10,7 +10,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
@@ -56,6 +54,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
 
     private float minScale;
     private float maxScale;
+    private float mediumScale;
     private float superMinScale;
     private float superMaxScale;
     private float[] m;
@@ -115,6 +114,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         }
         minScale = 1;
         maxScale = 3;
+        mediumScale = 1;
         superMinScale = SUPER_MIN_MULTIPLIER * minScale;
         superMaxScale = SUPER_MAX_MULTIPLIER * maxScale;
         setImageMatrix(matrix);
@@ -296,6 +296,14 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         maxScale = max;
         superMaxScale = SUPER_MAX_MULTIPLIER * maxScale;
     }
+
+    public float getMediumScale() {
+        return mediumScale;
+    };
+
+    public void setMediumScale(float mediumScale) {
+        this.mediumScale = mediumScale;
+    }
     
     /**
      * Get the min zoom multiplier.
@@ -329,6 +337,13 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     public void resetZoom() {
     	normalizedScale = 1;
     	fitImageToView();
+    }
+
+    public void resetZoomSmooth() {
+        if (state == State.NONE) {
+            DoubleTapZoom doubleTap = new DoubleTapZoom(minScale, 0, 0, false);
+            compatPostOnAnimation(doubleTap);
+        }
     }
     
     /**
@@ -750,7 +765,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         @Override
         public void onLongPress(MotionEvent e)
         {
-        	performLongClick();
+            performLongClick();
         }
         
         @Override
@@ -775,7 +790,8 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
             	consumed = doubleTapListener.onDoubleTap(e);
             }
         	if (state == State.NONE) {
-	        	float targetZoom = (normalizedScale == minScale) ? maxScale : minScale;
+	        	float targetZoom = (normalizedScale == minScale) ? mediumScale :
+                        (normalizedScale == mediumScale) ? maxScale : minScale;
 	        	DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, e.getX(), e.getY(), false);
 	        	compatPostOnAnimation(doubleTap);
 	        	consumed = true;

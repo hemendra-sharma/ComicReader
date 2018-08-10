@@ -4,7 +4,7 @@
     android:id="@+id/mainRL"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#bbc2e4"
+    android:background="@drawable/bordered_rectangle_primary_color"
     android:padding="3dp">
 
     <LinearLayout
@@ -20,8 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="3dp"
-            android:textColor="#ffffff"
-            android:textSize="16sp"
+            android:textColor="@color/textColorInverse"
+            android:textSize="@dimen/textSize16"
             android:background="@drawable/btn_selector"
             android:text="@string/all"/>
 
@@ -31,8 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="3dp"
-            android:textColor="#ffffff"
-            android:textSize="16sp"
+            android:textColor="@color/textColorInverse"
+            android:textSize="@dimen/textSize16"
             android:background="@drawable/btn_selector"
             android:text="@string/none"/>
 
@@ -63,8 +63,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="3dp"
-        android:textColor="#ffffff"
-        android:textSize="18sp"
+        android:textColor="@color/textColorInverse"
+        android:textSize="@dimen/textSize16"
         android:background="@drawable/btn_selector"
         android:text="@string/apply"/>
 

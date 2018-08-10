@@ -2,6 +2,8 @@ package com.hemendra.comicreader.model.source.comics.remote;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.JsonReader;
+import android.util.JsonToken;
 
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
@@ -13,10 +15,108 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 
 public class ComicsParser {
+
+    @Nullable
+    public static Comics parseComicsFromJSON(@NonNull InputStream in) {
+        try{
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
+            reader.beginObject();
+            Comics comics = new Comics();
+            ArrayList<String> allCategories = new ArrayList<>();
+            while(reader.hasNext()) {
+                String name = reader.nextName();
+                if(name.equals("manga")) {
+                    reader.beginArray();
+                    while(reader.hasNext()) {
+                        reader.beginObject();
+                        String id = "", title = "", image = "";
+                        int hits = 0;
+                        long lastUpdated = 0;
+                        ArrayList<String> categories = new ArrayList<>();
+                        while(reader.hasNext()) {
+                            if(reader.peek() == JsonToken.NULL) {
+                                reader.skipValue();
+                                continue;
+                            }
+                            name = reader.nextName();
+                            if(reader.peek() == JsonToken.NULL) {
+                                reader.skipValue();
+                                continue;
+                            }
+                            switch (name) {
+                                case "i":
+                                    id = reader.nextString();
+                                    break;
+                                case "t":
+                                    title = reader.nextString();
+                                    break;
+                                case "im":
+                                    image = reader.nextString();
+                                    break;
+                                case "h":
+                                    hits = reader.nextInt();
+                                    break;
+                                case "ld":
+                                    lastUpdated = (long) reader.nextDouble();
+                                    break;
+                                case "c":
+                                    reader.beginArray();
+                                    while (reader.hasNext()) {
+                                        if(reader.peek() == JsonToken.NULL) {
+                                            reader.skipValue();
+                                            continue;
+                                        }
+                                        String str = reader.nextString().toLowerCase();
+                                        categories.add(str);
+                                        if (!allCategories.contains(str)) {
+                                            allCategories.add(str);
+                                        }
+                                    }
+                                    reader.endArray();
+                                    break;
+                                default:
+                                    reader.skipValue();
+                                    break;
+                            }
+                        }
+                        reader.endObject();
+
+                        title = title.equalsIgnoreCase("null") ? "-" : title;
+                        image = image.equalsIgnoreCase("null") ? "" : image;
+
+                        Comic comic = new Comic(id, title, image, lastUpdated, categories);
+                        comic.hits = hits;
+                        comics.comics.add(comic);
+                    }
+                    reader.endArray();
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.endObject();
+
+            Collections.sort(allCategories, String::compareTo);
+            comics.categories = allCategories;
+
+            return comics;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 
     @Nullable
     public static Comics parseComicsFromJSON(@NonNull String json) {
@@ -65,7 +165,7 @@ public class ComicsParser {
                                 comics.comics.add(comic);
                             }
                         }
-                        allCategories.sort(Comparator.naturalOrder());
+                        Collections.sort(allCategories, String::compareTo);
                         comics.categories = allCategories;
                         return comics;
                     }
@@ -119,7 +219,7 @@ public class ComicsParser {
                     comic.released = jsonObject.getString("released");
                 }
 
-                comic.chapters.sort(Comparator.comparingInt(ch -> ch.number));
+                Collections.sort(comic.chapters, (c1, c2)-> Integer.compare(c1.number, c2.number));
 
                 return comic;
             }
@@ -152,7 +252,7 @@ public class ComicsParser {
                     }
                 }
 
-                chapter.pages.sort(Comparator.comparingInt(pg -> pg.number));
+                Collections.sort(chapter.pages, (p1, p2) -> Integer.compare(p1.number, p2.number));
 
                 return chapter;
             }

@@ -138,7 +138,7 @@
         android:scrollbars="vertical"
         android:layout_below="@+id/cardOptions"
         app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="3">
+        app:spanCount="6">
 
     </android.support.v7.widget.RecyclerView>
 

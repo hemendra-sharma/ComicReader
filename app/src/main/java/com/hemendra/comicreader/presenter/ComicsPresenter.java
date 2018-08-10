@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
@@ -299,6 +300,13 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    public Chapter getNextChapterFrom(Chapter ch) {
+        if(activityView != null) {
+            return activityView.getNextChapterFromDetailsFragment(ch);
+        }
+        return null;
+    }
+
     public void loadPages(Chapter chapter) {
         if(activityView != null
                 && remoteComicsDataSource != null) {
@@ -308,6 +316,25 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
                 remoteComicsDataSource.loadPages(chapter);
             }
         }
+    }
+
+    public void loadPages(Chapter chapter, IComicsDataSourceListener listener) {
+        if(chapter.pages.size() > 0) {
+            activityView.onChapterLoadingStarted();
+            listener.onPagesLoaded(chapter);
+        } else {
+            new RemoteComicsDataSource(context, listener).loadPages(chapter);
+        }
+    }
+
+    public void showProgress() {
+        if(activityView != null)
+            activityView.showProgress();
+    }
+
+    public void hideProgress() {
+        if(activityView != null)
+            activityView.hideProgress();
     }
 
     @Override
@@ -322,6 +349,12 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         if(activityView != null
                 && localComicsDataSource != null) {
             activityView.onChapterLoaded(chapter);
+            updateChapter(chapter);
+        }
+    }
+
+    public void updateChapter(Chapter chapter) {
+        if(localComicsDataSource != null) {
             localComicsDataSource.updateChapter(chapter);
         }
     }

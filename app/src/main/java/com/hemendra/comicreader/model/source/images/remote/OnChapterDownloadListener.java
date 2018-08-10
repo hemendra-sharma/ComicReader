@@ -5,6 +5,6 @@ import com.hemendra.comicreader.model.source.FailureReason;
 
 public interface OnChapterDownloadListener {
     void onChapterDownloaded(Chapter chapter);
-    void onProgressUpdate(Float... progress);
+    void onProgressUpdate(Integer... progress);
     void onFailedToDownloadChapter(FailureReason reason);
 }

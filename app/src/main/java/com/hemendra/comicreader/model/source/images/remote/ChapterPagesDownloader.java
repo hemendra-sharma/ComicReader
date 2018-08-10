@@ -17,13 +17,14 @@ import com.hemendra.comicreader.model.utils.Utils;
 import java.io.File;
 import java.net.HttpURLConnection;
 
-public class ChapterPagesDownloader extends CustomAsyncTask<Void,Float,Boolean> {
+public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean> {
 
     private Context context;
     private OnChapterDownloadListener listener;
     private Chapter chapter;
     private FailureReason reason = FailureReason.UNKNOWN_REMOTE_ERROR;
-    private float progress1 = 0;
+    private int progress1 = 0;
+    private int count = 0;
     private ImagesDB db;
 
     public ChapterPagesDownloader(Context context,
@@ -64,10 +65,10 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Float,Boolean> 
                 File file = new File(dir, chapter.id + ".obj");
                 if (!file.exists() || file.length() == 0) {
                     if (dir.exists() || dir.mkdirs()) {
-                        int count = 0;
+                        progress1 = count = 0;
                         for (Page page : chapter.pages) {
-                            progress1 = ((float) count / (float) chapter.pages.size()) * 100f;
-                            publishProgress(progress1, 0f);
+                            progress1 = (int) Math.ceil(((float) count / (float) chapter.pages.size()) * 100f);
+                            publishProgress(progress1, count, chapter.pages.size(), 0, page.number);
 
                             String imgUrl = page.getImageUrl();
 
@@ -78,7 +79,9 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Float,Boolean> 
                                         new ConnectionCallback() {
                                             @Override
                                             public void onProgress(float progress) {
-                                                publishProgress(progress1, progress);
+                                                publishProgress(progress1,
+                                                        count, chapter.pages.size(),
+                                                        (int)Math.ceil(progress), page.number);
                                             }
 
                                             @Override
@@ -117,7 +120,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Float,Boolean> 
     }
 
     @Override
-    protected void onProgressUpdate(Float... progress) {
+    protected void onProgressUpdate(Integer... progress) {
         listener.onProgressUpdate(progress);
     }
 

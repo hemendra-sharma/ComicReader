@@ -19,9 +19,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:textSize="14sp"
+        android:textSize="@dimen/textSize14"
         android:padding="10dp"
-        android:textColor="#ffffff"
+        android:textColor="@color/textColorInverse"
         android:singleLine="true"
         android:maxLines="1"
         android:text="@string/chapter_title"
@@ -51,8 +51,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="12sp"
-            android:textColor="#ffffff"
+            android:textSize="@dimen/textSize12"
+            android:textColor="@color/textColorInverse"
             android:text="@string/page_0_0"/>
 
     </RelativeLayout>

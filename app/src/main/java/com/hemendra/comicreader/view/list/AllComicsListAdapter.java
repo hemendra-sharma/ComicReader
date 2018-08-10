@@ -1,5 +1,6 @@
 package com.hemendra.comicreader.view.list;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -65,22 +66,15 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
     }
 
     public Comics getComics() {
-        if(type == TYPE_ALL)
-            return comics;
-        else
-            return favoriteComics;
+        return comics;
     }
 
     public void setComics(Comics comics) {
-        if(type == TYPE_ALL) {
-            this.comics = comics;
-            favoriteComics = new Comics();
-            for (Comic comic : this.comics.comics) {
-                if (comic.isFavorite)
-                    favoriteComics.comics.add(comic);
-            }
-        } else {
-            favoriteComics = comics;
+        this.comics = comics;
+        favoriteComics = new Comics();
+        for (Comic comic : this.comics.comics) {
+            if (comic.isFavorite)
+                favoriteComics.comics.add(comic);
         }
     }
 
@@ -104,7 +98,11 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
     @Override
     public void onBindViewHolder(@NonNull ComicViewHolder comicViewHolder, int position) {
         comicViewHolder.comic = getComic(position);
-        comicViewHolder.tvTitle.setText(Html.fromHtml(getComic(position).title, 0));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            comicViewHolder.tvTitle.setText(Html.fromHtml(getComic(position).title, 0));
+        } else {
+            comicViewHolder.tvTitle.setText(Html.fromHtml(getComic(position).title));
+        }
         comicViewHolder.tvCategories.setText(getComic(position).getCategoriesString(2));
         comicViewHolder.tvLastUpdated.setText(getComic(position).getLastUpdatedString());
         comicViewHolder.ivCover.setImageResource(R.drawable.no_cover);

@@ -15,6 +15,7 @@ public class Chapter implements Serializable {
     public String title;
     public long dateUpdated;
     public ArrayList<Page> pages = new ArrayList<>();
+    public int readingProgress = 0;
 
     public Chapter(String id, int number, String title, long dateUpdated) {
         this.id = id;

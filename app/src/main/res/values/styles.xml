@@ -6,9 +6,15 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/textColor</item>
         <item name="android:textSize">@dimen/textSize16</item>
         <item name="android:navigationBarColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="SpinnerTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/textColorDark</item>
+        <item name="android:textSize">@dimen/textSize16</item>
     </style>
 
     <style name="CategorySelectionDialog" parent="android:Theme.Dialog">
