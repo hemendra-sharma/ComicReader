@@ -46,19 +46,24 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
                 continue;
             if(categoryMatch(comic)
                     && comic.title.toLowerCase().contains(query.toLowerCase())) {
+                comic.searchScore = Integer.MAX_VALUE;
                 filteredComics.comics.add(comic);
             }
         }
-        for(String part : parts) {
-            for(Comic comic : comics.comics) {
-                if(filteredComics.comics.contains(comic))
-                    continue;
-                if(categoryMatch(comic)) {
-                    if (comic.title.toLowerCase().contains(part)
-                            || comic.description.toLowerCase().contains(part)) {
-                        filteredComics.comics.add(comic);
-                    }
+        for(Comic comic : comics.comics) {
+            if (filteredComics.comics.contains(comic))
+                continue;
+            if(!categoryMatch(comic))
+                continue;
+            int score = 0;
+            for(String part : parts) {
+                if (comic.title.toLowerCase().contains(part)) {
+                    score++;
                 }
+            }
+            if(score > 0) {
+                comic.searchScore = score;
+                filteredComics.comics.add(comic);
             }
         }
         //
@@ -68,6 +73,7 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
             Collections.sort(filteredComics.comics, (c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
         else if(sortingOption == SortingOption.A_TO_Z)
             Collections.sort(filteredComics.comics, (c1, c2) -> c1.title.compareTo(c2.title));
+        Collections.sort(filteredComics.comics, (c1, c2) -> Integer.compare(c2.searchScore, c1.searchScore));
         return filteredComics;
     }
 

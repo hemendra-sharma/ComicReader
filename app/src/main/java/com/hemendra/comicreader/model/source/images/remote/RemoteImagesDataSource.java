@@ -9,21 +9,26 @@ import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
-import com.hemendra.comicreader.model.source.images.local.ImagesDB;
 import com.hemendra.comicreader.view.reader.TouchImageView;
+
+import java.util.ArrayList;
 
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
-    public static int MAX_PARALLEL_DOWNLOADS = 10;
+    public static final int MAX_PARALLEL_DOWNLOADS = 10;
 
     private IImagesDataSourceListener listener;
     private ChapterPagesDownloader chapterPagesDownloader = null;
 
     private ImageDownloader[] downloadingSlots = new ImageDownloader[MAX_PARALLEL_DOWNLOADS];
 
+    private int maxQueuedDownloads;
+    private final ArrayList<ImageDownloader> queuedDownloads = new ArrayList<>();
+
     public RemoteImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
         this.listener = listener;
+        maxQueuedDownloads = context.getResources().getInteger(R.integer.max_queued_image_loaders);
     }
 
     @Override
@@ -80,6 +85,19 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
             if(page)
                 listener.onPageLoaded(url, bmp);
         }
+        popFromQueueAndFitIntoFreeSlot();
+    }
+
+    @Override
+    public void onFailedToDownloadImage(String url, boolean image, boolean page) {
+        popFromQueueAndFitIntoFreeSlot();
+    }
+
+    private void popFromQueueAndFitIntoFreeSlot() {
+        ImageDownloader id = getElementFromQueue();
+        if(id != null) {
+            fitIntoAnyFreeSlot(id);
+        }
     }
 
     private boolean alreadyDownloading(String url) {
@@ -90,13 +108,28 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
                 return true;
             }
         }
+        synchronized (queuedDownloads) {
+            for (ImageDownloader slot : queuedDownloads) {
+                if (slot != null && slot.isExecuting()
+                        && slot.imgUrl.equals(url)) {
+                    // already queued
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
     private boolean fitIntoAnyFreeSlot(String url, ImageView iv, TouchImageView tiv) {
+        if(fitIntoAnyFreeSlot(new ImageDownloader(this, url, iv, tiv)))
+            return true;
+        return queueDownload(url, iv, tiv);
+    }
+
+    private boolean fitIntoAnyFreeSlot(ImageDownloader id) {
         for(int i = 0; i< downloadingSlots.length; i++) {
             if(downloadingSlots[i] == null || !downloadingSlots[i].isExecuting()) {
-                downloadingSlots[i] = new ImageDownloader(this, url, iv, tiv);
+                downloadingSlots[i] = id;
                 downloadingSlots[i].execute(i);
                 return true;
             }
@@ -119,20 +152,52 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
                 // stop ongoing download
                 downloadingSlots[index].cancel(true);
             }
-            // replace the slot with new download
-            downloadingSlots[index] = new ImageDownloader(this, url, iv, tiv);
+            ImageDownloader id = getElementFromQueue();
+            if(id != null) {
+                // pooped first item from queue... there was already queue downloads.
+                downloadingSlots[index] = id;
+                queueDownload(url, iv, tiv);
+            } else {
+                // replace the slot with new download
+                downloadingSlots[index] = new ImageDownloader(this, url, iv, tiv);
+            }
             downloadingSlots[index].execute(index);
             return true;
         }
+        //
         return false;
+    }
+
+    private ImageDownloader getElementFromQueue() {
+        synchronized (queuedDownloads) {
+            if(queuedDownloads.size() > 0)
+                return queuedDownloads.remove(0);
+            else
+                return null;
+        }
+    }
+
+    private boolean queueDownload(String url, ImageView iv, TouchImageView tiv) {
+        synchronized (queuedDownloads) {
+            if(queuedDownloads.size() < maxQueuedDownloads) {
+                queuedDownloads.add(new ImageDownloader(this, url, iv, tiv));
+                return true;
+            }
+            return false;
+        }
     }
 
     @Override
     public void stopLoadingImage(String url) {
+        boolean aborted = false;
         for(ImageDownloader slot : downloadingSlots) {
-            if(slot != null && slot.isExecuting()) {
+            if(slot != null && slot.imgUrl.equals(url)) {
                 slot.cancel(true);
+                aborted = true;
             }
+        }
+        if(aborted) {
+            popFromQueueAndFitIntoFreeSlot();
         }
     }
 

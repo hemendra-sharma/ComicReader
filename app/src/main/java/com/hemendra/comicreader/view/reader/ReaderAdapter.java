@@ -29,7 +29,6 @@ import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class ReaderAdapter extends ArrayAdapter<Page> {
 
@@ -39,6 +38,10 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
     private FlipViewController flipView;
     private Runnable onClicked;
     private Chapter nextChapter;
+    public boolean isZoomed = false;
+
+    public static final int TYPE_NEXT_CHAPTER = 1;
+    public static final int TYPE_PAGE = 2;
 
     public ReaderAdapter(Context context, ComicReaderFragment fragment,
                          ArrayList<Page> pages, ComicsPresenter presenter,
@@ -52,11 +55,6 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         this.flipView = flipView;
         this.onClicked = onClicked;
         this.nextChapter = nextChapter;
-        if(this.nextChapter != null
-                && !this.pages.get(this.pages.size()-1).id.equals("next_chapter")) {
-            Page p = new Page(99999, "next_chapter");
-            this.pages.add(p);
-        }
     }
 
     @Override
@@ -71,12 +69,12 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
 
     @Override
     public int getCount() {
-        return pages.size();
+        return pages.size() + (nextChapter != null ? 1 : 0);
     }
 
     @Override
     public Page getItem(int i) {
-        return pages.get(i);
+        return i < pages.size() ? pages.get(i) : null;
     }
 
     @Override
@@ -97,10 +95,15 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
                 AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.MATCH_PARENT);
 
-        if(pages.get(i).id.equals("next_chapter")) {
+        if(getItemViewType(i) == TYPE_NEXT_CHAPTER) {
             View v = View.inflate(getContext(), R.layout.next_chapter_page, null);
             TextView tvNextChapterInfo = v.findViewById(R.id.tvNextChapterInfo);
             Button btnStartReading = v.findViewById(R.id.btnStartReading);
+            Button btnFirstPage = v.findViewById(R.id.btnFirstPage);
+
+            btnStartReading.setTransformationMethod(null);
+            btnFirstPage.setTransformationMethod(null);
+
             String html = "<small>Chapter Complete</small>" +
                     "<br><br>-: Next Chapter :-" +
                     "<br><br><big><b>" + nextChapter.title + "</b></big>";
@@ -113,6 +116,11 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
                 fragment.updateChapterProgress();
                 presenter.loadPages(nextChapter, nextChapterLoadingListener);
             });
+            btnFirstPage.setOnClickListener(btn->{
+                flipView.setSelection(0);
+                fragment.currentPosition = 0;
+                fragment.updateProgress();
+            });
             return v;
         } else {
             TouchImageView iv = new TouchImageView(getContext());
@@ -121,7 +129,6 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
             iv.setMaxZoom(3);
             iv.setMediumScale(2);
             iv.setBackgroundColor(Color.TRANSPARENT);
-            iv.setImageResource(R.drawable.loading_text);
             iv.setTag(i);
 
             iv.setOnTouchListener((v, event) -> {
@@ -136,6 +143,8 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
             });
 
             setImage(pages.get(i), iv);
+            if((Integer) iv.getTag() >= 0)
+                iv.setImageResource(R.drawable.loading_text);
 
             iv.setOnClickListener(v->{
                 onClicked.run();
@@ -143,6 +152,20 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
                     setImage(pages.get((Integer) v.getTag()), ((TouchImageView) v));
                 } else if(((TouchImageView)v).isZoomed()) {
                     ((TouchImageView)v).resetZoomSmooth();
+                }
+            });
+
+            iv.setOnTouchImageViewListener(new TouchImageView.OnTouchImageViewListener() {
+                @Override
+                public void onMove() {}
+                @Override
+                public void onZoomedIn() {
+                    isZoomed = true;
+                }
+                @Override
+                public void onZoomingOutFinished() {
+                    isZoomed = false;
+                    fragment.refreshFlipView();
                 }
             });
 
@@ -177,11 +200,8 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
                 ch = chapter;
             }
             pages = ch.pages;
+            isZoomed = false;
             nextChapter = presenter.getNextChapterFrom(chapter);
-            if(nextChapter != null) {
-                Page p = new Page(99999, "next_chapter");
-                pages.add(p);
-            }
             notifyDataSetChanged();
             fragment.refreshUI();
             if(chapter.readingProgress == 0)
@@ -217,12 +237,15 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
 
     @Override
     public int getItemViewType(int i) {
-        return 0;
+        if(i >= pages.size())
+            return TYPE_NEXT_CHAPTER;
+        else
+            return TYPE_PAGE;
     }
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
 
     @Override

@@ -105,6 +105,8 @@ public class ComicsParser {
             Collections.sort(allCategories, String::compareTo);
             comics.categories = allCategories;
 
+            Collections.sort(comics.comics, (c1, c2) -> Integer.compare(c2.hits, c1.hits));
+
             return comics;
         } catch (IOException e) {
             e.printStackTrace();

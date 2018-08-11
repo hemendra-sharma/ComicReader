@@ -16,6 +16,7 @@ import com.hemendra.comicreader.view.list.SortingOption;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class LocalComicsDataSource extends ComicsDataSource implements OnComicsLoadedListener {
 
@@ -91,14 +92,9 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         this.selectedCategories = selectedCategories;
         if(comics != null) {
             if(isNotAlreadyLoading()) {
-                if(selectedCategories.size() == comics.categories.size()) {
-                    // selected all... return all
-                    listener.onComicsLoaded(comics, SourceType.LOCAL_FILTER);
-                } else {
-                    filterer = new ComicsFilterer(comics, this, selectedCategories, sortingOption);
-                    filterer.execute();
-                    listener.onStartedLoadingComics();
-                }
+                filterer = new ComicsFilterer(comics, this, selectedCategories, sortingOption);
+                filterer.execute();
+                listener.onStartedLoadingComics();
             } else {
                 listener.onFailedToLoadComics(FailureReason.ALREADY_LOADING);
             }

@@ -792,6 +792,10 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         	if (state == State.NONE) {
 	        	float targetZoom = (normalizedScale == minScale) ? mediumScale :
                         (normalizedScale == mediumScale) ? maxScale : minScale;
+	        	if(touchImageViewListener != null
+	        	        && targetZoom > minScale) {
+                    touchImageViewListener.onZoomedIn();
+                }
 	        	DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, e.getX(), e.getY(), false);
 	        	compatPostOnAnimation(doubleTap);
 	        	consumed = true;
@@ -810,6 +814,8 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     
     public interface OnTouchImageViewListener {
     	public void onMove();
+    	public void onZoomedIn();
+    	public void onZoomingOutFinished();
     }
     
     /**
@@ -903,6 +909,9 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         	//
         	if (touchImageViewListener != null) {
         		touchImageViewListener.onMove();
+        		if(normalizedScale > minScale) {
+                    touchImageViewListener.onZoomedIn();
+                }
         	}
             return true;
         }
@@ -925,7 +934,10 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         	if (animateToZoomBoundary) {
 	        	DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, viewWidth / 2, viewHeight / 2, true);
 	        	compatPostOnAnimation(doubleTap);
-        	}
+        	} else if (touchImageViewListener != null
+                    && normalizedScale == minScale) {
+                touchImageViewListener.onZoomingOutFinished();
+            }
         }
     }
     
@@ -1017,6 +1029,10 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
 				// Finished zooming
 				//
 				setState(State.NONE);
+                if (touchImageViewListener != null
+                        && normalizedScale == minScale) {
+                    touchImageViewListener.onZoomingOutFinished();
+                }
 			}
 		}
 		

@@ -29,7 +29,7 @@ public class ComicReaderFragment extends Fragment {
     private ReaderAdapter adapter;
     private TextView tvPageProgress, tvTitle;
     private ImageView ivPageProgress;
-    private int currentPosition = 0;
+    public int currentPosition = 0;
     private int progressColor = Color.DKGRAY;
 
     public static ComicReaderFragment getFragment(ComicsPresenter comicsPresenter) {
@@ -113,20 +113,27 @@ public class ComicReaderFragment extends Fragment {
             tvTitle.setVisibility(View.VISIBLE);
     };
 
-    private void updateProgress() {
-        int totalPages = adapter.getCount();
-        int currentPage = currentPosition+1;
-        int percent = (int)(((float) currentPage / (float) totalPages) * 100f);
-        Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
-        for(int i=0; i<100; i++) {
-            if(i <= percent)
-                bmp.setPixel(i, 0, progressColor);
-            else
-                bmp.setPixel(i, 0, Color.BLACK);
+    public void updateProgress() {
+        if(adapter.getItemViewType(currentPosition) == ReaderAdapter.TYPE_NEXT_CHAPTER) {
+            tvPageProgress.setVisibility(View.INVISIBLE);
+            ivPageProgress.setVisibility(View.INVISIBLE);
+        } else {
+            tvPageProgress.setVisibility(View.VISIBLE);
+            ivPageProgress.setVisibility(View.VISIBLE);
+            int totalPages = adapter.getCount();
+            int currentPage = currentPosition + 1;
+            int percent = (int) (((float) currentPage / (float) totalPages) * 100f);
+            Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
+            for (int i = 0; i < 100; i++) {
+                if (i <= percent)
+                    bmp.setPixel(i, 0, progressColor);
+                else
+                    bmp.setPixel(i, 0, Color.BLACK);
+            }
+            tvPageProgress.setText(String.format(Locale.getDefault(),
+                    "Page %d/%d", currentPage, totalPages));
+            ivPageProgress.setImageBitmap(bmp);
         }
-        tvPageProgress.setText(String.format(Locale.getDefault(),
-                "Page %d/%d", currentPage, totalPages));
-        ivPageProgress.setImageBitmap(bmp);
     }
 
     @Override
@@ -150,6 +157,8 @@ public class ComicReaderFragment extends Fragment {
     }
 
     public void refreshFlipView() {
+        if(adapter.isZoomed)
+            return;
         if(currentPosition > 0)
             flipView.refreshPage(currentPosition-1);
         if(currentPosition < adapter.getCount())

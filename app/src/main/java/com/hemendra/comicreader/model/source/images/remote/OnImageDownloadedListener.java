@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 public interface OnImageDownloadedListener {
 
-    public void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page);
+    void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page);
+    void onFailedToDownloadImage(String url, boolean image, boolean page);
 
 }

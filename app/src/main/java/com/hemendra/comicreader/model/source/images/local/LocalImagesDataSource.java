@@ -6,38 +6,52 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.widget.ImageView;
 
+import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Page;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
+import com.hemendra.comicreader.model.source.images.remote.OnImageDownloadedListener;
 import com.hemendra.comicreader.model.utils.Utils;
 import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class LocalImagesDataSource extends ImagesDataSource {
+public class LocalImagesDataSource extends ImagesDataSource implements OnImageLoadedListener {
 
-    private ImagesDB db;
+    public static final int MAX_PARALLEL_LOADS = 10;
+
+    private final ImagesDB db;
     private File chaptersDirectory;
+
+    private LocalImageLoader[] loadingSlots = new LocalImageLoader[MAX_PARALLEL_LOADS];
+
+    private int maxQueuedDownloads;
+    private final ArrayList<LocalImageLoader> queuedDownloads = new ArrayList<>();
 
     public LocalImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
         db = new ImagesDB(context).open();
         chaptersDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
                 "/" + getContext().getPackageName() + "/cache/chapters");
+        maxQueuedDownloads = context.getResources().getInteger(R.integer.max_queued_image_loaders);
     }
 
     @Override
     public void loadImage(String url, ImageView iv) {
         if(listener != null) {
-            Bitmap bmp = getImageFromCache(url);
-            if (bmp != null) {
-                iv.setImageBitmap(bmp);
+            if(!alreadyDownloading(url)) {
+                if(!fitIntoAnyFreeSlot(url, iv, null)) {
+                    if(!removeOldestAndAddNewDownload(url, iv, null)) {
+                        listener.onFailedToLoadImage(FailureReason.UNKNOWN_LOCAL_ERROR, url, iv);
+                    }
+                }
             } else {
-                listener.onFailedToLoadImage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
+                listener.onFailedToLoadImage(FailureReason.ALREADY_LOADING, url, iv);
             }
         }
     }
@@ -45,11 +59,10 @@ public class LocalImagesDataSource extends ImagesDataSource {
     @Override
     public void loadPage(String url, TouchImageView iv) {
         if(listener != null) {
-            Bitmap bmp = getPageFromCache(url);
-            if (bmp != null) {
+            Bitmap bmp = getPageFromCache(url, null);
+            if(bmp != null) {
                 iv.setImageBitmap(bmp);
                 iv.setTag(-1);
-                listener.onPageLoaded(null, null);
             } else {
                 listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
             }
@@ -57,20 +70,33 @@ public class LocalImagesDataSource extends ImagesDataSource {
     }
 
     @Override
-    public void stopLoadingImage(String url) {
-
+    public void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page) {
+        popFromQueueAndFitIntoFreeSlot();
     }
 
-    private Bitmap getImageFromCache(String url) {
+    @Override
+    public void onFailedToDownloadImage(String url, ImageView iv, TouchImageView tiv) {
+        if(iv != null)
+            listener.onFailedToLoadImage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
+        else if(tiv != null)
+            listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, tiv);
+        popFromQueueAndFitIntoFreeSlot();
+    }
+
+    public Bitmap getImageFromCache(String url, Bitmap inBitmap) {
         Bitmap bmp = null;
         try{
-            byte[] bytes = db.getImage(url);
-            if (bytes != null && bytes.length > 0) {
-                // we already have the image. resize and return...
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = false;
-                options.inSampleSize = 1;
-                bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+            synchronized (db) {
+                byte[] bytes = db.getImage(url);
+                if (bytes != null && bytes.length > 0) {
+                    // we already have the image. resize and return...
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inScaled = false;
+                    options.inSampleSize = 1;
+                    if (inBitmap != null)
+                        options.inBitmap = inBitmap;
+                    bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                }
             }
         }catch (Throwable ex) {
             ex.printStackTrace();
@@ -78,16 +104,20 @@ public class LocalImagesDataSource extends ImagesDataSource {
         return bmp;
     }
 
-    private Bitmap getPageFromCache(String url) {
+    public Bitmap getPageFromCache(String url, Bitmap inBitmap) {
         Bitmap bmp = null;
         try{
-            byte[] bytes = db.getPage(url);
-            if (bytes != null && bytes.length > 0) {
-                // we already have the image. resize and return...
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = false;
-                options.inSampleSize = 1;
-                bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+            synchronized (db) {
+                byte[] bytes = db.getPage(url);
+                if (bytes != null && bytes.length > 0) {
+                    // we already have the image. resize and return...
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inScaled = false;
+                    options.inSampleSize = 1;
+                    if(inBitmap != null)
+                        options.inBitmap = inBitmap;
+                    bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                }
             }
         }catch (Throwable ex) {
             ex.printStackTrace();
@@ -97,10 +127,12 @@ public class LocalImagesDataSource extends ImagesDataSource {
 
     public void saveImage(String url, Bitmap bmp) {
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            db.insertImage(url, out.toByteArray());
-            out.close();
+            synchronized (db) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                db.insertImage(url, out.toByteArray());
+                out.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,10 +140,12 @@ public class LocalImagesDataSource extends ImagesDataSource {
 
     public void savePage(String url, Bitmap bmp) {
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            db.insertPage(url, out.toByteArray());
-            out.close();
+            synchronized (db) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                db.insertPage(url, out.toByteArray());
+                out.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -144,9 +178,119 @@ public class LocalImagesDataSource extends ImagesDataSource {
         return null;
     }
 
+    private void popFromQueueAndFitIntoFreeSlot() {
+        LocalImageLoader id = getElementFromQueue();
+        if(id != null) {
+            fitIntoAnyFreeSlot(id);
+        }
+    }
+
+    private boolean alreadyDownloading(String url) {
+        for (LocalImageLoader slot : loadingSlots) {
+            if (slot != null && slot.isExecuting()
+                    && slot.imgUrl.equals(url)) {
+                // already downloading
+                return true;
+            }
+        }
+        synchronized (queuedDownloads) {
+            for (LocalImageLoader slot : queuedDownloads) {
+                if (slot != null && slot.isExecuting()
+                        && slot.imgUrl.equals(url)) {
+                    // already queued
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean fitIntoAnyFreeSlot(String url, ImageView iv, TouchImageView tiv) {
+        if(fitIntoAnyFreeSlot(new LocalImageLoader(this, url, iv, tiv)))
+            return true;
+        return queueDownload(url, iv, tiv);
+    }
+
+    private boolean fitIntoAnyFreeSlot(LocalImageLoader id) {
+        for(int i = 0; i< loadingSlots.length; i++) {
+            if(loadingSlots[i] == null || !loadingSlots[i].isExecuting()) {
+                loadingSlots[i] = id;
+                loadingSlots[i].execute(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean removeOldestAndAddNewDownload(String url, ImageView iv, TouchImageView tiv) {
+        int index = -1;
+        long oldestTimestamp = System.currentTimeMillis();
+        for(int i = 0; i< loadingSlots.length; i++) {
+            if(loadingSlots[i] == null || loadingSlots[i].startedAt < oldestTimestamp) {
+                oldestTimestamp = loadingSlots[i].startedAt;
+                index = i;
+            }
+        }
+        if(index >= 0) {
+            // found index...
+            if(loadingSlots[index] != null && loadingSlots[index].isExecuting()) {
+                // stop ongoing download
+                loadingSlots[index].cancel(true);
+            }
+            LocalImageLoader id = getElementFromQueue();
+            if(id != null) {
+                // pooped first item from queue... there was already queue downloads.
+                loadingSlots[index] = id;
+                queueDownload(url, iv, tiv);
+            } else {
+                // replace the slot with new download
+                loadingSlots[index] = new LocalImageLoader(this, url, iv, tiv);
+            }
+            loadingSlots[index].execute(index);
+            return true;
+        }
+        //
+        return false;
+    }
+
+    private LocalImageLoader getElementFromQueue() {
+        synchronized (queuedDownloads) {
+            if(queuedDownloads.size() > 0)
+                return queuedDownloads.remove(0);
+            else
+                return null;
+        }
+    }
+
+    private boolean queueDownload(String url, ImageView iv, TouchImageView tiv) {
+        synchronized (queuedDownloads) {
+            if(queuedDownloads.size() < maxQueuedDownloads) {
+                queuedDownloads.add(new LocalImageLoader(this, url, iv, tiv));
+                return true;
+            }
+            return false;
+        }
+    }
+
+    @Override
+    public void stopLoadingImage(String url) {
+        boolean aborted = false;
+        for(LocalImageLoader slot : loadingSlots) {
+            if(slot != null && slot.imgUrl.equals(url)) {
+                slot.cancel(true);
+                aborted = true;
+            }
+        }
+        if(aborted) {
+            popFromQueueAndFitIntoFreeSlot();
+        }
+    }
+
     @Override
     public void dispose() {
-        db.close();
+        synchronized (db) {
+            db.close();
+        }
         listener = null;
     }
 }

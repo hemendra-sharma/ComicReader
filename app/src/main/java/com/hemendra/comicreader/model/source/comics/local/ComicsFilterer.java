@@ -29,12 +29,17 @@ public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
     @Override
     protected Comics doInBackground(Void... params) {
         Comics filteredComics = new Comics();
-        for(String category : selectedCategories) {
-            for(Comic comic : comics.comics) {
-                if(filteredComics.comics.contains(comic))
-                    continue;
-                if(comic.categories.contains(category)) {
-                    filteredComics.comics.add(comic);
+        if(selectedCategories.size() == comics.categories.size()) {
+            // selected all... return all
+            filteredComics = comics;
+        } else {
+            for (String category : selectedCategories) {
+                for (Comic comic : comics.comics) {
+                    if (filteredComics.comics.contains(comic))
+                        continue;
+                    if (comic.categories.contains(category)) {
+                        filteredComics.comics.add(comic);
+                    }
                 }
             }
         }

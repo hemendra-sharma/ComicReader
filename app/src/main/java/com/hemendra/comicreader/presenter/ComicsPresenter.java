@@ -179,6 +179,15 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    public void stopLoadingImageOrPage(@NonNull String url) {
+        if(activityView != null
+                && localImagesDataSource != null
+                && remoteImagesDataSource != null) {
+            localImagesDataSource.stopLoadingImage(url);
+            remoteImagesDataSource.stopLoadingImage(url);
+        }
+    }
+
     @Override
     public void onImageLoaded(String url, Bitmap bmp) {
         if(localImagesDataSource != null) {

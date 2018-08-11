@@ -116,6 +116,14 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
         }
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ComicViewHolder comicViewHolder) {
+        String url = comicViewHolder.comic.getImageUrl();
+        if(url != null)
+            presenter.stopLoadingImageOrPage(url);
+        super.onViewRecycled(comicViewHolder);
+    }
+
     private Comic getComic(int position) {
         if(type == TYPE_ALL)
             return comics.comics.get(position);

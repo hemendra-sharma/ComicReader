@@ -4,13 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
-import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
-import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import com.hemendra.comicreader.view.reader.TouchImageView;
-
-import java.net.HttpURLConnection;
 
 public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
 
@@ -21,7 +17,6 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     private ImageView iv;
     private TouchImageView tiv;
     public long startedAt = 0;
-    private FailureReason reason = FailureReason.UNKNOWN_REMOTE_ERROR;
 
     public ImageDownloader(OnImageDownloadedListener listener,
                            String imgUrl, ImageView iv, TouchImageView tiv) {
@@ -40,19 +35,7 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     protected Bitmap doInBackground(Integer... params) {
         try {
             int inBitmapIndex = params[0];
-            byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
-                    new ConnectionCallback() {
-                        @Override
-                        public void onResponseCode(int code) {
-                            switch (code) {
-                                case HttpURLConnection.HTTP_NOT_FOUND:
-                                    reason = FailureReason.API_MISSING;
-                                    break;
-                                default:
-                                    reason = FailureReason.INVALID_RESPONSE_FROM_SERVER;
-                            }
-                        }
-                    });
+            byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl, null);
             if (bytes != null && bytes.length > 0) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = false;
@@ -84,6 +67,7 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
             //
             if (listener != null)
                 listener.onImageDownloaded(imgUrl, bitmap, iv != null, tiv != null);
-        }
+        } else if (listener != null)
+            listener.onFailedToDownloadImage(imgUrl, iv != null, tiv != null);
     }
 }

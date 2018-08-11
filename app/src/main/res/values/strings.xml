@@ -34,6 +34,8 @@
     <string name="view_chapters_list">View Chapters List</string>
     <string name="chapter_title">Chapter Title</string>
     <string name="start_reading">Start Reading</string>
+    <string name="refresh_data">Refresh Data</string>
+    <string name="read_this_chapter_again">Read This Chapter Again</string>
 
     <string-array name="sorting_options">
         <item>@string/popularity</item>
