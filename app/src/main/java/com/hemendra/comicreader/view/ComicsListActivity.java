@@ -77,6 +77,15 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     @Override
     public void onDestroy() {
         comicsPresenter.destroy();
+
+        runtimePermissionManager = null;
+        comicsPresenter = null;
+        allComicsListFragment = null;
+        comicDetailsFragment = null;
+        comicReaderFragment = null;
+        searchView = null;
+        rlProgress = null;
+
         super.onDestroy();
     }
 

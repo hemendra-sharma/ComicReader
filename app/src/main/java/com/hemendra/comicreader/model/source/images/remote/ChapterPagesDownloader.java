@@ -1,6 +1,7 @@
 package com.hemendra.comicreader.model.source.images.remote;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 
 import com.hemendra.comicreader.model.data.Chapter;
@@ -26,6 +27,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
     private int progress1 = 0;
     private int count = 0;
     private ImagesDB db;
+    private HttpURLConnection connection = null;
 
     public ChapterPagesDownloader(Context context,
                                   OnChapterDownloadListener listener,
@@ -37,11 +39,27 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
     }
 
     @Override
+    public void cancel(boolean interrupt) {
+        try {
+            if (connection != null)
+                connection.disconnect();
+        }catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        super.cancel(interrupt);
+    }
+
+    @Override
     protected Boolean doInBackground(Void... params) {
         try {
             if(chapter.pages.size() == 0) {
                 String json = ContentDownloader.downloadAsString(RemoteConfig.buildChapterUrl(chapter.id),
                         new ConnectionCallback() {
+                            @Override
+                            public void onConnectionInitialized(HttpURLConnection conn) {
+                                connection = conn;
+                            }
+
                             @Override
                             public void onResponseCode(int code) {
                                 switch (code) {
@@ -67,6 +85,8 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                     if (dir.exists() || dir.mkdirs()) {
                         progress1 = count = 0;
                         for (Page page : chapter.pages) {
+                            if(isCancelled())
+                                break;
                             progress1 = (int) Math.ceil(((float) count / (float) chapter.pages.size()) * 100f);
                             publishProgress(progress1, count, chapter.pages.size(), 0, page.number);
 
@@ -74,9 +94,14 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
 
                             page.rawImageData = db.getPage(imgUrl);
 
-                            if (page.rawImageData == null || page.rawImageData.length == 0) {
+                            if (!isCancelled()
+                                    && page.rawImageData == null || page.rawImageData.length == 0) {
                                 byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
                                         new ConnectionCallback() {
+                                            @Override
+                                            public void onConnectionInitialized(HttpURLConnection conn) {
+                                                connection = conn;
+                                            }
                                             @Override
                                             public void onProgress(float progress) {
                                                 publishProgress(progress1,
@@ -95,7 +120,9 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                                                 }
                                             }
                                         });
-                                if (bytes != null && bytes.length > 0) {
+                                if (!isCancelled()
+                                        && bytes != null && bytes.length > 0
+                                        && isValidImageData(bytes)) {
                                     page.rawImageData = bytes;
                                     db.insertPage(imgUrl, bytes);
                                 } else {
@@ -113,6 +140,15 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                 }
                 return allSuccess;
             }
+        }catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean isValidImageData(byte[] data) {
+        try {
+            return BitmapFactory.decodeByteArray(data, 0, data.length) != null;
         }catch (Throwable ex) {
             ex.printStackTrace();
         }

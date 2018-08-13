@@ -32,7 +32,8 @@ public class ChapterDownloaderDialog {
     private ImageView ivProgress1, ivProgress2, ivDownload;
     private Dialog dialog;
 
-    private int progressColor = 0;
+    private Bitmap bmp1, bmp2;
+    private int progressColor;
 
     public ChapterDownloaderDialog(Context context, Chapter chapter, ComicsPresenter presenter,
                                    ImageView ivDownload) {
@@ -44,6 +45,8 @@ public class ChapterDownloaderDialog {
         dialog = prepareLayout();
 
         progressColor = context.getResources().getColor(R.color.progressColor, null);
+        bmp1 = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
+        bmp2 = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
     }
 
     private Dialog prepareLayout() {
@@ -77,11 +80,9 @@ public class ChapterDownloaderDialog {
         return dialog;
     }
 
-    private Bitmap getProgressBitmap(float progress) {
-        int p = (int) Math.ceil(progress);
-        Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
+    private Bitmap getProgressBitmap(Bitmap bmp, int progress) {
         for(int i=0; i<100; i++) {
-            if(i <= p)
+            if(i <= progress)
                 bmp.setPixel(i, 0, progressColor);
             else
                 bmp.setPixel(i, 0, Color.LTGRAY);
@@ -114,10 +115,10 @@ public class ChapterDownloaderDialog {
                     tvProgress1.setText(String.format(Locale.getDefault(),
                             "Downloaded %d out of %d Pages (%d%%)",
                             downloadedPages, totalPages, chapterProgress));
-                    ivProgress1.setImageBitmap(getProgressBitmap(progress[0]));
+                    ivProgress1.setImageBitmap(getProgressBitmap(bmp1, chapterProgress));
                     tvProgress2.setText(String.format(Locale.getDefault(),
                             "Downloading Page No. %d (%d%%)", currentPageNumber, pageProgress));
-                    ivProgress2.setImageBitmap(getProgressBitmap(progress[1]));
+                    ivProgress2.setImageBitmap(getProgressBitmap(bmp2, pageProgress));
                 }
 
                 @Override

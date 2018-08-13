@@ -26,7 +26,8 @@ public class Comic implements Serializable {
     public String released = "";
     public ArrayList<Chapter> chapters = new ArrayList<>();
 
-    public int searchScore = 0;
+    transient public int searchScore = 0;
+
     public boolean isFavorite = false;
 
     public Comic(String id, String title, String image,

@@ -16,7 +16,6 @@ import com.hemendra.comicreader.view.list.SortingOption;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class LocalComicsDataSource extends ComicsDataSource implements OnComicsLoadedListener {
 
@@ -201,8 +200,14 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     @Override
     public void dispose() {
         stopLoadingComics();
+        comicsCacheFile = null;
         loader = null;
+        searcher = null;
+        sorter = null;
+        filterer = null;
         listener = null;
+        sortingOption = null;
         comics = null;
+        selectedCategories = null;
     }
 }

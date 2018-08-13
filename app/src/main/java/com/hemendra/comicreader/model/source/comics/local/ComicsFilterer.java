@@ -33,13 +33,18 @@ public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
             // selected all... return all
             filteredComics = comics;
         } else {
-            for (String category : selectedCategories) {
-                for (Comic comic : comics.comics) {
-                    if (filteredComics.comics.contains(comic))
-                        continue;
+            for (Comic comic : comics.comics) {
+                if (filteredComics.comics.contains(comic))
+                    continue;
+                int score = 0;
+                for (String category : selectedCategories) {
                     if (comic.categories.contains(category)) {
-                        filteredComics.comics.add(comic);
+                        score++;
                     }
+                }
+                if(score > 0) {
+                    comic.searchScore = score;
+                    filteredComics.comics.add(comic);
                 }
             }
         }
@@ -49,6 +54,7 @@ public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
             Collections.sort(filteredComics.comics, (c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
         else if(sortingOption == SortingOption.A_TO_Z)
             Collections.sort(filteredComics.comics, (c1, c2) -> c1.title.compareTo(c2.title));
+        Collections.sort(filteredComics.comics, (c1, c2) -> Integer.compare(c2.searchScore, c1.searchScore));
         return filteredComics;
     }
 

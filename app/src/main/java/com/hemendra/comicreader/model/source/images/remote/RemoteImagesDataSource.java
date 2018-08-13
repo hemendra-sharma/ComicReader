@@ -2,6 +2,7 @@ package com.hemendra.comicreader.model.source.images.remote;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Looper;
 import android.widget.ImageView;
 
 import com.hemendra.comicreader.R;

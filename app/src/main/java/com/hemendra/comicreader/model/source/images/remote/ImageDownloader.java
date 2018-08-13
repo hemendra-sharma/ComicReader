@@ -4,9 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
+import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import com.hemendra.comicreader.view.reader.TouchImageView;
+
+import java.net.HttpURLConnection;
 
 public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
 
@@ -17,6 +20,7 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     private ImageView iv;
     private TouchImageView tiv;
     public long startedAt = 0;
+    private HttpURLConnection connection = null;
 
     public ImageDownloader(OnImageDownloadedListener listener,
                            String imgUrl, ImageView iv, TouchImageView tiv) {
@@ -24,6 +28,17 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
         this.imgUrl = imgUrl;
         this.iv = iv;
         this.tiv = tiv;
+    }
+
+    @Override
+    public void cancel(boolean interrupt) {
+        try{
+            if(connection != null)
+                connection.disconnect();
+        }catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        super.cancel(interrupt);
     }
 
     @Override
@@ -35,8 +50,14 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     protected Bitmap doInBackground(Integer... params) {
         try {
             int inBitmapIndex = params[0];
-            byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl, null);
-            if (bytes != null && bytes.length > 0) {
+            byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
+                    new ConnectionCallback() {
+                        @Override
+                        public void onConnectionInitialized(HttpURLConnection conn) {
+                            connection = conn;
+                        }
+                    });
+            if (!isCancelled() && bytes != null && bytes.length > 0) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = false;
                 options.inSampleSize = 1;

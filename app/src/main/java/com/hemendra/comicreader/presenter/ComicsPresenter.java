@@ -394,6 +394,8 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         localImagesDataSource = null;
         remoteImagesDataSource = null;
 
+        sources = null;
+
         presenter = null;
     }
 }

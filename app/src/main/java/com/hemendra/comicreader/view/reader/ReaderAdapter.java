@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.Html;
+import android.view.GestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -39,6 +40,7 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
     private Runnable onClicked;
     private Chapter nextChapter;
     public boolean isZoomed = false;
+    private Bitmap inBitmap = null;
 
     public static final int TYPE_NEXT_CHAPTER = 1;
     public static final int TYPE_PAGE = 2;
@@ -96,7 +98,9 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
                 AbsListView.LayoutParams.MATCH_PARENT);
 
         if(getItemViewType(i) == TYPE_NEXT_CHAPTER) {
-            View v = View.inflate(getContext(), R.layout.next_chapter_page, null);
+            View v = view;
+            if(v == null)
+                v = View.inflate(getContext(), R.layout.next_chapter_page, null);
             TextView tvNextChapterInfo = v.findViewById(R.id.tvNextChapterInfo);
             Button btnStartReading = v.findViewById(R.id.btnStartReading);
             Button btnFirstPage = v.findViewById(R.id.btnFirstPage);
@@ -123,13 +127,19 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
             });
             return v;
         } else {
-            TouchImageView iv = new TouchImageView(getContext());
-            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            iv.setLayoutParams(params);
-            iv.setMaxZoom(3);
-            iv.setMediumScale(2);
-            iv.setBackgroundColor(Color.TRANSPARENT);
+            TouchImageView iv = (TouchImageView) view;
+            if(iv == null) {
+                iv = new TouchImageView(getContext());
+                iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                iv.setLayoutParams(params);
+                iv.setMaxZoom(3);
+                iv.setMediumScale(2);
+                iv.setBackgroundColor(Color.TRANSPARENT);
+            }
+
             iv.setTag(i);
+            if(!setImage(pages.get(i), iv))
+                iv.setImageResource(R.drawable.loading_text);
 
             iv.setOnTouchListener((v, event) -> {
                 v.invalidate();
@@ -141,10 +151,6 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
                 }
                 return false;
             });
-
-            setImage(pages.get(i), iv);
-            if((Integer) iv.getTag() >= 0)
-                iv.setImageResource(R.drawable.loading_text);
 
             iv.setOnClickListener(v->{
                 onClicked.run();
@@ -216,23 +222,28 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         }
     };
 
-    private void setImage(Page page, TouchImageView iv) {
+    private boolean setImage(Page page, TouchImageView iv) {
         if(page.rawImageData != null && page.rawImageData.length > 0) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
             options.inSampleSize = 1;
+            if(inBitmap != null)
+                options.inBitmap = inBitmap;
             Bitmap bmp = BitmapFactory.decodeByteArray(page.rawImageData,
                     0, page.rawImageData.length, options);
             if(bmp != null) {
+                if(inBitmap == null)
+                    inBitmap = bmp;
                 iv.setImageBitmap(bmp);
                 iv.setTag(-1);
-                return;
+                return true;
             }
         }
 
         String url = page.getImageUrl();
         if (url != null)
             presenter.loadPage(url, iv);
+        return false;
     }
 
     @Override

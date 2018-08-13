@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
-import com.hemendra.comicreader.view.reader.TouchImageView;
 
 public class LocalImageLoader extends CustomAsyncTask<Integer,Void,Bitmap> {
 
@@ -14,15 +13,13 @@ public class LocalImageLoader extends CustomAsyncTask<Integer,Void,Bitmap> {
     private LocalImagesDataSource dataSource;
     public String imgUrl;
     private ImageView iv;
-    private TouchImageView tiv;
     public long startedAt = 0;
 
     public LocalImageLoader(@NonNull LocalImagesDataSource dataSource,
-                            String imgUrl, ImageView iv, TouchImageView tiv) {
+                            String imgUrl, ImageView iv) {
         this.dataSource = dataSource;
         this.imgUrl = imgUrl;
         this.iv = iv;
-        this.tiv = tiv;
     }
 
     @Override
@@ -34,16 +31,13 @@ public class LocalImageLoader extends CustomAsyncTask<Integer,Void,Bitmap> {
     protected Bitmap doInBackground(Integer... params) {
         try {
             int inBitmapIndex = params[0];
-            Bitmap bmp = null;
-            if(iv != null) {
-                bmp = dataSource.getImageFromCache(imgUrl, bitmapCache[inBitmapIndex]);
-            } else if(tiv != null) {
-                bmp = dataSource.getPageFromCache(imgUrl, bitmapCache[inBitmapIndex]);
+            Bitmap bmp = dataSource.getImageFromCache(imgUrl, bitmapCache[inBitmapIndex]);
+            if(!isCancelled()) {
+                if (bitmapCache[inBitmapIndex] == null && bmp != null) {
+                    bitmapCache[inBitmapIndex] = bmp;
+                }
+                return bmp;
             }
-            if(bitmapCache[inBitmapIndex] == null && bmp != null) {
-                bitmapCache[inBitmapIndex] = bmp;
-            }
-            return bmp;
         }catch (Throwable ex) {
             ex.printStackTrace();
         }
@@ -55,13 +49,8 @@ public class LocalImageLoader extends CustomAsyncTask<Integer,Void,Bitmap> {
         if(bitmap != null) {
             if(iv != null)
                 iv.setImageBitmap(bitmap);
-            else if(tiv != null) {
-                tiv.setImageBitmap(bitmap);
-                tiv.setTag(-1);
-            }
-            //
-            dataSource.onImageDownloaded(imgUrl, bitmap, iv != null, tiv != null);
+            dataSource.onImageDownloaded(imgUrl, bitmap, iv != null, false);
         } else
-            dataSource.onFailedToDownloadImage(imgUrl, iv, tiv);
+            dataSource.onFailedToDownloadImage(imgUrl, iv, null);
     }
 }

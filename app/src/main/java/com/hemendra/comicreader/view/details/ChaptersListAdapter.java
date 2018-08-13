@@ -27,6 +27,7 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
         ImageView ivDownload, ivProgress;
         TextView tvChapterName, tvProgress;
         Chapter chapter;
+        Bitmap bmp;
 
         @SuppressLint("ClickableViewAccessibility")
         public ChapterViewHolder(@NonNull View itemView,
@@ -45,6 +46,8 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
             });
 
             itemView.setOnClickListener(view -> listener.onItemClicked(chapter));
+
+            bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
         }
     }
 
@@ -86,7 +89,8 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
                 "%d. %s", comic.chapters.get(i).number, comic.chapters.get(i).title));
 
         chapterViewHolder.ivProgress.setImageBitmap(
-                getProgressBitmap(comic.chapters.get(i).readingProgress,
+                getProgressBitmap(chapterViewHolder.bmp,
+                        comic.chapters.get(i).readingProgress,
                         comic.chapters.get(i).pages.size()));
 
         if(comic.chapters.get(i).pages.size() == 0) {
@@ -121,13 +125,12 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
         }
     }
 
-    private Bitmap getProgressBitmap(int currentPage, int totalPages) {
+    private Bitmap getProgressBitmap(Bitmap bmp, int currentPage, int totalPages) {
         float progress = 0;
         if(totalPages > 0) {
             progress = ((float) (currentPage + 1) / (float) totalPages) * 100f;
         }
         int p = (int) Math.ceil(progress);
-        Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
         for(int i=0; i<100; i++) {
             if(i <= p)
                 bmp.setPixel(i, 0, progressColor);

@@ -789,7 +789,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
             if(doubleTapListener != null) {
             	consumed = doubleTapListener.onDoubleTap(e);
             }
-        	if (state == State.NONE) {
+        	if (state == State.NONE && !consumed) {
 	        	float targetZoom = (normalizedScale == minScale) ? mediumScale :
                         (normalizedScale == mediumScale) ? maxScale : minScale;
 	        	if(touchImageViewListener != null
