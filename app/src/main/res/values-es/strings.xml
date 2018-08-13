@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permission_request_from_app_settings">La aplicación requiere permiso para guardar datos temporales en caché. Vaya a la configuración de la aplicación y permita todos los permisos.</string>
+    <string name="ok">Bueno</string>
+    <string name="permission_request_rationale">La aplicación requiere permiso para guardar los datos temporales en caché localmente. Por favor, permita el permiso de la aplicación.</string>
+    <string name="search">Buscar</string>
+    <string name="please_wait">Por Favor Espera…</string>
+    <string name="sort_by">Ordenar Por</string>
+    <string name="popularity">Popularidad</string>
+    <string name="latest_first">Último Primero</string>
+    <string name="a_to_z">De la A a la Z</string>
+    <string name="categories">Categorías</string>
+    <string name="apply">Aplicar</string>
+    <string name="all">Todas</string>
+    <string name="none">Ninguna</string>
+    <string name="favorite">Favorito</string>
+    <string name="downloading">Descargando…</string>
+    <string name="cancel">Cancelar</string>
+    <string name="view_chapters_list">Ver Lista de Capítulos</string>
+    <string name="start_reading">Empieza a Leer</string>
+    <string name="read_this_chapter_again">Lea Este Capítulo Nuevamente</string>
+    <string name="not_started_yet">No ha Comenzado Todavía</string>
+    <string name="finished_reading">Lectura Terminada</string>
+    <string name="failed_to_download_chapter_">¡No se pudo descargar el Capítulo! Inténtalo de nuevo.</string>
+    <string name="downloaded_x_out_of_y_pages_z">Descargado %d de cada %d páginas (%d%%)</string>
+    <string name="downloading_page_no_x_y">Descargar la página número %d (%d%%) - %.2f mb</string>
+    <string name="downloading_chapter_s">Descargando el Capítulo&lt;br&gt;&lt;br&gt;&lt;b&gt;&quot;%s&quot;&lt;/b&gt;&lt;/br&gt;&lt;/br&gt;</string>
+    <string name="failed_to_load_comics_reason_s">Error al cargar cómics. Motivo: %s</string>
+    <string name="failed_to_load_comic_details_reason_s">Error al cargar los detalles del cómic. Motivo: %s</string>
+    <string name="failed_to_load_chapter_reason_s">Error al cargar el Capítulo. Motivo: %s</string>
+    <string name="page_d_d">Página %d/%d</string>
+    <string name="chapter_complete_next_chapter_s">&lt;small&gt;Capítulo completo&lt;/small&gt;&lt;br&gt;&lt;br&gt;-: Siguiente capítulo :-&lt;br&gt;&lt;br&gt;&lt;big&gt;&lt;b&gt;%s&lt;/b&gt;&lt;/big&gt;</string>
+    <string name="failed_to_load_next_chapter">Error al cargar el siguiente capítulo!</string>
+    <string name="_d_selected">%d Seleccionados</string>
+    <string name="found_d_comics">Encontrados %d Comics</string>
+    <string name="select_at_least_1_category">Seleccione al menos 1 categoría</string>
+    <string name="reading_page_no_d_out_of_d_pages">Leyendo el número de página %d de %d páginas</string>
+    <string name="released_in_s">Lanzado en %s</string>
+    <string name="_d_hits">%d éxitos</string>
+    <string name="_d_chapters">%d capítulos</string>
+    <string name="app_closed">Aplicación Cerrada</string>
+    <string name="no_internet_connection">Sin Conexión a Internet</string>
+    <string name="connection_timeout">El tiempo de conexión expiro</string>
+    <string name="unknown">Desconocido</string>
+    <string name="favorites">Favoritos</string>
+</resources>

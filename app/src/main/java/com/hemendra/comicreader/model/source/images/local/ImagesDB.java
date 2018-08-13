@@ -7,9 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * After looking at several images from openlibrary.org, it looks like the images are
- * always going to have small data sizes. So, instead of saving the images on disk, we are
- * going to convert them in blob (byte array) and save them into the database itself.
+ * We are going to convert them in blob (byte array) and save them into the database itself.
  * This way we can query and manage the images more easily and efficiently.
  */
 public class ImagesDB {

@@ -10,7 +10,7 @@ public abstract class ImagesDataSource extends DataSource {
 
     protected IImagesDataSourceListener listener;
 
-    public ImagesDataSource(Context context, IImagesDataSourceListener listener) {
+    protected ImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context);
         this.listener = listener;
     }

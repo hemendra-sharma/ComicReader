@@ -5,7 +5,7 @@ import android.widget.ImageView;
 
 import com.hemendra.comicreader.view.reader.TouchImageView;
 
-public interface OnImageLoadedListener {
+interface OnImageLoadedListener {
 
     void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page);
     void onFailedToDownloadImage(String url, ImageView iv, TouchImageView tiv);

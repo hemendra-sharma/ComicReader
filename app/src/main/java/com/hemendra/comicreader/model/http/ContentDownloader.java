@@ -72,7 +72,7 @@ public class ContentDownloader {
                         if(callback != null && total > 0) {
                             totalRead += read;
                             float percent = ((float) totalRead / (float) total) * 100f;
-                            callback.onProgress(percent);
+                            callback.onProgress(percent, total);
                         }
                     }
                     response = new String(output.toByteArray());
@@ -213,7 +213,7 @@ public class ContentDownloader {
      */
     @WorkerThread
     public static InputStream downloadAsStream(String url, ConnectionCallback callback) {
-        HttpURLConnection conn = null;
+        HttpURLConnection conn;
         try {
             if(url != null && url.trim().length() > 0)
                 url = url.replace(" ", "%20");
@@ -290,7 +290,7 @@ public class ContentDownloader {
                         if(callback != null && total > 0) {
                             totalRead += read;
                             float percent = ((float) totalRead / (float) total) * 100f;
-                            callback.onProgress(percent);
+                            callback.onProgress(percent, total);
                         }
                     }
                     bytes = outStream.toByteArray();

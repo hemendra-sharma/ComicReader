@@ -10,7 +10,7 @@
         android:id="@+id/tvInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/found_0_comics"
+        android:text="@string/found_d_comics"
         android:layout_marginTop="5dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
@@ -33,7 +33,8 @@
             android:id="@+id/llSorting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -90,7 +91,7 @@
                     android:paddingBottom="10dp"
                     android:textSize="@dimen/textSize16"
                     android:textStyle="bold"
-                    android:text="0 Selected"
+                    android:text="@string/_d_selected"
                     android:gravity="center_vertical"
                     android:textColor="@color/textColorDark"/>
 
@@ -109,7 +110,7 @@
                     android:id="@+id/tvFavoritesOnly"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Favorites"
+                    android:text="@string/favorites"
                     android:textSize="@dimen/textSize14"
                     android:textColor="@color/textColor"/>
 

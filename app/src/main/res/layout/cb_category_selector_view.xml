@@ -5,5 +5,4 @@
     android:layout_height="wrap_content"
     android:textSize="@dimen/textSize16"
     android:textColor="@color/colorPrimary"
-    android:gravity="center_vertical"
-    android:text="Value"/>
+    android:gravity="center_vertical"/>

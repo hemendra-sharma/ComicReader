@@ -49,7 +49,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
         runtimePermissionManager = new RuntimePermissionManager(this);
 
-        comicsPresenter = ComicsPresenter.getInstance(getApplicationContext(), this);
+        comicsPresenter = new ComicsPresenter(getApplicationContext(), this);
 
         allComicsListFragment = AllComicsListFragment.getFragment(comicsPresenter);
         comicDetailsFragment = ComicDetailsFragment.getFragment(comicsPresenter);
@@ -242,7 +242,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     public void onFailedToLoadComics(String reason) {
         showSearchView();
         hideProgress();
-        showMessage(this, "Failed to Load Comics. Reason: "+reason, null);
+        showMessage(this, getString(R.string.failed_to_load_comics_reason_s, reason), null);
     }
 
     @Override
@@ -261,7 +261,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     public void onFailedToLoadComicDetails(String reason) {
         showSearchView();
         hideProgress();
-        showMessage(this, "Failed to Load Comic Details. Reason: "+reason, null);
+        showMessage(this, getString(R.string.failed_to_load_comic_details_reason_s, reason), null);
     }
 
     @Override
@@ -279,7 +279,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     @Override
     public void onFailedToLoadChapter(String reason) {
         hideProgress();
-        showMessage(this, "Failed to Load Chapter. Reason: "+reason, null);
+        showMessage(this, getString(R.string.failed_to_load_chapter_reason_s, reason), null);
     }
 
     @Override

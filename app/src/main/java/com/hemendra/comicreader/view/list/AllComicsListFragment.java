@@ -18,7 +18,6 @@ import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class AllComicsListFragment extends Fragment {
 
@@ -89,6 +88,9 @@ public class AllComicsListFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
             }
         });
+
+        tvInfo.setText(getString(R.string.found_d_comics, 0));
+        tvCategoriesSelector.setText(getString(R.string._d_selected, 0));
     }
 
     public void refreshCurrentView() {
@@ -123,27 +125,22 @@ public class AllComicsListFragment extends Fragment {
     };
 
     private void setSelectedCategoriesCount(ArrayList<String> selectedCategories) {
-        if(tvCategoriesSelector != null) {
+        if(tvCategoriesSelector != null && categorySelectionDialog != null) {
             if(selectedCategories.size() == categorySelectionDialog.getTotalCategoriesCount()) {
-                tvCategoriesSelector.setText("All");
+                tvCategoriesSelector.setText(R.string.all);
             } else {
-                tvCategoriesSelector.setText(String.format(Locale.getDefault(),
-                        "%d Selected", selectedCategories.size()));
+                tvCategoriesSelector.setText(
+                        getString(R.string._d_selected, selectedCategories.size()));
             }
         }
     }
 
     private void setInfo() {
-        if(tvInfo != null) {
-            tvInfo.setText(String.format(Locale.getDefault(),
-                    "Found %d Comics", mAdapter.getItemCount()));
+        if(tvInfo != null && mAdapter != null) {
+            tvInfo.setText(getString(R.string.found_d_comics, mAdapter.getItemCount()));
         }
     }
 
     private OnComicItemClickListener listener = comic -> comicsPresenter.loadComicDetails(comic);
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 }

@@ -20,7 +20,7 @@
             android:textSize="@dimen/textSize18"
             android:textColor="@color/textColorInverse"
             android:layout_margin="10dp"
-            android:text="Next Chapter"/>
+            android:text="@string/chapter_complete_next_chapter_s"/>
 
         <Button
             android:id="@+id/btnStartReading"

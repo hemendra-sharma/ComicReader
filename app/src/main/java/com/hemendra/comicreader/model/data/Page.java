@@ -11,7 +11,7 @@ public class Page implements Serializable {
     private static final long serialVersionUID = -5997692223648746465L;
 
     public int number;
-    public String id;
+    private String id;
     public byte[] rawImageData = null;
 
     public Page(int number, String id) {

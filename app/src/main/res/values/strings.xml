@@ -10,9 +10,6 @@
     <string name="mmm_dd_yyyy">MMM dd, yyyy</string>
     <string name="cat1_cat2_">Category 1, Category 2…</string>
     <string name="the_comic_description_goes_here">The Comic Description Goes Here…</string>
-    <string name="released_in_1990">Released in 1990</string>
-    <string name="_1234_hits">1234 Hits</string>
-    <string name="_10_chapters">10 Chapters:</string>
     <string name="sort_by">Sort By</string>
 
     <string name="popularity">Popularity</string>
@@ -22,10 +19,7 @@
     <string name="apply">Apply</string>
     <string name="all">All</string>
     <string name="none">None</string>
-    <string name="found_0_comics">Found 0 Comics</string>
     <string name="page_progress">Page Progress</string>
-    <string name="page_0_0">Page 0/0</string>
-    <string name="view_all">View All</string>
     <string name="favorite">Favorite</string>
     <string name="download">Download</string>
     <string name="downloading">Downloading…</string>
@@ -34,8 +28,32 @@
     <string name="view_chapters_list">View Chapters List</string>
     <string name="chapter_title">Chapter Title</string>
     <string name="start_reading">Start Reading</string>
-    <string name="refresh_data">Refresh Data</string>
     <string name="read_this_chapter_again">Read This Chapter Again</string>
+    <string name="not_started_yet">Not Started Yet</string>
+    <string name="finished_reading">Finished Reading</string>
+    <string name="failed_to_download_chapter_">Failed to Download Chapter ! Please Try Again.</string>
+    <string name="downloaded_x_out_of_y_pages_z">Downloaded %d out of %d Pages (%d%%)</string>
+    <string name="downloading_page_no_x_y">Downloading Page No. %d (%d%%) - %.2f mb</string>
+    <string name="downloading_chapter_s">Downloading Chapter&lt;br&gt;&lt;br&gt;&lt;b&gt;&quot;%s&quot;&lt;/b&gt;&lt;/br&gt;&lt;/br&gt;</string>
+    <string name="failed_to_load_comics_reason_s">Failed to Load Comics. Reason: %s</string>
+    <string name="failed_to_load_comic_details_reason_s">Failed to Load Comic Details. Reason: %s</string>
+    <string name="failed_to_load_chapter_reason_s">Failed to Load Chapter. Reason: %s</string>
+    <string name="page_d_d">Page %d/%d</string>
+    <string name="chapter_complete_next_chapter_s">&lt;small&gt;Chapter Complete&lt;/small&gt;&lt;br&gt;&lt;br&gt;-: Next Chapter :-&lt;br&gt;&lt;br&gt;&lt;big&gt;&lt;b&gt;%s&lt;/b&gt;&lt;/big&gt;</string>
+    <string name="failed_to_load_next_chapter">Failed to Load Next Chapter !</string>
+    <string name="_d_selected">%d Selected</string>
+    <string name="found_d_comics">Found %d Comics</string>
+    <string name="select_at_least_1_category">Select at least 1 category</string>
+    <string name="reading_page_no_d_out_of_d_pages">Reading Page No. %d out of %d Pages</string>
+    <string name="released_in_s">Released in %s</string>
+    <string name="_d_hits">%d Hits</string>
+    <string name="_d_chapters">%d Chapters</string>
+    <string name="app_closed">App Closed</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="connection_timeout">Connection Timeout</string>
+    <string name="unknown">Unknown</string>
+    <string name="___">…</string>
+    <string name="favorites">Favorites</string>
 
     <string-array name="sorting_options">
         <item>@string/popularity</item>

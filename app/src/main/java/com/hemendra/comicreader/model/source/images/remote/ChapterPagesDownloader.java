@@ -88,7 +88,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                             if(isCancelled())
                                 break;
                             progress1 = (int) Math.ceil(((float) count / (float) chapter.pages.size()) * 100f);
-                            publishProgress(progress1, count, chapter.pages.size(), 0, page.number);
+                            publishProgress(progress1, count, chapter.pages.size(), 0, page.number, 0);
 
                             String imgUrl = page.getImageUrl();
 
@@ -103,10 +103,10 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                                                 connection = conn;
                                             }
                                             @Override
-                                            public void onProgress(float progress) {
+                                            public void onProgress(float progress, int totalLength) {
                                                 publishProgress(progress1,
                                                         count, chapter.pages.size(),
-                                                        (int)Math.ceil(progress), page.number);
+                                                        (int)Math.ceil(progress), page.number, totalLength);
                                             }
 
                                             @Override

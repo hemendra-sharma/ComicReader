@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.os.Looper;
 import android.widget.ImageView;
 
 import com.hemendra.comicreader.R;
@@ -13,8 +12,6 @@ import com.hemendra.comicreader.model.data.Page;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
-import com.hemendra.comicreader.model.source.images.remote.OnImageDownloadedListener;
-import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import com.hemendra.comicreader.model.utils.Utils;
 import com.hemendra.comicreader.view.reader.TouchImageView;
 

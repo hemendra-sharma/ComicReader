@@ -5,14 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bordered_rectangle_primary_color"
-    android:padding="3dp">
+    android:padding="3dp"
+    style="?android:attr/buttonBarStyle">
 
     <LinearLayout
         android:id="@+id/llAllNone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        style="?android:attr/buttonBarButtonStyle">
+        style="?android:attr/buttonBarStyle">
 
         <Button
             android:id="@+id/btnAll"
@@ -23,7 +24,8 @@
             android:textColor="@color/textColorInverse"
             android:textSize="@dimen/textSize16"
             android:background="@drawable/btn_selector"
-            android:text="@string/all"/>
+            android:text="@string/all"
+            style="?android:attr/buttonBarButtonStyle"/>
 
         <Button
             android:id="@+id/btnNone"
@@ -34,7 +36,8 @@
             android:textColor="@color/textColorInverse"
             android:textSize="@dimen/textSize16"
             android:background="@drawable/btn_selector"
-            android:text="@string/none"/>
+            android:text="@string/none"
+            style="?android:attr/buttonBarButtonStyle"/>
 
     </LinearLayout>
 
@@ -66,6 +69,7 @@
         android:textColor="@color/textColorInverse"
         android:textSize="@dimen/textSize16"
         android:background="@drawable/btn_selector"
-        android:text="@string/apply"/>
+        android:text="@string/apply"
+        style="?android:attr/buttonBarButtonStyle"/>
 
 </RelativeLayout>

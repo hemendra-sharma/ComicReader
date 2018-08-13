@@ -19,9 +19,7 @@ import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.remote.OnChapterDownloadListener;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
-import java.util.Locale;
-
-public class ChapterDownloaderDialog {
+class ChapterDownloaderDialog {
 
     private Context context;
     private Chapter chapter;
@@ -35,8 +33,8 @@ public class ChapterDownloaderDialog {
     private Bitmap bmp1, bmp2;
     private int progressColor;
 
-    public ChapterDownloaderDialog(Context context, Chapter chapter, ComicsPresenter presenter,
-                                   ImageView ivDownload) {
+    ChapterDownloaderDialog(Context context, Chapter chapter, ComicsPresenter presenter,
+                            ImageView ivDownload) {
         this.context = context;
         this.chapter = chapter;
         this.presenter = presenter;
@@ -61,10 +59,11 @@ public class ChapterDownloaderDialog {
         Button btnCancel = view.findViewById(R.id.btnCancel);
 
         btnCancel.setTransformationMethod(null);
+        String str = context.getString(R.string.downloading_chapter_s, chapter.title);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            tvInfo.setText(Html.fromHtml("Downloading Chapter<br><br><b>\""+chapter.title+"\"</b>", 0));
+            tvInfo.setText(Html.fromHtml(str, 0));
         } else {
-            tvInfo.setText(Html.fromHtml("Downloading Chapter<br><br><b>\""+chapter.title+"\"</b>"));
+            tvInfo.setText(Html.fromHtml(str));
         }
 
         Dialog dialog = new Dialog(context, R.style.CategorySelectionDialog);
@@ -90,6 +89,11 @@ public class ChapterDownloaderDialog {
         return bmp;
     }
 
+    private float bytesToMb(int numBytes) {
+        float kb = (float) numBytes / 1024f;
+        return kb / 1024f;
+    }
+
     public void show() {
         if(dialog != null) {
             dialog.show();
@@ -111,13 +115,16 @@ public class ChapterDownloaderDialog {
                     int totalPages = progress[2];
                     int pageProgress = progress[3];
                     int currentPageNumber = progress[4];
+                    int numBytes = progress[5];
 
-                    tvProgress1.setText(String.format(Locale.getDefault(),
-                            "Downloaded %d out of %d Pages (%d%%)",
-                            downloadedPages, totalPages, chapterProgress));
+                    tvProgress1.setText(
+                            context.getString(R.string.downloaded_x_out_of_y_pages_z,
+                                    downloadedPages, totalPages, chapterProgress));
                     ivProgress1.setImageBitmap(getProgressBitmap(bmp1, chapterProgress));
-                    tvProgress2.setText(String.format(Locale.getDefault(),
-                            "Downloading Page No. %d (%d%%)", currentPageNumber, pageProgress));
+
+                    tvProgress2.setText(
+                            context.getString(R.string.downloading_page_no_x_y,
+                                    currentPageNumber, pageProgress, bytesToMb(numBytes)));
                     ivProgress2.setImageBitmap(getProgressBitmap(bmp2, pageProgress));
                 }
 
@@ -125,7 +132,7 @@ public class ChapterDownloaderDialog {
                 public void onFailedToDownloadChapter(FailureReason reason) {
                     if(chapter.equals(ivDownload.getTag()))
                         ivDownload.setImageResource(R.drawable.ic_download);
-                    tvInfo.setText("Failed !");
+                    tvInfo.setText(R.string.failed_to_download_chapter_);
                 }
             });
         }

@@ -30,7 +30,6 @@ public class ComicReaderFragment extends Fragment {
     private TextView tvPageProgress, tvTitle;
     private ImageView ivPageProgress;
     public int currentPosition = 0;
-    private int progressColor = Color.DKGRAY;
 
     public static ComicReaderFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicReaderFragment fragment = new ComicReaderFragment();
@@ -126,12 +125,11 @@ public class ComicReaderFragment extends Fragment {
             Bitmap bmp = Bitmap.createBitmap(100, 1, Bitmap.Config.ARGB_8888);
             for (int i = 0; i < 100; i++) {
                 if (i <= percent)
-                    bmp.setPixel(i, 0, progressColor);
+                    bmp.setPixel(i, 0, Color.DKGRAY);
                 else
                     bmp.setPixel(i, 0, Color.BLACK);
             }
-            tvPageProgress.setText(String.format(Locale.getDefault(),
-                    "Page %d/%d", currentPage, totalPages));
+            tvPageProgress.setText(getString(R.string.page_d_d, currentPage, totalPages));
             ivPageProgress.setImageBitmap(bmp);
         }
     }
@@ -167,8 +165,4 @@ public class ComicReaderFragment extends Fragment {
             flipView.refreshPage(currentPosition+1);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 }

@@ -2,7 +2,6 @@ package com.hemendra.comicreader.model.source.images.remote;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Looper;
 import android.widget.ImageView;
 
 import com.hemendra.comicreader.R;
@@ -122,9 +121,8 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     }
 
     private boolean fitIntoAnyFreeSlot(String url, ImageView iv, TouchImageView tiv) {
-        if(fitIntoAnyFreeSlot(new ImageDownloader(this, url, iv, tiv)))
-            return true;
-        return queueDownload(url, iv, tiv);
+        return fitIntoAnyFreeSlot(new ImageDownloader(this, url, iv, tiv))
+                || queueDownload(url, iv, tiv);
     }
 
     private boolean fitIntoAnyFreeSlot(ImageDownloader id) {

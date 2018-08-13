@@ -16,7 +16,7 @@ public abstract class ComicsDataSource extends DataSource {
 
     protected IComicsDataSourceListener listener;
 
-    public ComicsDataSource(Context context, IComicsDataSourceListener listener) {
+    protected ComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context);
         this.listener = listener;
     }

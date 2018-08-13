@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.Html;
-import android.view.GestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -31,7 +30,7 @@ import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
 
-public class ReaderAdapter extends ArrayAdapter<Page> {
+class ReaderAdapter extends ArrayAdapter<Page> {
 
     private ComicReaderFragment fragment;
     private ComicsPresenter presenter;
@@ -43,13 +42,13 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
     private Bitmap inBitmap = null;
 
     public static final int TYPE_NEXT_CHAPTER = 1;
-    public static final int TYPE_PAGE = 2;
+    private static final int TYPE_PAGE = 2;
 
-    public ReaderAdapter(Context context, ComicReaderFragment fragment,
-                         ArrayList<Page> pages, ComicsPresenter presenter,
-                         FlipViewController flipView,
-                         Runnable onClicked,
-                         Chapter nextChapter) {
+    ReaderAdapter(Context context, ComicReaderFragment fragment,
+                  ArrayList<Page> pages, ComicsPresenter presenter,
+                  FlipViewController flipView,
+                  Runnable onClicked,
+                  Chapter nextChapter) {
         super(context, 0);
         this.fragment = fragment;
         this.pages = pages;
@@ -108,9 +107,8 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
             btnStartReading.setTransformationMethod(null);
             btnFirstPage.setTransformationMethod(null);
 
-            String html = "<small>Chapter Complete</small>" +
-                    "<br><br>-: Next Chapter :-" +
-                    "<br><br><big><b>" + nextChapter.title + "</b></big>";
+            String html = getContext()
+                    .getString(R.string.chapter_complete_next_chapter_s, nextChapter.title);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 tvNextChapterInfo.setText(Html.fromHtml(html, 0));
             } else {
@@ -218,7 +216,7 @@ public class ReaderAdapter extends ArrayAdapter<Page> {
         @Override
         public void onFailedToLoadPages(FailureReason reason) {
             presenter.hideProgress();
-            Toast.makeText(getContext(), "Failed to Load Next Chapter !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.failed_to_load_next_chapter, Toast.LENGTH_SHORT).show();
         }
     };
 

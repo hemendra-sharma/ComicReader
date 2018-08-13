@@ -13,7 +13,7 @@ public class Chapter implements Serializable {
     public String id;
     public int number;
     public String title;
-    public long dateUpdated;
+    private long dateUpdated;
     public ArrayList<Page> pages = new ArrayList<>();
     public int readingProgress = 0;
 

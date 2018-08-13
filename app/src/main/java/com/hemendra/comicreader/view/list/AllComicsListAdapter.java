@@ -15,18 +15,16 @@ import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
-import java.util.ArrayList;
-
 public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdapter.ComicViewHolder> {
 
-    public class ComicViewHolder extends RecyclerView.ViewHolder {
+    class ComicViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ivCover, ivStar;
         TextView tvTitle, tvLastUpdated, tvCategories;
         Comic comic;
 
-        public ComicViewHolder(@NonNull View itemView,
-                               OnComicItemClickListener listener) {
+        ComicViewHolder(@NonNull View itemView,
+                        OnComicItemClickListener listener) {
             super(itemView);
 
             ivCover = itemView.findViewById(R.id.ivCover);
@@ -48,8 +46,8 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
 
     public static final int TYPE_ALL = 0, TYPE_FAVORITES = 1;
 
-    public AllComicsListAdapter(Comics comics, ComicsPresenter presenter,
-                                OnComicItemClickListener onComicItemClickListener) {
+    AllComicsListAdapter(Comics comics, ComicsPresenter presenter,
+                         OnComicItemClickListener onComicItemClickListener) {
         this.comics = comics;
         this.presenter = presenter;
         this.onComicItemClickListener = onComicItemClickListener;

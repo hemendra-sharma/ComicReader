@@ -116,7 +116,7 @@
                 android:layout_marginTop="10dp"
                 android:textSize="@dimen/textSize16"
                 android:textColor="@color/textColor"
-                android:text="@string/released_in_1990"/>
+                android:text="@string/released_in_s"/>
 
             <TextView
                 android:id="@+id/tvHits"
@@ -126,7 +126,7 @@
                 android:layout_marginTop="10dp"
                 android:textSize="@dimen/textSize16"
                 android:textColor="@color/textColor"
-                android:text="@string/_1234_hits"/>
+                android:text="@string/_d_hits"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -146,7 +146,7 @@
                     android:gravity="center_vertical"
                     android:textStyle="bold"
                     android:textColor="@color/textColor"
-                    android:text="@string/_10_chapters"/>
+                    android:text="@string/_d_chapters"/>
 
                 <Button
                     android:id="@+id/btnStartReading2"

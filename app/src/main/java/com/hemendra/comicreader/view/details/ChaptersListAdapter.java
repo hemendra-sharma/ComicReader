@@ -22,7 +22,7 @@ import java.util.Locale;
 
 public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapter.ChapterViewHolder>  {
 
-    public class ChapterViewHolder extends RecyclerView.ViewHolder {
+    class ChapterViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ivDownload, ivProgress;
         TextView tvChapterName, tvProgress;
@@ -30,8 +30,8 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
         Bitmap bmp;
 
         @SuppressLint("ClickableViewAccessibility")
-        public ChapterViewHolder(@NonNull View itemView,
-                                 OnChapterItemClickListener listener) {
+        ChapterViewHolder(@NonNull View itemView,
+                          OnChapterItemClickListener listener) {
             super(itemView);
 
             ivDownload = itemView.findViewById(R.id.ivDownload);
@@ -60,17 +60,17 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
     private int darkGreen;
     private int darkRed;
 
-    public ChaptersListAdapter(Context context, Comic comic,
-                               ComicsPresenter presenter,
-                               OnChapterItemClickListener listener) {
+    ChaptersListAdapter(Context context, Comic comic,
+                        ComicsPresenter presenter,
+                        OnChapterItemClickListener listener) {
         this.context = context;
         this.comic = comic;
         this.presenter = presenter;
         this.listener = listener;
-        this.progressColor = context.getResources().getColor(R.color.progressColor);
-        this.textColor = context.getResources().getColor(R.color.textColor);
-        this.darkGreen = context.getResources().getColor(R.color.textColorDarkGreen);
-        this.darkRed = context.getResources().getColor(R.color.textColorDarkRed);
+        this.progressColor = context.getResources().getColor(R.color.progressColor, null);
+        this.textColor = context.getResources().getColor(R.color.textColor, null);
+        this.darkGreen = context.getResources().getColor(R.color.textColorDarkGreen, null);
+        this.darkRed = context.getResources().getColor(R.color.textColorDarkRed, null);
     }
 
     @NonNull
@@ -94,17 +94,17 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
                         comic.chapters.get(i).pages.size()));
 
         if(comic.chapters.get(i).pages.size() == 0) {
-            chapterViewHolder.tvProgress.setText("Not Started Yet");
+            chapterViewHolder.tvProgress.setText(R.string.not_started_yet);
             chapterViewHolder.tvProgress.setTextColor(darkRed);
         } else if(comic.chapters.get(i).readingProgress+1
                 >= comic.chapters.get(i).pages.size()) {
-            chapterViewHolder.tvProgress.setText("Finished Reading");
+            chapterViewHolder.tvProgress.setText(R.string.finished_reading);
             chapterViewHolder.tvProgress.setTextColor(darkGreen);
         } else {
-            chapterViewHolder.tvProgress.setText(String.format(Locale.getDefault(),
-                    "Reading Page No. %d out of %d Pages",
-                    comic.chapters.get(i).readingProgress+1,
-                    comic.chapters.get(i).pages.size()));
+            chapterViewHolder.tvProgress.setText(
+                    context.getString(R.string.reading_page_no_d_out_of_d_pages,
+                            comic.chapters.get(i).readingProgress+1,
+                            comic.chapters.get(i).pages.size()));
             chapterViewHolder.tvProgress.setTextColor(textColor);
         }
 

@@ -6,7 +6,7 @@ public abstract class DataSource {
 
     private Context context;
 
-    public DataSource(Context context) {
+    protected DataSource(Context context) {
         this.context = context;
     }
 

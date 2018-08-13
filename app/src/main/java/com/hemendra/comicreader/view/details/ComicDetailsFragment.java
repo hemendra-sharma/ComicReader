@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,8 +22,6 @@ import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
-
-import java.util.Locale;
 
 @SuppressLint("ClickableViewAccessibility")
 public class ComicDetailsFragment extends Fragment {
@@ -36,7 +32,6 @@ public class ComicDetailsFragment extends Fragment {
     private RecyclerView recycler;
     private RelativeLayout rlDetails;
     private ImageView ivStar;
-    private Button btnStartReading1, btnStartReading2;
 
     private ChaptersListAdapter adapter = null;
 
@@ -68,8 +63,8 @@ public class ComicDetailsFragment extends Fragment {
         TextView tvHits = view.findViewById(R.id.tvHits);
         TextView tvChapters = view.findViewById(R.id.tvChapters);
         recycler = view.findViewById(R.id.recycler);
-        btnStartReading1 = view.findViewById(R.id.btnStartReading1);
-        btnStartReading2 = view.findViewById(R.id.btnStartReading2);
+        Button btnStartReading1 = view.findViewById(R.id.btnStartReading1);
+        Button btnStartReading2 = view.findViewById(R.id.btnStartReading2);
         rlDetails = view.findViewById(R.id.rlDetails);
 
         String url = comic.getImageUrl();
@@ -95,18 +90,16 @@ public class ComicDetailsFragment extends Fragment {
         } else {
             tvDescription.setText(Html.fromHtml(comic.description));
         }
-        tvReleasedYear.setText(String.format(Locale.getDefault(),
-                "Released in %s", comic.released));
-        tvHits.setText(String.format(Locale.getDefault(),
-                "%s Hits", comic.hits));
-        tvChapters.setText(String.format(Locale.getDefault(),
-                "%s Chapters", comic.chapters.size()));
+        tvReleasedYear.setText(getString(R.string.released_in_s, comic.released));
+        tvHits.setText(getString(R.string._d_hits, comic.hits));
+        tvChapters.setText(getString(R.string._d_chapters, comic.chapters.size()));
 
         recycler.setItemAnimator(new DefaultItemAnimator());
 
-        adapter = new ChaptersListAdapter(getContext(), comic,
-                comicsPresenter, listener);
-        recycler.setAdapter(adapter);
+        if(getContext() != null) {
+            adapter = new ChaptersListAdapter(getContext(), comic, comicsPresenter, listener);
+            recycler.setAdapter(adapter);
+        }
 
         int lastReadIndex = 0;
         for(int i=comic.chapters.size()-1; i>=0; i--) {
@@ -115,7 +108,9 @@ public class ComicDetailsFragment extends Fragment {
                 break;
             }
         }
-        recycler.getLayoutManager().scrollToPosition(lastReadIndex);
+
+        if(recycler.getLayoutManager() != null)
+            recycler.getLayoutManager().scrollToPosition(lastReadIndex);
 
         btnStartReading1.setOnClickListener(onStartReadingClicked);
         btnStartReading2.setOnClickListener(onStartReadingClicked);
@@ -134,7 +129,7 @@ public class ComicDetailsFragment extends Fragment {
     }
 
     private View.OnClickListener onStartReadingClicked = v->{
-        if(adapter.getItemCount() > 0) {
+        if(adapter != null && adapter.getItemCount() > 0) {
             recycler.setVisibility(View.VISIBLE);
             rlDetails.setVisibility(View.GONE);
         } else {
@@ -177,8 +172,4 @@ public class ComicDetailsFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 }

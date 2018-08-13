@@ -9,7 +9,6 @@ import com.hemendra.comicreader.view.list.SortingOption;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
 

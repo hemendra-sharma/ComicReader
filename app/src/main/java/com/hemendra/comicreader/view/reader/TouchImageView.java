@@ -1,5 +1,6 @@
 package com.hemendra.comicreader.view.reader;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -24,6 +25,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+@SuppressLint("ClickableViewAccessibility")
 public class TouchImageView extends android.support.v7.widget.AppCompatImageView {
 	
 	private static final String DEBUG = "DEBUG";
@@ -49,7 +51,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     //
 	private Matrix matrix, prevMatrix;
 
-    private static enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM };
+    private enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM }
     private State state;
 
     private float minScale;
@@ -99,7 +101,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     	super(context, attrs, defStyle);
     	sharedConstructing(context);
     }
-    
+
     private void sharedConstructing(Context context) {
         super.setClickable(true);
         this.context = context;
@@ -299,7 +301,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
 
     public float getMediumScale() {
         return mediumScale;
-    };
+    }
 
     public void setMediumScale(float mediumScale) {
         this.mediumScale = mediumScale;
@@ -318,7 +320,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
      * scale, not the original resource.
      * @return current zoom multiplier.
      */
-    public float getCurrentZoom() {
+    private float getCurrentZoom() {
     	return normalizedScale;
     }
     
@@ -334,7 +336,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     /**
      * Reset zoom and translation to initial state.
      */
-    public void resetZoom() {
+    private void resetZoom() {
     	normalizedScale = 1;
     	fitImageToView();
     }
@@ -363,7 +365,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
      * @param focusX
      * @param focusY
      */
-    public void setZoom(float scale, float focusX, float focusY) {
+    private void setZoom(float scale, float focusX, float focusY) {
     	setZoom(scale, focusX, focusY, mScaleType);
     }
     
@@ -377,7 +379,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
      * @param focusY
      * @param scaleType
      */
-    public void setZoom(float scale, float focusX, float focusY, ScaleType scaleType) {
+    private void setZoom(float scale, float focusX, float focusY, ScaleType scaleType) {
     	//
     	// setZoom can be called before the image is on the screen, but at this point, 
     	// image and view sizes have not yet been calculated in onMeasure. Thus, we should
@@ -406,7 +408,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
      * and ScaleType.
      * @param img Instance of TouchImageView
      */
-    public void setZoom(TouchImageView img) {
+    private void setZoom(TouchImageView img) {
     	PointF center = img.getScrollPosition();
     	setZoom(img.getCurrentZoom(), center.x, center.y, img.getScaleType());
     }
@@ -418,7 +420,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
      * And the bottom right corner would be (1, 1).
      * @return PointF representing the scroll position of the zoomed image.
      */
-    public PointF getScrollPosition() {
+    private PointF getScrollPosition() {
     	Drawable drawable = getDrawable();
     	if (drawable == null) {
     		return null;
@@ -774,7 +776,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
         	if (fling != null) {
         		//
         		// If a previous fling is still active, it should be cancelled so that two flings
-        		// are not run simultaenously.
+        		// are not run simultaneously.
         		//
         		fling.cancelFling();
         	}
@@ -813,9 +815,9 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     }
     
     public interface OnTouchImageViewListener {
-    	public void onMove();
-    	public void onZoomedIn();
-    	public void onZoomingOutFinished();
+    	void onMove();
+    	void onZoomedIn();
+    	void onZoomingOutFinished();
     }
     
     /**
@@ -1159,7 +1161,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		currY = startY;
     	}
     	
-    	public void cancelFling() {
+    	void cancelFling() {
     		if (scroller != null) {
     			setState(State.NONE);
     			scroller.forceFinished(true);
@@ -1203,7 +1205,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     	OverScroller overScroller;
     	boolean isPreGingerbread;
     	
-    	public CompatScroller(Context context) {
+    	CompatScroller(Context context) {
     		if (VERSION.SDK_INT < VERSION_CODES.GINGERBREAD) {
     			isPreGingerbread = true;
     			scroller = new Scroller(context);
@@ -1214,7 +1216,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		}
     	}
     	
-    	public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
+    	void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
     		if (isPreGingerbread) {
     			scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
     		} else {
@@ -1222,7 +1224,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		}
     	}
     	
-    	public void forceFinished(boolean finished) {
+    	void forceFinished(boolean finished) {
     		if (isPreGingerbread) {
     			scroller.forceFinished(finished);
     		} else {
@@ -1230,7 +1232,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		}
     	}
     	
-    	public boolean isFinished() {
+    	boolean isFinished() {
     		if (isPreGingerbread) {
     			return scroller.isFinished();
     		} else {
@@ -1238,7 +1240,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		}
     	}
     	
-    	public boolean computeScrollOffset() {
+    	boolean computeScrollOffset() {
     		if (isPreGingerbread) {
     			return scroller.computeScrollOffset();
     		} else {
@@ -1247,7 +1249,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		}
     	}
     	
-    	public int getCurrX() {
+    	int getCurrX() {
     		if (isPreGingerbread) {
     			return scroller.getCurrX();
     		} else {
@@ -1255,7 +1257,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     		}
     	}
     	
-    	public int getCurrY() {
+    	int getCurrY() {
     		if (isPreGingerbread) {
     			return scroller.getCurrY();
     		} else {
@@ -1275,12 +1277,12 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     }
     
     private class ZoomVariables {
-    	public float scale;
-    	public float focusX;
-    	public float focusY;
-    	public ScaleType scaleType;
+    	float scale;
+    	float focusX;
+    	float focusY;
+    	ScaleType scaleType;
     	
-    	public ZoomVariables(float scale, float focusX, float focusY, ScaleType scaleType) {
+    	ZoomVariables(float scale, float focusX, float focusY, ScaleType scaleType) {
     		this.scale = scale;
     		this.focusX = focusX;
     		this.focusY = focusY;

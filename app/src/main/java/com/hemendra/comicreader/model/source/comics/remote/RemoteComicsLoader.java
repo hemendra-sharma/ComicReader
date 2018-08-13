@@ -1,7 +1,5 @@
 package com.hemendra.comicreader.model.source.comics.remote;
 
-import android.os.Build;
-
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
@@ -13,7 +11,6 @@ import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.Collections;
 
 public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
 

@@ -56,7 +56,7 @@ public abstract class CustomAsyncTask<Params, Progress, Result> implements Handl
      * Check whether the task execution has been cancelled or not.
      * @return TRUE if cancelled, FALSE otherwise.
      */
-    public boolean isCancelled() {
+    protected boolean isCancelled() {
         return isCancelled;
     }
 
@@ -104,7 +104,7 @@ public abstract class CustomAsyncTask<Params, Progress, Result> implements Handl
     /**
      * This method gets called when the execution was cancelled.
      */
-    protected void onCancelled() { }
+    private void onCancelled() { }
 
     /**
      * Start the execution

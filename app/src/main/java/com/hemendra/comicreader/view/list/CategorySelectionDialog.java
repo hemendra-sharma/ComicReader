@@ -2,7 +2,6 @@ package com.hemendra.comicreader.view.list;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -16,7 +15,7 @@ import com.hemendra.comicreader.R;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class CategorySelectionDialog {
+class CategorySelectionDialog {
 
     private Context context;
     private ArrayList<String> categories;
@@ -66,7 +65,7 @@ public class CategorySelectionDialog {
                 LinearLayout.LayoutParams.WRAP_CONTENT);
 
         for(int i=0; i<categories.size(); i++) {
-            CheckBox cb = (CheckBox) View.inflate(context, R.layout.cb_spinner_drop_down_view, null);
+            CheckBox cb = (CheckBox) View.inflate(context, R.layout.cb_category_selector_view, null);
             cb.setLayoutParams(cbParams);
             cb.setChecked(true);
             cb.setTag(i);
@@ -120,13 +119,13 @@ public class CategorySelectionDialog {
         return str;
     }
 
-    public void selectAll() {
+    private void selectAll() {
         selectAll.run();
         if(callListener())
             dialog.dismiss();
     }
 
-    public void selectNone() {
+    private void selectNone() {
         selectNone.run();
     }
 
@@ -147,7 +146,7 @@ public class CategorySelectionDialog {
                 listener.onSelectionChanged(selectedCategories);
                 return true;
             } else {
-                Toast.makeText(context, "Select at least 1 category", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.select_at_least_1_category, Toast.LENGTH_SHORT).show();
             }
             return false;
         }

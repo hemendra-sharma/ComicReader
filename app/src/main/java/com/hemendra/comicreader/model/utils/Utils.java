@@ -4,11 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -41,12 +41,13 @@ public class Utils {
         ConnectivityManager connectivity = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
-            NetworkInfo[] info = connectivity.getAllNetworkInfo();
-            if (info != null) {
-                for (int i = 0; i < info.length; i++) {
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                        return true;
-                    }
+            Network[] networks = connectivity.getAllNetworks();
+            NetworkInfo info;
+            for(Network network : networks) {
+                info = connectivity.getNetworkInfo(network);
+                if (info != null
+                        && info.getState() == NetworkInfo.State.CONNECTED) {
+                    return true;
                 }
             }
         }
@@ -69,7 +70,7 @@ public class Utils {
      * @return Raw bytes read from file. NULL if failed to read.
      */
     @Nullable
-    public static byte[] readBytesFromFile(@NonNull File file) {
+    private static byte[] readBytesFromFile(@NonNull File file) {
         FileInputStream fin = null;
         ByteArrayOutputStream outstr = null;
         try {
@@ -116,7 +117,7 @@ public class Utils {
      * @return String read from file. NULL if failed to read.
      */
     @Nullable
-    public static String readStringFromFile(@NonNull File file) {
+    private static String readStringFromFile(@NonNull File file) {
         BufferedReader reader = null;
         try {
             if (!file.exists())
@@ -175,16 +176,8 @@ public class Utils {
             bufferIn.close();
             in.close();
             return obj;
-        } catch (EOFException ignore) {
+        } catch (EOFException | StreamCorruptedException | OptionalDataException ignore) {
             // 'null' was written to the file, so returning null
-            deleteFile(file);
-            return null;
-        } catch (StreamCorruptedException ignore) {
-            // the Class structure has been changed
-            deleteFile(file);
-            return null;
-        } catch (OptionalDataException ignore) {
-            // the Class structure has been changed
             deleteFile(file);
             return null;
         } catch (Throwable ex) {
@@ -213,7 +206,7 @@ public class Utils {
      * @return Raw byte array.
      */
     @Nullable
-    public static byte[] getSerializedData(@NonNull Object obj) {
+    private static byte[] getSerializedData(@NonNull Object obj) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         byte[] bytes = null;
@@ -269,7 +262,7 @@ public class Utils {
      * @param file Target tile
      * @return TRUE if the file was written successfully. FALSE otherwise.
      */
-    public static boolean writeToFile(@NonNull byte[] data, @NonNull File file) {
+    private static boolean writeToFile(@NonNull byte[] data, @NonNull File file) {
         FileOutputStream fout = null;
         try {
             boolean proceed = file.getParentFile().exists()
@@ -395,7 +388,7 @@ public class Utils {
      * @return resized bitmap object if successful. NULL otherwise.
      */
     @Nullable
-    public static Bitmap getThumbnail(@NonNull Bitmap bmp, int width, int height) {
+    private static Bitmap getThumbnail(@NonNull Bitmap bmp, int width, int height) {
         try {
             int bmpWidth = bmp.getWidth();
             int bmpHeight = bmp.getHeight();

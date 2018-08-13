@@ -12,7 +12,7 @@ import com.hemendra.comicreader.R;
 
 import static com.hemendra.comicreader.view.MessageBox.*;
 
-public class RuntimePermissionManager {
+class RuntimePermissionManager {
 
     private static final int REQUEST_READ_WRITE_PERMISSION = 1001;
 
