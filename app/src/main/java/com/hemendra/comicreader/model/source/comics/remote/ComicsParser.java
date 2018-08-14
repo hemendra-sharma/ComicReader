@@ -102,6 +102,8 @@ public class ComicsParser {
             }
             reader.endObject();
 
+            reader.close();
+
             Collections.sort(allCategories, String::compareTo);
             comics.categories = allCategories;
 
@@ -116,65 +118,6 @@ public class ComicsParser {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        return null;
-    }
-
-    @Nullable
-    public static Comics parseComicsFromJSON(@NonNull String json) {
-        try {
-            if(new JSONTokener(json).nextValue() instanceof JSONObject) {
-                JSONObject jsonObject = new JSONObject(json);
-                if(jsonObject.has("manga")) {
-                    if(new JSONTokener(jsonObject.getString("manga")).nextValue()
-                            instanceof JSONArray) {
-                        Comics comics = new Comics();
-                        ArrayList<String> allCategories = new ArrayList<>();
-                        JSONArray mangaArray = jsonObject.getJSONArray("manga");
-                        int count = mangaArray.length();
-                        for(int i=0; i<count; i++) {
-                            if(new JSONTokener(mangaArray.getString(i)).nextValue()
-                                    instanceof JSONObject) {
-                                JSONObject mangaObject = mangaArray.getJSONObject(i);
-
-                                String id = mangaObject.optString("i");
-                                String title = mangaObject.optString("t");
-                                String image = mangaObject.optString("im");
-                                int hits = mangaObject.optInt("h");
-                                long lastUpdated = (long) mangaObject.optDouble("ld", 0);
-
-                                ArrayList<String> categories = new ArrayList<>();
-                                if(mangaObject.has("c")) {
-                                    if (new JSONTokener(mangaObject.getString("c")).nextValue()
-                                            instanceof JSONArray) {
-                                        JSONArray categoriesArray = mangaObject.getJSONArray("c");
-                                        int len = categoriesArray.length();
-                                        for (int x = 0; x < len; x++) {
-                                            String str = categoriesArray.getString(x).toLowerCase();
-                                            categories.add(str);
-                                            if(!allCategories.contains(str)) {
-                                                allCategories.add(str);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                title = title.equalsIgnoreCase("null") ? "-" : title;
-                                image = image.equalsIgnoreCase("null") ? "" : image;
-
-                                Comic comic = new Comic(id, title, image, lastUpdated, categories);
-                                comic.hits = hits;
-                                comics.comics.add(comic);
-                            }
-                        }
-                        Collections.sort(allCategories, String::compareTo);
-                        comics.categories = allCategories;
-                        return comics;
-                    }
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
         return null;
     }

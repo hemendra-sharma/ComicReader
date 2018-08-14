@@ -15,20 +15,22 @@ import java.util.ArrayList;
 
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
-    public static final int MAX_PARALLEL_DOWNLOADS = 10;
+    private static final int MAX_PARALLEL_DOWNLOADS = 10;
 
     private IImagesDataSourceListener listener;
     private ChapterPagesDownloader chapterPagesDownloader = null;
 
     private ImageDownloader[] downloadingSlots = new ImageDownloader[MAX_PARALLEL_DOWNLOADS];
 
-    private int maxQueuedDownloads;
+    private int maxQueuedDownloads, cover_size_x, cover_size_y;
     private final ArrayList<ImageDownloader> queuedDownloads = new ArrayList<>();
 
     public RemoteImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
         this.listener = listener;
         maxQueuedDownloads = context.getResources().getInteger(R.integer.max_queued_image_loaders);
+        cover_size_x = context.getResources().getDimensionPixelSize(R.dimen.cover_size_x);
+        cover_size_y = context.getResources().getDimensionPixelSize(R.dimen.cover_size_y);
     }
 
     @Override
@@ -81,7 +83,8 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     @Override
     public void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page) {
         if(listener != null) {
-            listener.onImageLoaded(url, bmp);
+            if(image)
+                listener.onImageLoaded(url, bmp);
             if(page)
                 listener.onPageLoaded(url, bmp);
         }
@@ -129,7 +132,7 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         for(int i = 0; i< downloadingSlots.length; i++) {
             if(downloadingSlots[i] == null || !downloadingSlots[i].isExecuting()) {
                 downloadingSlots[i] = id;
-                downloadingSlots[i].execute(i);
+                downloadingSlots[i].execute();
                 return true;
             }
         }
@@ -160,7 +163,7 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
                 // replace the slot with new download
                 downloadingSlots[index] = new ImageDownloader(this, url, iv, tiv);
             }
-            downloadingSlots[index].execute(index);
+            downloadingSlots[index].execute();
             return true;
         }
         //

@@ -29,6 +29,15 @@ public class Chapter implements Serializable {
         return sdf.format(new Date(dateUpdated));
     }
 
+    public Chapter getCopyWithoutRawPageData() {
+        Chapter chapter = new Chapter(id, number, title, dateUpdated);
+        chapter.readingProgress = readingProgress;
+        for(Page page : pages) {
+            chapter.pages.add(page.getCopyWithoutRawImageData());
+        }
+        return chapter;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj != null

@@ -54,6 +54,20 @@
     <string name="unknown">Unknown</string>
     <string name="___">…</string>
     <string name="favorites">Favorites</string>
+    <string name="no_chapters_available_right_now">No Chapters Available Right Now !</string>
+    <string name="removed_from_favorites">Removed From Favorites</string>
+    <string name="marked_as_favorite">Marked As Favorite</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="you_can_filter_the_comics_using_these_options">You Can Filter the Comics Using These Options</string>
+    <string name="got_it">GOT IT</string>
+    <string name="next">NEXT</string>
+    <string name="details_tutorial_1">Mark this comic as favorite, so that you can come back here quickly.</string>
+    <string name="details_tutorial_2">View the Chapters List and Start Reading.</string>
+    <string name="its_awesome">It\'s Awesome</string>
+    <string name="chapter_download_tutorial">Download the Chapter Offline and Read Without Internet Connection ! Isn\'t it Awesome?</string>
+    <string name="reader_tutorial_1">Double Tap to Zoom In</string>
+    <string name="reader_tutorial_2">Single Tap to Zoom Out</string>
+    <string name="reader_tutorial_3">Swipe Left or Right to Flip Pages</string>
 
     <string-array name="sorting_options">
         <item>@string/popularity</item>

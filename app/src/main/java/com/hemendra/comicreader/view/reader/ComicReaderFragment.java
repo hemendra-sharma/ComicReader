@@ -19,7 +19,8 @@ import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
-import java.util.Locale;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class ComicReaderFragment extends Fragment {
 
@@ -30,6 +31,8 @@ public class ComicReaderFragment extends Fragment {
     private TextView tvPageProgress, tvTitle;
     private ImageView ivPageProgress;
     public int currentPosition = 0;
+
+    private static final String TUTORIAL_ID = "reader_screen_tutorial";
 
     public static ComicReaderFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicReaderFragment fragment = new ComicReaderFragment();
@@ -56,6 +59,7 @@ public class ComicReaderFragment extends Fragment {
         tvTitle = view.findViewById(R.id.tvTitle);
         tvPageProgress = view.findViewById(R.id.tvPageProgress);
         ivPageProgress = view.findViewById(R.id.ivPageProgress);
+        View vTutorialTarget = view.findViewById(R.id.vTutorialTarget);
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -72,12 +76,14 @@ public class ComicReaderFragment extends Fragment {
             ch = chapter;
         }
 
-        adapter = new ReaderAdapter(getContext(), this, ch.pages,
+        adapter = new ReaderAdapter(getActivity(), this, ch.pages,
                 comicsPresenter, flipView, overlaysVisibility,
                 comicsPresenter.getNextChapterFrom(chapter));
         flipView.setAdapter(adapter);
 
         refreshUI();
+
+        showTutorial(vTutorialTarget);
     }
 
     public void refreshUI() {
@@ -163,6 +169,32 @@ public class ComicReaderFragment extends Fragment {
             flipView.refreshPage(currentPosition);
         if(currentPosition < adapter.getCount()-1)
             flipView.refreshPage(currentPosition+1);
+    }
+
+    private void showTutorial(View v) {
+        if(getActivity() == null)
+            return;
+
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500);
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(),
+                TUTORIAL_ID);
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(v,
+                getString(R.string.reader_tutorial_1),
+                getString(R.string.next));
+
+        sequence.addSequenceItem(v,
+                getString(R.string.reader_tutorial_2),
+                getString(R.string.next));
+
+        sequence.addSequenceItem(v,
+                getString(R.string.reader_tutorial_3),
+                getString(R.string.got_it));
+
+        sequence.start();
     }
 
 }

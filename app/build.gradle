@@ -20,6 +20,16 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    allprojects {
+        repositories {
+            jcenter()
+            maven { url "https://jitpack.io" }
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -34,4 +44,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation files('libs/flipview_library.jar')
+    implementation 'com.github.deano2390:MaterialShowcaseView:1.2.0'
 }

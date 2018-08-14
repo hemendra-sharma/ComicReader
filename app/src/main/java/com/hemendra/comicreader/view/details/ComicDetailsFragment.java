@@ -23,6 +23,9 @@ import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 @SuppressLint("ClickableViewAccessibility")
 public class ComicDetailsFragment extends Fragment {
 
@@ -31,9 +34,12 @@ public class ComicDetailsFragment extends Fragment {
 
     private RecyclerView recycler;
     private RelativeLayout rlDetails;
+    private Button btnStartReading1;
     private ImageView ivStar;
 
     private ChaptersListAdapter adapter = null;
+
+    private static final String TUTORIAL_ID = "details_tutorial";
 
     public static ComicDetailsFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicDetailsFragment fragment = new ComicDetailsFragment();
@@ -63,7 +69,7 @@ public class ComicDetailsFragment extends Fragment {
         TextView tvHits = view.findViewById(R.id.tvHits);
         TextView tvChapters = view.findViewById(R.id.tvChapters);
         recycler = view.findViewById(R.id.recycler);
-        Button btnStartReading1 = view.findViewById(R.id.btnStartReading1);
+        btnStartReading1 = view.findViewById(R.id.btnStartReading1);
         Button btnStartReading2 = view.findViewById(R.id.btnStartReading2);
         rlDetails = view.findViewById(R.id.rlDetails);
 
@@ -96,8 +102,8 @@ public class ComicDetailsFragment extends Fragment {
 
         recycler.setItemAnimator(new DefaultItemAnimator());
 
-        if(getContext() != null) {
-            adapter = new ChaptersListAdapter(getContext(), comic, comicsPresenter, listener);
+        if(getActivity() != null) {
+            adapter = new ChaptersListAdapter(getActivity(), comic, comicsPresenter, listener);
             recycler.setAdapter(adapter);
         }
 
@@ -114,6 +120,8 @@ public class ComicDetailsFragment extends Fragment {
 
         btnStartReading1.setOnClickListener(onStartReadingClicked);
         btnStartReading2.setOnClickListener(onStartReadingClicked);
+
+        showTutorial();
     }
 
     public Chapter getNextChapterFrom(Chapter ch) {
@@ -133,7 +141,7 @@ public class ComicDetailsFragment extends Fragment {
             recycler.setVisibility(View.VISIBLE);
             rlDetails.setVisibility(View.GONE);
         } else {
-            Toast.makeText(getContext(), "No Chapters Available Right Now !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.no_chapters_available_right_now, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -156,15 +164,34 @@ public class ComicDetailsFragment extends Fragment {
         if(comic.isFavorite) {
             ivStar.setImageResource(R.drawable.star_off);
             comicsPresenter.setComicFavorite(comic, false);
-            Toast.makeText(getContext(), "Removed From Favorites", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.removed_from_favorites, Toast.LENGTH_SHORT).show();
         } else {
             ivStar.setImageResource(R.drawable.star_on);
             comicsPresenter.setComicFavorite(comic, true);
-            Toast.makeText(getContext(), "Marked As Favorite", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.marked_as_favorite, Toast.LENGTH_SHORT).show();
         }
     };
 
     private OnChapterItemClickListener listener = chapter -> comicsPresenter.loadPages(chapter);
+
+    private void showTutorial() {
+        if(getActivity() == null)
+            return;
+
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500);
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), TUTORIAL_ID);
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(ivStar,
+                getString(R.string.details_tutorial_1), getString(R.string.next));
+
+        sequence.addSequenceItem(btnStartReading1,
+                getString(R.string.details_tutorial_2), getString(R.string.got_it));
+
+        sequence.start();
+    }
 
     public void refreshChaptersList() {
         if(adapter != null) {

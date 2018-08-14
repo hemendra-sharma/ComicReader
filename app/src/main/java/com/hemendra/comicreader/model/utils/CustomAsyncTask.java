@@ -12,6 +12,7 @@ import android.support.annotation.WorkerThread;
  * @param <Progress> Progress type
  * @param <Result> Result type
  */
+@SuppressWarnings("unchecked")
 public abstract class CustomAsyncTask<Params, Progress, Result> implements Handler.Callback {
 
     private boolean isFinished = true;

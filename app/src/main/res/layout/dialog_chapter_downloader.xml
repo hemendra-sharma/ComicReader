@@ -81,7 +81,7 @@
         android:layout_margin="3dp"
         android:textColor="@color/textColorInverse"
         android:textSize="@dimen/textSize16"
-        android:background="@drawable/btn_selector"
+        android:background="@drawable/btn_selector_orange"
         android:text="@string/cancel"
         style="?android:attr/buttonBarButtonStyle"/>
 

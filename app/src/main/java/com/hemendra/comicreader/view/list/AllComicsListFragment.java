@@ -1,23 +1,31 @@
 package com.hemendra.comicreader.view.list;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.hemendra.comicreader.R;
+import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class AllComicsListFragment extends Fragment {
 
@@ -27,6 +35,9 @@ public class AllComicsListFragment extends Fragment {
     private String[] sorting_options;
     private TextView tvCategoriesSelector = null;
     private CheckBox cbFavoritesOnly;
+
+    private CardView cardOptions;
+    private static final String TUTORIAL_ID = "list_tutorial";
 
     private CategorySelectionDialog categorySelectionDialog = null;
     private AllComicsListAdapter mAdapter = null;
@@ -52,6 +63,7 @@ public class AllComicsListFragment extends Fragment {
         Spinner spinnerSorting = view.findViewById(R.id.spinnerSorting);
         tvCategoriesSelector = view.findViewById(R.id.tvCategoriesSelector);
         cbFavoritesOnly = view.findViewById(R.id.cbFavoritesOnly);
+        cardOptions = view.findViewById(R.id.cardOptions);
 
         recycler.setItemAnimator(new DefaultItemAnimator());
 
@@ -99,6 +111,13 @@ public class AllComicsListFragment extends Fragment {
         }
     }
 
+    public void onComicUpdated(Comic comic) {
+        if(recycler != null && mAdapter != null) {
+            mAdapter.updateComic(comic);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
     public void onComicsLoaded(Comics comics) {
         if(recycler != null) {
             if(mAdapter == null) {
@@ -116,6 +135,7 @@ public class AllComicsListFragment extends Fragment {
             }
             recycler.smoothScrollToPosition(0);
             setInfo();
+            showTutorial();
         }
     }
 
@@ -142,5 +162,23 @@ public class AllComicsListFragment extends Fragment {
     }
 
     private OnComicItemClickListener listener = comic -> comicsPresenter.loadComicDetails(comic);
+
+    private void showTutorial() {
+        if(getActivity() == null)
+            return;
+        new MaterialShowcaseView.Builder(getActivity())
+                .setTarget(cardOptions)
+                .setDismissText(getString(R.string.got_it))
+                .setContentText(R.string.you_can_filter_the_comics_using_these_options)
+                .setDelay(500)
+                .singleUse(TUTORIAL_ID)
+                .show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        mAdapter = null;
+        super.onDestroyView();
+    }
 
 }

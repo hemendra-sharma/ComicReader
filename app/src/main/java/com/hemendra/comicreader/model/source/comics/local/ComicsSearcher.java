@@ -66,12 +66,7 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
             }
         }
         //
-        if(sortingOption == SortingOption.POPULARITY)
-            Collections.sort(filteredComics.comics, (c1, c2) -> Integer.compare(c2.hits, c1.hits));
-        else if(sortingOption == SortingOption.LATEST_FIRST)
-            Collections.sort(filteredComics.comics, (c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
-        else if(sortingOption == SortingOption.A_TO_Z)
-            Collections.sort(filteredComics.comics, (c1, c2) -> c1.title.compareTo(c2.title));
+        ComicsSorter.sort(filteredComics, sortingOption);
         Collections.sort(filteredComics.comics, (c1, c2) -> Integer.compare(c2.searchScore, c1.searchScore));
         return filteredComics;
     }

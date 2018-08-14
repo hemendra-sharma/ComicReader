@@ -76,6 +76,20 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
         }
     }
 
+    public void updateComic(Comic c) {
+        for(int i=0; i<comics.comics.size(); i++) {
+            if(comics.comics.get(i).id.equals(c.id)) {
+                comics.comics.set(i, c);
+                break;
+            }
+        }
+        favoriteComics = new Comics();
+        for (Comic comic : this.comics.comics) {
+            if (comic.isFavorite)
+                favoriteComics.comics.add(comic);
+        }
+    }
+
     public void setType(int type) {
         this.type = type;
     }

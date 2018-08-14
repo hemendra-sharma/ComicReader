@@ -21,17 +21,21 @@ public class ComicsSorter extends CustomAsyncTask<Comics,Void,Comics> {
     @Override
     protected Comics doInBackground(Comics... params) {
         Comics comics = params[0];
-        if(option == SortingOption.POPULARITY)
-            Collections.sort(comics.comics, (c1, c2) -> Integer.compare(c2.hits, c1.hits));
-        else if(option == SortingOption.LATEST_FIRST)
-            Collections.sort(comics.comics, (c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
-        else if(option == SortingOption.A_TO_Z)
-            Collections.sort(comics.comics, (c1, c2) -> c1.title.compareTo(c2.title));
+        sort(comics, option);
         return comics;
     }
 
     @Override
     protected void onPostExecute(Comics comics) {
         listener.onComicsLoaded(comics, ComicsDataSource.SourceType.LOCAL_SORT);
+    }
+
+    public static void sort(Comics comics, SortingOption option) {
+        if(option == SortingOption.POPULARITY)
+            Collections.sort(comics.comics, (c1, c2) -> Integer.compare(c2.hits, c1.hits));
+        else if(option == SortingOption.LATEST_FIRST)
+            Collections.sort(comics.comics, (c1, c2) -> Long.compare(c2.lastUpdated, c1.lastUpdated));
+        else if(option == SortingOption.A_TO_Z)
+            Collections.sort(comics.comics, (c1, c2) -> c1.title.compareTo(c2.title));
     }
 }

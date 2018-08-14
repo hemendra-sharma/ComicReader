@@ -283,6 +283,14 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
     }
 
     @Override
+    public void onComicUpdated(Comic comic) {
+        if(activityView != null
+                && localComicsDataSource != null) {
+            activityView.onComicUpdated(comic);
+        }
+    }
+
+    @Override
     public void onFailedToLoadComicDetails(FailureReason reason) {
         if(activityView != null) {
             if(reason == FailureReason.NETWORK_UNAVAILABLE) {

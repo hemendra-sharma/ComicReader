@@ -34,7 +34,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                                   Chapter chapter) {
         this.context = context;
         this.listener = listener;
-        this.chapter = chapter;
+        this.chapter = chapter.getCopyWithoutRawPageData();
         this.db = new ImagesDB(context).open();
     }
 
@@ -106,7 +106,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                                             public void onProgress(float progress, int totalLength) {
                                                 publishProgress(progress1,
                                                         count, chapter.pages.size(),
-                                                        (int)Math.ceil(progress), page.number, totalLength);
+                                                        (int)Math.ceil(progress), count+1, totalLength);
                                             }
 
                                             @Override

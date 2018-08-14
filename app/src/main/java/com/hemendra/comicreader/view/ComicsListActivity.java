@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
@@ -58,6 +59,11 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     @Override
     public void onBackPressed() {
+        if(isProgressVisible()) {
+            Toast.makeText(this, R.string.please_wait, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //
         if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
             if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
                 recoverFromFullScreen();
@@ -70,7 +76,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
             }
             getSupportFragmentManager().popBackStack();
         } else {
-            super.onBackPressed();
+            finishAffinity();
         }
     }
 
@@ -258,6 +264,11 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     @Override
+    public void onComicUpdated(Comic comic) {
+        allComicsListFragment.onComicUpdated(comic);
+    }
+
+    @Override
     public void onFailedToLoadComicDetails(String reason) {
         showSearchView();
         hideProgress();
@@ -290,6 +301,10 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     @Override
     public Chapter getNextChapterFromDetailsFragment(Chapter ch) {
         return comicDetailsFragment.getNextChapterFrom(ch);
+    }
+
+    private boolean isProgressVisible() {
+        return rlProgress.getVisibility() == View.VISIBLE;
     }
 
     @Override

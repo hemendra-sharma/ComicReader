@@ -23,7 +23,7 @@
             android:layout_margin="3dp"
             android:textColor="@color/textColorInverse"
             android:textSize="@dimen/textSize16"
-            android:background="@drawable/btn_selector"
+            android:background="@drawable/btn_selector_orange"
             android:text="@string/all"
             style="?android:attr/buttonBarButtonStyle"/>
 
@@ -35,7 +35,7 @@
             android:layout_margin="3dp"
             android:textColor="@color/textColorInverse"
             android:textSize="@dimen/textSize16"
-            android:background="@drawable/btn_selector"
+            android:background="@drawable/btn_selector_orange"
             android:text="@string/none"
             style="?android:attr/buttonBarButtonStyle"/>
 
@@ -68,7 +68,7 @@
         android:layout_margin="3dp"
         android:textColor="@color/textColorInverse"
         android:textSize="@dimen/textSize16"
-        android:background="@drawable/btn_selector"
+        android:background="@drawable/btn_selector_orange"
         android:text="@string/apply"
         style="?android:attr/buttonBarButtonStyle"/>
 

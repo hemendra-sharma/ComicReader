@@ -19,6 +19,10 @@ public class Page implements Serializable {
         this.id = id;
     }
 
+    public Page getCopyWithoutRawImageData() {
+        return new Page(number, id);
+    }
+
     @Nullable
     public String getImageUrl() {
         if(id.length() > 0) {

@@ -16,6 +16,7 @@ public interface IComicsDataSourceListener {
 
     void onStartedLoadingComicDetails();
     void onComicDetailsLoaded(Comic comic);
+    void onComicUpdated(Comic comic);
     void onFailedToLoadComicDetails(FailureReason reason);
 
     void onStartedLoadingPages();

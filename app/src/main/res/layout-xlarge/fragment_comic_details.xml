@@ -95,7 +95,7 @@
                 android:paddingEnd="10dp"
                 android:textColor="@color/textColorInverse"
                 android:textSize="@dimen/textSize16"
-                android:background="@drawable/btn_selector"
+                android:background="@drawable/btn_selector_orange"
                 android:text="@string/start_reading"/>
 
             <TextView
@@ -157,7 +157,7 @@
                     android:paddingEnd="10dp"
                     android:textColor="@color/textColorInverse"
                     android:textSize="@dimen/textSize16"
-                    android:background="@drawable/btn_selector"
+                    android:background="@drawable/btn_selector_orange"
                     android:text="@string/start_reading"/>
 
             </RelativeLayout>

@@ -10,6 +10,7 @@ public interface IComicListActivityCallback {
 
     void onComicDetailsLoadingStarted();
     void onComicDetailsLoaded(Comic comic);
+    void onComicUpdated(Comic comic);
     void onFailedToLoadComicDetails(String reason);
 
     void onComicsLoadingStarted();

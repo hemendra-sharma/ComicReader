@@ -6,6 +6,7 @@ import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.OnComicsLoadedListener;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import com.hemendra.comicreader.model.utils.Utils;
+import com.hemendra.comicreader.view.list.SortingOption;
 
 import java.io.File;
 import java.util.Collections;
@@ -24,7 +25,7 @@ public class LocalComicsLoader extends CustomAsyncTask<File,Void,Comics> {
         if(files.length > 0 && files[0] != null && files[0].exists() && files[0].length() > 0) {
             Comics comics = (Comics) Utils.readObjectFromFile(files[0]);
             if(comics != null) {
-                Collections.sort(comics.comics, (c1, c2) -> Integer.compare(c2.hits, c1.hits));
+                ComicsSorter.sort(comics, SortingOption.POPULARITY);
                 return comics;
             }
         } else

@@ -178,8 +178,10 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
                 break;
             }
         }
-        if(updated)
+        if(updated) {
+            listener.onComicUpdated(comic);
             save(comics);
+        }
     }
 
     public void updateChapter(@NonNull Chapter chapter) {
@@ -187,7 +189,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         for(Comic comic : comics.comics) {
             for(int i=0; i<comic.chapters.size(); i++) {
                 if(comic.chapters.get(i).id.equals(chapter.id)) {
-                    comic.chapters.set(i, chapter);
+                    comic.chapters.set(i, chapter.getCopyWithoutRawPageData());
                     updated = true;
                     break;
                 }

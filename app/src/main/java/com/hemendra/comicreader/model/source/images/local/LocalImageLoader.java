@@ -6,9 +6,7 @@ import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
-public class LocalImageLoader extends CustomAsyncTask<Integer,Void,Bitmap> {
-
-    private static Bitmap[] bitmapCache = new Bitmap[LocalImagesDataSource.MAX_PARALLEL_LOADS];
+public class LocalImageLoader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     private LocalImagesDataSource dataSource;
     public String imgUrl;
@@ -28,16 +26,9 @@ public class LocalImageLoader extends CustomAsyncTask<Integer,Void,Bitmap> {
     }
 
     @Override
-    protected Bitmap doInBackground(Integer... params) {
+    protected Bitmap doInBackground(Void... params) {
         try {
-            int inBitmapIndex = params[0];
-            Bitmap bmp = dataSource.getImageFromCache(imgUrl, bitmapCache[inBitmapIndex]);
-            if(!isCancelled()) {
-                if (bitmapCache[inBitmapIndex] == null && bmp != null) {
-                    bitmapCache[inBitmapIndex] = bmp;
-                }
-                return bmp;
-            }
+            return dataSource.getImageFromCache(imgUrl);
         }catch (Throwable ex) {
             ex.printStackTrace();
         }

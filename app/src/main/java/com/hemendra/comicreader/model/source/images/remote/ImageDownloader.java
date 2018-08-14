@@ -11,9 +11,7 @@ import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.net.HttpURLConnection;
 
-public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
-
-    private static Bitmap[] bitmapCache = new Bitmap[RemoteImagesDataSource.MAX_PARALLEL_DOWNLOADS];
+public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     private OnImageDownloadedListener listener;
     public String imgUrl;
@@ -47,9 +45,8 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
     }
 
     @Override
-    protected Bitmap doInBackground(Integer... params) {
+    protected Bitmap doInBackground(Void... params) {
         try {
-            int inBitmapIndex = params[0];
             byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
                     new ConnectionCallback() {
                         @Override
@@ -61,14 +58,7 @@ public class ImageDownloader extends CustomAsyncTask<Integer,Void,Bitmap> {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = false;
                 options.inSampleSize = 1;
-                if(bitmapCache[inBitmapIndex] != null) {
-                    options.inBitmap = bitmapCache[inBitmapIndex];
-                }
-                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                if(bitmapCache[inBitmapIndex] == null) {
-                    bitmapCache[inBitmapIndex] = bmp;
-                }
-                return bmp;
+                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
             }
         }catch (Throwable ex) {
             ex.printStackTrace();

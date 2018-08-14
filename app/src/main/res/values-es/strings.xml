@@ -43,4 +43,16 @@
     <string name="connection_timeout">El tiempo de conexión expiro</string>
     <string name="unknown">Desconocido</string>
     <string name="favorites">Favoritos</string>
+    <string name="no_chapters_available_right_now">No hay capítulos disponibles en este momento!</string>
+    <string name="removed_from_favorites">Eliminado de favoritos</string>
+    <string name="marked_as_favorite">Marcado como favorito</string>
+    <string name="you_can_filter_the_comics_using_these_options">Puedes Filtrar los Cómics Usando Estas Opciones.</string>
+    <string name="got_it">LO TENGO</string>
+    <string name="next">SIGUIENTE</string>
+    <string name="details_tutorial_1">Ver la lista de capítulos y comenzar a leer.</string>
+    <string name="its_awesome">Es Impresionante</string>
+    <string name="chapter_download_tutorial">¡Descargue el capítulo sin conexión y lea sin conexión a Internet! ¿No es asombroso?</string>
+    <string name="reader_tutorial_1">Doble toque para acercar</string>
+    <string name="reader_tutorial_2">Solo toque para alejar</string>
+    <string name="reader_tutorial_3">Desliza hacia la izquierda o hacia la derecha para voltear páginas</string>
 </resources>

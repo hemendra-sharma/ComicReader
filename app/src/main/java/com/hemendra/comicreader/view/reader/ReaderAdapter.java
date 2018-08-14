@@ -1,6 +1,7 @@
 package com.hemendra.comicreader.view.reader;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +31,9 @@ import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 class ReaderAdapter extends ArrayAdapter<Page> {
 
     private ComicReaderFragment fragment;
@@ -39,7 +43,6 @@ class ReaderAdapter extends ArrayAdapter<Page> {
     private Runnable onClicked;
     private Chapter nextChapter;
     public boolean isZoomed = false;
-    private Bitmap inBitmap = null;
 
     public static final int TYPE_NEXT_CHAPTER = 1;
     private static final int TYPE_PAGE = 2;
@@ -97,9 +100,7 @@ class ReaderAdapter extends ArrayAdapter<Page> {
                 AbsListView.LayoutParams.MATCH_PARENT);
 
         if(getItemViewType(i) == TYPE_NEXT_CHAPTER) {
-            View v = view;
-            if(v == null)
-                v = View.inflate(getContext(), R.layout.next_chapter_page, null);
+            View v = View.inflate(getContext(), R.layout.next_chapter_page, null);
             TextView tvNextChapterInfo = v.findViewById(R.id.tvNextChapterInfo);
             Button btnStartReading = v.findViewById(R.id.btnStartReading);
             Button btnFirstPage = v.findViewById(R.id.btnFirstPage);
@@ -125,15 +126,12 @@ class ReaderAdapter extends ArrayAdapter<Page> {
             });
             return v;
         } else {
-            TouchImageView iv = (TouchImageView) view;
-            if(iv == null) {
-                iv = new TouchImageView(getContext());
-                iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                iv.setLayoutParams(params);
-                iv.setMaxZoom(3);
-                iv.setMediumScale(2);
-                iv.setBackgroundColor(Color.TRANSPARENT);
-            }
+            TouchImageView iv = new TouchImageView(getContext());
+            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            iv.setLayoutParams(params);
+            iv.setMaxZoom(3);
+            iv.setMediumScale(2);
+            iv.setBackgroundColor(Color.TRANSPARENT);
 
             iv.setTag(i);
             if(!setImage(pages.get(i), iv))
@@ -189,13 +187,13 @@ class ReaderAdapter extends ArrayAdapter<Page> {
         @Override
         public void onComicDetailsLoaded(Comic comic) { }
         @Override
+        public void onComicUpdated(Comic comic) { }
+        @Override
         public void onFailedToLoadComicDetails(FailureReason reason) { }
-
         @Override
         public void onStartedLoadingPages() {
             presenter.showProgress();
         }
-
         @Override
         public void onPagesLoaded(Chapter chapter) {
             fragment.setChapter(chapter);
@@ -225,13 +223,9 @@ class ReaderAdapter extends ArrayAdapter<Page> {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
             options.inSampleSize = 1;
-            if(inBitmap != null)
-                options.inBitmap = inBitmap;
             Bitmap bmp = BitmapFactory.decodeByteArray(page.rawImageData,
                     0, page.rawImageData.length, options);
             if(bmp != null) {
-                if(inBitmap == null)
-                    inBitmap = bmp;
                 iv.setImageBitmap(bmp);
                 iv.setTag(-1);
                 return true;
@@ -241,7 +235,7 @@ class ReaderAdapter extends ArrayAdapter<Page> {
         String url = page.getImageUrl();
         if (url != null)
             presenter.loadPage(url, iv);
-        return false;
+        return (Integer) iv.getTag() < 0;
     }
 
     @Override

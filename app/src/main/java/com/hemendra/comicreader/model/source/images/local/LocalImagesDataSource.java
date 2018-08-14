@@ -22,17 +22,15 @@ import java.util.ArrayList;
 
 public class LocalImagesDataSource extends ImagesDataSource implements OnImageLoadedListener {
 
-    public static final int MAX_PARALLEL_LOADS = 10;
+    private static final int MAX_PARALLEL_LOADS = 10;
 
     private final ImagesDB db;
     private File chaptersDirectory;
 
     private LocalImageLoader[] loadingSlots = new LocalImageLoader[MAX_PARALLEL_LOADS];
 
-    private int maxQueuedDownloads;
+    private int maxQueuedDownloads, cover_size_x, cover_size_y;
     private final ArrayList<LocalImageLoader> queuedDownloads = new ArrayList<>();
-
-    private Bitmap pageInBitmap = null;
 
     public LocalImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
@@ -40,6 +38,8 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         chaptersDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
                 "/" + getContext().getPackageName() + "/cache/chapters");
         maxQueuedDownloads = context.getResources().getInteger(R.integer.max_queued_image_loaders);
+        cover_size_x = context.getResources().getDimensionPixelSize(R.dimen.cover_size_x);
+        cover_size_y = context.getResources().getDimensionPixelSize(R.dimen.cover_size_y);
     }
 
     @Override
@@ -73,6 +73,7 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
     @Override
     public void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page) {
         popFromQueueAndFitIntoFreeSlot();
+        nullifyInactiveSlots();
     }
 
     @Override
@@ -84,9 +85,10 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
                 listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, tiv);
             popFromQueueAndFitIntoFreeSlot();
         }
+        nullifyInactiveSlots();
     }
 
-    public Bitmap getImageFromCache(String url, Bitmap inBitmap) {
+    public Bitmap getImageFromCache(String url) {
         Bitmap bmp = null;
         try{
             byte[] bytes = db.getImage(url);
@@ -95,8 +97,15 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = false;
                 options.inSampleSize = 1;
-                if (inBitmap != null)
-                    options.inBitmap = inBitmap;
+
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+
+                options.inSampleSize = Utils.calculateInSampleSize(options,
+                        cover_size_x, cover_size_y);
+
+                options.inJustDecodeBounds = false;
+
                 bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
             }
         }catch (Throwable ex) {
@@ -110,15 +119,10 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         try{
             byte[] bytes = db.getPage(url);
             if (bytes != null && bytes.length > 0) {
-                // we already have the image. resize and return...
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = false;
                 options.inSampleSize = 1;
-                if(pageInBitmap != null)
-                    options.inBitmap = pageInBitmap;
                 bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                if(pageInBitmap == null)
-                    pageInBitmap = bmp;
             }
         }catch (Throwable ex) {
             ex.printStackTrace();
@@ -175,11 +179,17 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         return null;
     }
 
+    private void nullifyInactiveSlots() {
+        for(int i=0; i<loadingSlots.length; i++) {
+            if(loadingSlots[i] != null && !loadingSlots[i].isExecuting()) {
+                loadingSlots[i] = null;
+            }
+        }
+    }
+
     private void popFromQueueAndFitIntoFreeSlot() {
         LocalImageLoader id = getElementFromQueue();
-        if(id != null) {
-            fitIntoAnyFreeSlot(id);
-        }
+        if(id != null) fitIntoAnyFreeSlot(id);
     }
 
     private boolean alreadyDownloading(String url) {
@@ -211,7 +221,7 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         for(int i = 0; i< loadingSlots.length; i++) {
             if(loadingSlots[i] == null || !loadingSlots[i].isExecuting()) {
                 loadingSlots[i] = id;
-                loadingSlots[i].execute(i);
+                loadingSlots[i].execute();
                 return true;
             }
         }
@@ -242,7 +252,7 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
                 // replace the slot with new download
                 loadingSlots[index] = new LocalImageLoader(this, url, iv);
             }
-            loadingSlots[index].execute(index);
+            loadingSlots[index].execute();
             return true;
         }
         //

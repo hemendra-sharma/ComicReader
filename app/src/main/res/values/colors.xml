@@ -13,4 +13,6 @@
     <color name="textColorDarkRed">#811616</color>
 
     <color name="lightGray">#cccccc</color>
+    <color name="tutorial_blue">#0072bb</color>
+    <color name="tutorial_blue_dark">#095281</color>
 </resources>

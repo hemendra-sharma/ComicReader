@@ -261,7 +261,7 @@ public class ImagesDB {
                         c = db.rawQuery(query, null);
                         if (c != null) {
                             if (c.moveToFirst()) {
-                                int diff = totalImages - MAX_CACHED_IMAGES;
+                                int diff = totalImages - MAX_CACHED_PAGES;
                                 int count = 0;
                                 do {
                                     db.delete(TAB_PAGES, "_id="+c.getInt(0), null);

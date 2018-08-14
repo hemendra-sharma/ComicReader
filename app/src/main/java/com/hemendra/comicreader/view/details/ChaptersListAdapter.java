@@ -1,6 +1,7 @@
 package com.hemendra.comicreader.view.details;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,6 +20,8 @@ import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.Locale;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapter.ChapterViewHolder>  {
 
@@ -59,6 +62,9 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
     private int textColor;
     private int darkGreen;
     private int darkRed;
+
+    private static final String TUTORIAL_ID = "chapter_download_tutorial";
+    private boolean tutorialCalledOnce = false;
 
     ChaptersListAdapter(Context context, Comic comic,
                         ComicsPresenter presenter,
@@ -122,6 +128,17 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
                     dialog.show();
                 }
             });
+        }
+
+        if(i == 0 && !tutorialCalledOnce && context instanceof Activity) {
+            tutorialCalledOnce = true;
+            new MaterialShowcaseView.Builder((Activity) context)
+                    .setTarget(chapterViewHolder.ivDownload)
+                    .setDismissText(context.getString(R.string.its_awesome))
+                    .setContentText(R.string.chapter_download_tutorial)
+                    .setDelay(500)
+                    .singleUse(TUTORIAL_ID)
+                    .show();
         }
     }
 
