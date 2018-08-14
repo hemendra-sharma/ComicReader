@@ -59,7 +59,7 @@ class ChapterDownloaderDialog {
         Button btnCancel = view.findViewById(R.id.btnCancel);
 
         btnCancel.setTransformationMethod(null);
-        String str = context.getString(R.string.downloading_chapter_s, chapter.title);
+        String str = context.getString(R.string.buffering_chapter_s, chapter.title);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             tvInfo.setText(Html.fromHtml(str, 0));
         } else {
@@ -118,12 +118,12 @@ class ChapterDownloaderDialog {
                     int numBytes = progress[5];
 
                     tvProgress1.setText(
-                            context.getString(R.string.downloaded_x_out_of_y_pages_z,
+                            context.getString(R.string.buffered_x_out_of_y_pages_z,
                                     downloadedPages, totalPages, chapterProgress));
                     ivProgress1.setImageBitmap(getProgressBitmap(bmp1, chapterProgress));
 
                     tvProgress2.setText(
-                            context.getString(R.string.downloading_page_no_x_y,
+                            context.getString(R.string.buffering_page_no_x_y,
                                     currentPageNumber, pageProgress, bytesToMb(numBytes)));
                     ivProgress2.setImageBitmap(getProgressBitmap(bmp2, pageProgress));
                 }
@@ -132,7 +132,7 @@ class ChapterDownloaderDialog {
                 public void onFailedToDownloadChapter(FailureReason reason) {
                     if(chapter.equals(ivDownload.getTag()))
                         ivDownload.setImageResource(R.drawable.ic_download);
-                    tvInfo.setText(R.string.failed_to_download_chapter_);
+                    tvInfo.setText(R.string.failed_to_buffer_chapter_);
                 }
             });
         }

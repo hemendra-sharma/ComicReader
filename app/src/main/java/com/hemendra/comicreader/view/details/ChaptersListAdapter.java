@@ -134,8 +134,8 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
             tutorialCalledOnce = true;
             new MaterialShowcaseView.Builder((Activity) context)
                     .setTarget(chapterViewHolder.ivDownload)
-                    .setDismissText(context.getString(R.string.its_awesome))
-                    .setContentText(R.string.chapter_download_tutorial)
+                    .setDismissText(context.getString(R.string.got_it))
+                    .setContentText(R.string.chapter_buffer_tutorial)
                     .setDelay(500)
                     .singleUse(TUTORIAL_ID)
                     .show();

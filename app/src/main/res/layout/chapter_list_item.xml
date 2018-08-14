@@ -42,7 +42,7 @@
             android:layout_alignParentEnd="true"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_download"
-            android:contentDescription="@string/download"
+            android:contentDescription="@string/buffer"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:clickable="true"/>
