@@ -1,7 +1,7 @@
-# Comic Reader ![Crates.io](https://img.shields.io/crates/l/rustc-serialize.svg)
+# Comic Reader
 A comic book reader Android app built using MVP architecture.
 
-<img src="https://github.com/hemendra-sharma/ComicReader/tree/master/gif/recording.gif"/>
+![](https://github.com/hemendra-sharma/ComicReader/tree/master/gif/recording.gif)
 
 ## API
 The app uses free public API from mangeeden.com ([API](https://www.mangaeden.com/api/))
