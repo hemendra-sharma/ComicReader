@@ -1,7 +1,7 @@
 # Comic Reader
 A comic book reader Android app built using MVP architecture.
 
-<img src="https://github.com/hemendra-sharma/ComicReader/tree/master/gif/recording.gif"/>
+<img src="https://github.com/hemendra-sharma/ComicReader/blob/master/gif/recording.gif?raw=true"/>
 
 ## API
 The app uses free public API from mangeeden.com ([API](https://www.mangaeden.com/api/))
