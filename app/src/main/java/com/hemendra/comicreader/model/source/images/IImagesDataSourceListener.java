@@ -23,13 +23,42 @@ import android.widget.ImageView;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.view.reader.TouchImageView;
 
+/**
+ * Provides an interface for loading the images using any of the
+ * {@link com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource}
+ * or {@link com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource}
+ */
 public interface IImagesDataSourceListener {
 
+    /**
+     * Gets called when the cover image was loaded successfully.
+     * @param url The URL used to load image.
+     * @param bmp Loaded Bitmap.
+     */
     void onImageLoaded(String url, Bitmap bmp);
+
+    /**
+     * Gets called when the cover image loading failed.
+     * @param reason Any one of the {@link FailureReason}
+     * @param url The URL used to load image.
+     * @param iv The visible image view on screen.
+     */
     void onFailedToLoadImage(@NonNull FailureReason reason,
                              @NonNull String url, @NonNull ImageView iv);
 
+    /**
+     * Gets called when the page was loaded successfully.
+     * @param url The URL used to load page.
+     * @param bmp Loaded Bitmap.
+     */
     void onPageLoaded(String url, Bitmap bmp);
+
+    /**
+     * Gets called when the page loading failed.
+     * @param reason Any one of the {@link FailureReason}
+     * @param url The URL used to load image.
+     * @param iv The visible page view on screen.
+     */
     void onFailedToLoadPage(@NonNull FailureReason reason,
                             @NonNull String url, @NonNull TouchImageView iv);
 

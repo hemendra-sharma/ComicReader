@@ -19,8 +19,32 @@ package com.hemendra.comicreader.model.source.images.remote;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.source.FailureReason;
 
+/**
+ * Provides an interface for downloading the images for all pages.
+ */
 public interface OnChapterDownloadListener {
+    /**
+     * Gets called when the images for all the pages were downloaded successfully.
+     * @param chapter The chapter instance that was downloaded.
+     */
     void onChapterDownloaded(Chapter chapter);
+
+    /**
+     * Gets called when the page download progress is updated.
+     * @param progress Array Sequence: [
+     *                 Overall Progress,
+     *                 Overall Count,
+     *                 Total Pages Count,
+     *                 Current Page's Download Progress,
+     *                 Current Page Number,
+     *                 Current Page Size in Bytes
+     *                 ]
+     */
     void onProgressUpdate(Integer... progress);
+
+    /**
+     * Gets called when it failed to download all the pages.
+     * @param reason One of the {@link FailureReason}
+     */
     void onFailedToDownloadChapter(FailureReason reason);
 }

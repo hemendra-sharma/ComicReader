@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * This class holds the list of comics and their categories.
+ * Holds the list of comics and their categories.
  * @author Hemendra Sharma
  * @see java.io.Serializable
  */

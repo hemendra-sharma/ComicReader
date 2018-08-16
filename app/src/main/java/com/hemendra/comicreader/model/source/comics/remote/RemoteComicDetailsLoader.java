@@ -26,6 +26,12 @@ import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
 import java.net.HttpURLConnection;
 
+/**
+ * A background worker thread to download the comic details and the list of chapters for any
+ * given comic.
+ * @author Hemendra Sharma
+ * @see CustomAsyncTask
+ */
 public class RemoteComicDetailsLoader extends CustomAsyncTask<Comic,Void,Comic> {
 
     private OnComicsLoadedListener listener;
@@ -37,7 +43,8 @@ public class RemoteComicDetailsLoader extends CustomAsyncTask<Comic,Void,Comic> 
 
     @Override
     protected Comic doInBackground(Comic... comics) {
-        String json = ContentDownloader.downloadAsString(RemoteConfig.buildComicDetailsUrl(comics[0].id),
+        String json = ContentDownloader.downloadAsString(
+                RemoteConfig.buildComicDetailsUrl(comics[0].id),
                 new ConnectionCallback() {
                     @Override
                     public void onResponseCode(int code) {

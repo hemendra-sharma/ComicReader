@@ -36,6 +36,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Provides the functionality to smoothly load the images from cache if available.
+ */
 public class LocalImagesDataSource extends ImagesDataSource implements OnImageLoadedListener {
 
     private static final int MAX_PARALLEL_LOADS = 10;
@@ -48,6 +51,12 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
     private int maxQueuedDownloads, cover_size_x, cover_size_y;
     private final ArrayList<LocalImageLoader> queuedDownloads = new ArrayList<>();
 
+    /**
+     * Creates a new instance of {@link LocalImagesDataSource}
+     * @param context The Android application context
+     * @param listener An instance of {@link IImagesDataSourceListener}, which in this case, is
+     *                 {@link com.hemendra.comicreader.presenter.ComicsPresenter}
+     */
     public LocalImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
         db = new ImagesDB(context).open();
@@ -58,6 +67,11 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         cover_size_y = context.getResources().getDimensionPixelSize(R.dimen.cover_size_y);
     }
 
+    /**
+     * Triggers a background thread to start loading the image from cache.
+     * @param url The image URL
+     * @param iv The visible ImageView on which this image would be used.
+     */
     @Override
     public void loadImage(String url, ImageView iv) {
         if(listener != null) {
@@ -73,6 +87,11 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         }
     }
 
+    /**
+     * Triggers a background thread to start loading the page from cache.
+     * @param url The page URL
+     * @param iv The visible TouchImageView on which this image would be used.
+     */
     @Override
     public void loadPage(String url, TouchImageView iv) {
         if(listener != null) {
@@ -104,48 +123,55 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         nullifyInactiveSlots();
     }
 
+    /**
+     * Returns an image Bitmap by reading the image data from database as byte-array.
+     * @param url The image URL
+     * @return Decoded Bitmap
+     */
     public Bitmap getImageFromCache(String url) {
         Bitmap bmp = null;
-        try{
-            byte[] bytes = db.getImage(url);
-            if (bytes != null && bytes.length > 0) {
-                // we already have the image. resize and return...
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = false;
-                options.inSampleSize = 1;
+        byte[] bytes = db.getImage(url);
+        if (bytes != null && bytes.length > 0) {
+            // we already have the image. resize and return...
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;
+            options.inSampleSize = 1;
 
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
 
-                options.inSampleSize = Utils.calculateInSampleSize(options,
-                        cover_size_x, cover_size_y);
+            options.inSampleSize = Utils.calculateInSampleSize(options,
+                    cover_size_x, cover_size_y);
 
-                options.inJustDecodeBounds = false;
+            options.inJustDecodeBounds = false;
 
-                bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-            }
-        }catch (Throwable ex) {
-            ex.printStackTrace();
+            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         }
         return bmp;
     }
 
+    /**
+     * Returns an image Bitmap by reading the image data from database as byte-array.
+     * @param url The image URL
+     * @return Decoded Bitmap
+     */
     private Bitmap getPageFromCache(String url) {
         Bitmap bmp = null;
-        try{
-            byte[] bytes = db.getPage(url);
-            if (bytes != null && bytes.length > 0) {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = false;
-                options.inSampleSize = 1;
-                bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-            }
-        }catch (Throwable ex) {
-            ex.printStackTrace();
+        byte[] bytes = db.getPage(url);
+        if (bytes != null && bytes.length > 0) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;
+            options.inSampleSize = 1;
+            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         }
         return bmp;
     }
 
+    /**
+     * Save the image into image cache by inserting the blob data into database.
+     * @param url The image URL
+     * @param bmp The bitmap to be saved
+     */
     public void saveImage(String url, Bitmap bmp) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -157,6 +183,11 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         }
     }
 
+    /**
+     * Save the page into image cache by inserting the blob data into database.
+     * @param url The page URL
+     * @param bmp The bitmap to be saved
+     */
     public void savePage(String url, Bitmap bmp) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -168,6 +199,11 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         }
     }
 
+    /**
+     * Checks whether the chapter was downloaded offline and is available or not.
+     * @param chapter The chapter to check for.
+     * @return TRUE if available offline, FALSE otherwise.
+     */
     public boolean isChapterOffline(Chapter chapter) {
         if(listener != null) {
             File file = new File(chaptersDirectory, chapter.id+".obj");
@@ -176,6 +212,11 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         return false;
     }
 
+    /**
+     * Reads the offline chapter and returns as an instance of {@link Chapter}
+     * @param chapter The chapter to read from local storage.
+     * @return Instance of the read {@link Chapter} object.
+     */
     public Chapter getOfflineChapter(Chapter chapter) {
         if(listener != null && chapter.pages.size() > 0) {
             File file = new File(chaptersDirectory, chapter.id+".obj");
@@ -308,9 +349,15 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         }
     }
 
+    /**
+     * Stop ongoing processes, close the database connection, and release any memory so GC can collect it.
+     */
     @Override
     public void dispose() {
         db.close();
+        for(LocalImageLoader slot : loadingSlots) {
+            slot.cancel(true);
+        }
         listener = null;
     }
 }

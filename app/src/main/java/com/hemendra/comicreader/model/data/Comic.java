@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * This class holds the information about a single comic.
+ * Holds the information about a single comic.
  * @author Hemendra Sharma
  * @see java.io.Serializable
  */

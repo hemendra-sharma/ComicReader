@@ -39,8 +39,8 @@ public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
     private ArrayList<String> selectedCategories;
     private SortingOption sortingOption;
 
-    public ComicsFilterer(Comics comics, OnComicsLoadedListener listener,
-                          ArrayList<String> selectedCategories, SortingOption sortingOption) {
+    ComicsFilterer(Comics comics, OnComicsLoadedListener listener,
+                   ArrayList<String> selectedCategories, SortingOption sortingOption) {
         this.comics = comics;
         this.listener = listener;
         this.selectedCategories = selectedCategories;

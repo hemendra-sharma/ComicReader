@@ -85,8 +85,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
                 recoverFromFullScreen();
                 comicDetailsFragment.refreshChaptersList();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
-                if(comicDetailsFragment.onBackPressed())
-                    return;
+                if(comicDetailsFragment.onBackPressed()) return;
                 showSearchView();
                 allComicsListFragment.refreshCurrentView();
             }

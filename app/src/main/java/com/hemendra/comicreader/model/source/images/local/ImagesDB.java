@@ -28,7 +28,13 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class ImagesDB {
 
+    /**
+     * Maximum number of cover images we want to hold up in the cache.
+     */
     private static final int MAX_CACHED_IMAGES = 500;
+    /**
+     * Maximum number of comic book pages we want to hold up in the cache.
+     */
     private static final int MAX_CACHED_PAGES = 100;
 
     private static final int DATABASE_VERSION = 2;
@@ -66,13 +72,9 @@ public class ImagesDB {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            try {
-                db.execSQL("PRAGMA foreign_keys=ON");
-                db.execSQL(CREATE_TAB_IMAGES);
-                db.execSQL(CREATE_TAB_PAGES);
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
+            db.execSQL("PRAGMA foreign_keys=ON");
+            db.execSQL(CREATE_TAB_IMAGES);
+            db.execSQL(CREATE_TAB_PAGES);
         }
 
         @Override
@@ -86,20 +88,12 @@ public class ImagesDB {
             UpgradeDowngrade(db, oldVersion, newVersion);
         }
 
-        private void UpgradeDowngrade(SQLiteDatabase db, int oldVersion,
+        private void UpgradeDowngrade(SQLiteDatabase db,
+                                      int oldVersion,
                                       int newVersion) {
-            try {
-                //
-                // when upgrading or downgrading we can migrate the data into new format
-                // conditionally. But for now we are just going to drop the whole cache,
-                // because this app is going to have only this version.
-                //
-                db.execSQL("DROP TABLE IF EXISTS " + TAB_IMAGES);
-                db.execSQL("DROP TABLE IF EXISTS " + TAB_PAGES);
-                onCreate(db);
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
+            db.execSQL("DROP TABLE IF EXISTS " + TAB_IMAGES);
+            db.execSQL("DROP TABLE IF EXISTS " + TAB_PAGES);
+            onCreate(db);
         }
     }
 
@@ -109,13 +103,9 @@ public class ImagesDB {
      * @return a new instance of {@link ImagesDB}
      */
     public ImagesDB open() {
-        try {
-            if (DBHelper != null) {
-                db = DBHelper.getWritableDatabase();
-                return this;
-            }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+        if (DBHelper != null) {
+            db = DBHelper.getWritableDatabase();
+            return this;
         }
         return null;
     }
@@ -124,8 +114,7 @@ public class ImagesDB {
      * Close the existing open connection.
      */
     public void close() {
-        if (db != null)
-            db.close();
+        db.close();
     }
 
     /**
@@ -135,33 +124,29 @@ public class ImagesDB {
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     public long insertImage(String url, byte[] data) {
-        try {
-            if (url != null && url.trim().length() > 0) {
-                int count = 0;
-                String countQuery = "SELECT count(*) FROM " + TAB_IMAGES + " WHERE url='" + url.trim() + "'";
-                Cursor c = db.rawQuery(countQuery, null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        count = c.getInt(0);
-                    }
-                    c.close();
+        if (url != null && url.trim().length() > 0) {
+            int count = 0;
+            String countQuery = "SELECT count(*) FROM " + TAB_IMAGES + " WHERE url='" + url.trim() + "'";
+            Cursor c = db.rawQuery(countQuery, null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    count = c.getInt(0);
                 }
-                //
-                if(count <= 0) {
-                    ContentValues values = new ContentValues();
-                    if (data != null && data.length > 0) {
-                        values.put("url", url);
-                        values.put("data", data);
-                        long ret = db.insert(TAB_IMAGES, null, values);
-                        if (ret > 0) {
-                            keepLastMaxImagesOnly();
-                            return ret;
-                        }
+                c.close();
+            }
+            //
+            if(count <= 0) {
+                ContentValues values = new ContentValues();
+                if (data != null && data.length > 0) {
+                    values.put("url", url);
+                    values.put("data", data);
+                    long ret = db.insert(TAB_IMAGES, null, values);
+                    if (ret > 0) {
+                        keepLastMaxImagesOnly();
+                        return ret;
                     }
                 }
             }
-        } catch(Throwable ex){
-            ex.printStackTrace();
         }
         return -1;
     }
@@ -170,32 +155,28 @@ public class ImagesDB {
      * Keep the latest MAX_CACHED_IMAGES images and delete all other old images.
      */
     private void keepLastMaxImagesOnly() {
-        try {
-            String countQuery = "SELECT count(*) FROM "+TAB_IMAGES;
-            Cursor c = db.rawQuery(countQuery, null);
-            if(c != null) {
-                if(c.moveToFirst()) {
-                    int totalImages = c.getInt(0);
-                    c.close();
-                    if(totalImages > MAX_CACHED_IMAGES) {
-                        String query = "SELECT _id FROM " + TAB_IMAGES + " ORDER BY _id ASC";
-                        c = db.rawQuery(query, null);
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                int diff = totalImages - MAX_CACHED_IMAGES;
-                                int count = 0;
-                                do {
-                                    db.delete(TAB_IMAGES, "_id="+c.getInt(0), null);
-                                    count++;
-                                } while (c.moveToNext() && count < diff);
-                            }
-                            c.close();
+        String countQuery = "SELECT count(*) FROM "+TAB_IMAGES;
+        Cursor c = db.rawQuery(countQuery, null);
+        if(c != null) {
+            if(c.moveToFirst()) {
+                int totalImages = c.getInt(0);
+                c.close();
+                if(totalImages > MAX_CACHED_IMAGES) {
+                    String query = "SELECT _id FROM " + TAB_IMAGES + " ORDER BY _id ASC";
+                    c = db.rawQuery(query, null);
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            int diff = totalImages - MAX_CACHED_IMAGES;
+                            int count = 0;
+                            do {
+                                db.delete(TAB_IMAGES, "_id="+c.getInt(0), null);
+                                count++;
+                            } while (c.moveToNext() && count < diff);
                         }
+                        c.close();
                     }
                 }
             }
-        } catch (Throwable ex){
-            ex.printStackTrace();
         }
     }
 
@@ -207,18 +188,14 @@ public class ImagesDB {
      */
     public byte[] getImage(String url) {
         byte[] bytes = null;
-        try {
-            if(url != null && url.trim().length() > 0) {
-                Cursor c = db.rawQuery("select * from " + TAB_IMAGES + " WHERE url='" + url.trim() + "'", null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        bytes = c.getBlob(2);
-                    }
-                    c.close();
+        if(url != null && url.trim().length() > 0) {
+            Cursor c = db.rawQuery("select * from " + TAB_IMAGES + " WHERE url='" + url.trim() + "'", null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    bytes = c.getBlob(2);
                 }
+                c.close();
             }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
         }
         return bytes;
     }
@@ -230,33 +207,29 @@ public class ImagesDB {
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     public long insertPage(String url, byte[] data) {
-        try {
-            if (url != null && url.trim().length() > 0) {
-                int count = 0;
-                String countQuery = "SELECT count(*) FROM " + TAB_PAGES + " WHERE url='" + url.trim() + "'";
-                Cursor c = db.rawQuery(countQuery, null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        count = c.getInt(0);
-                    }
-                    c.close();
+        if (url != null && url.trim().length() > 0) {
+            int count = 0;
+            String countQuery = "SELECT count(*) FROM " + TAB_PAGES + " WHERE url='" + url.trim() + "'";
+            Cursor c = db.rawQuery(countQuery, null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    count = c.getInt(0);
                 }
-                //
-                if(count <= 0) {
-                    ContentValues values = new ContentValues();
-                    if (data != null && data.length > 0) {
-                        values.put("url", url);
-                        values.put("data", data);
-                        long ret = db.insert(TAB_PAGES, null, values);
-                        if (ret > 0) {
-                            keepLastMaxPagesOnly();
-                            return ret;
-                        }
+                c.close();
+            }
+            //
+            if(count <= 0) {
+                ContentValues values = new ContentValues();
+                if (data != null && data.length > 0) {
+                    values.put("url", url);
+                    values.put("data", data);
+                    long ret = db.insert(TAB_PAGES, null, values);
+                    if (ret > 0) {
+                        keepLastMaxPagesOnly();
+                        return ret;
                     }
                 }
             }
-        } catch(Throwable ex){
-            ex.printStackTrace();
         }
         return -1;
     }
@@ -265,32 +238,28 @@ public class ImagesDB {
      * Keep the latest MAX_CACHED_IMAGES images and delete all other old images.
      */
     private void keepLastMaxPagesOnly() {
-        try {
-            String countQuery = "SELECT count(*) FROM "+TAB_PAGES;
-            Cursor c = db.rawQuery(countQuery, null);
-            if(c != null) {
-                if(c.moveToFirst()) {
-                    int totalImages = c.getInt(0);
-                    c.close();
-                    if(totalImages > MAX_CACHED_PAGES) {
-                        String query = "SELECT _id FROM " + TAB_PAGES + " ORDER BY _id ASC";
-                        c = db.rawQuery(query, null);
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                int diff = totalImages - MAX_CACHED_PAGES;
-                                int count = 0;
-                                do {
-                                    db.delete(TAB_PAGES, "_id="+c.getInt(0), null);
-                                    count++;
-                                } while (c.moveToNext() && count < diff);
-                            }
-                            c.close();
+        String countQuery = "SELECT count(*) FROM "+TAB_PAGES;
+        Cursor c = db.rawQuery(countQuery, null);
+        if(c != null) {
+            if(c.moveToFirst()) {
+                int totalImages = c.getInt(0);
+                c.close();
+                if(totalImages > MAX_CACHED_PAGES) {
+                    String query = "SELECT _id FROM " + TAB_PAGES + " ORDER BY _id ASC";
+                    c = db.rawQuery(query, null);
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            int diff = totalImages - MAX_CACHED_PAGES;
+                            int count = 0;
+                            do {
+                                db.delete(TAB_PAGES, "_id="+c.getInt(0), null);
+                                count++;
+                            } while (c.moveToNext() && count < diff);
                         }
+                        c.close();
                     }
                 }
             }
-        } catch (Throwable ex){
-            ex.printStackTrace();
         }
     }
 
@@ -302,36 +271,28 @@ public class ImagesDB {
      */
     public byte[] getPage(String url) {
         byte[] bytes = null;
-        try {
-            if(url != null && url.trim().length() > 0) {
-                Cursor c = db.rawQuery("select * from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        bytes = c.getBlob(2);
-                    }
-                    c.close();
+        if(url != null && url.trim().length() > 0) {
+            Cursor c = db.rawQuery("select * from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    bytes = c.getBlob(2);
                 }
+                c.close();
             }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
         }
         return bytes;
     }
 
     public boolean hasPage(String url) {
         int count = 0;
-        try {
-            if(url != null && url.trim().length() > 0) {
-                Cursor c = db.rawQuery("select count(*) from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        count = c.getInt(0);
-                    }
-                    c.close();
+        if(url != null && url.trim().length() > 0) {
+            Cursor c = db.rawQuery("select count(*) from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    count = c.getInt(0);
                 }
+                c.close();
             }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
         }
         return count > 0;
     }

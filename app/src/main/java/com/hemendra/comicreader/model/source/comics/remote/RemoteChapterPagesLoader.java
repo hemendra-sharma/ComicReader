@@ -26,18 +26,24 @@ import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
 import java.net.HttpURLConnection;
 
+/**
+ * A background worker thread to download the list of pages for any given chapter.
+ * @author Hemendra Sharma
+ * @see CustomAsyncTask
+ */
 public class RemoteChapterPagesLoader extends CustomAsyncTask<Chapter,Void,Chapter> {
 
     private OnComicsLoadedListener listener;
     private FailureReason reason = FailureReason.UNKNOWN_REMOTE_ERROR;
 
-    public RemoteChapterPagesLoader(OnComicsLoadedListener listener) {
+    RemoteChapterPagesLoader(OnComicsLoadedListener listener) {
         this.listener = listener;
     }
 
     @Override
     protected Chapter doInBackground(Chapter... params) {
-        String json = ContentDownloader.downloadAsString(RemoteConfig.buildChapterUrl(params[0].id),
+        String json = ContentDownloader.downloadAsString(
+                RemoteConfig.buildChapterUrl(params[0].id),
                 new ConnectionCallback() {
                     @Override
                     public void onResponseCode(int code) {

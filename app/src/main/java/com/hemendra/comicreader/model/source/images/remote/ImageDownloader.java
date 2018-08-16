@@ -27,6 +27,9 @@ import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.net.HttpURLConnection;
 
+/**
+ * A worker thread which downloads any image from given URL and converts it into Bitmap.
+ */
 public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     private OnImageDownloadedListener listener;
@@ -36,8 +39,8 @@ public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
     public long startedAt = 0;
     private HttpURLConnection connection = null;
 
-    public ImageDownloader(OnImageDownloadedListener listener,
-                           String imgUrl, ImageView iv, TouchImageView tiv) {
+    ImageDownloader(OnImageDownloadedListener listener,
+                    String imgUrl, ImageView iv, TouchImageView tiv) {
         this.listener = listener;
         this.imgUrl = imgUrl;
         this.iv = iv;
@@ -46,12 +49,8 @@ public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     @Override
     public void cancel(boolean interrupt) {
-        try{
-            if(connection != null)
-                connection.disconnect();
-        }catch (Throwable ex) {
-            ex.printStackTrace();
-        }
+        if(connection != null)
+            connection.disconnect();
         super.cancel(interrupt);
     }
 
@@ -62,22 +61,18 @@ public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        try {
-            byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
-                    new ConnectionCallback() {
-                        @Override
-                        public void onConnectionInitialized(HttpURLConnection conn) {
-                            connection = conn;
-                        }
-                    });
-            if (!isCancelled() && bytes != null && bytes.length > 0) {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = false;
-                options.inSampleSize = 1;
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-            }
-        }catch (Throwable ex) {
-            ex.printStackTrace();
+        byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
+                new ConnectionCallback() {
+                    @Override
+                    public void onConnectionInitialized(HttpURLConnection conn) {
+                        connection = conn;
+                    }
+                });
+        if (!isCancelled() && bytes != null && bytes.length > 0) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;
+            options.inSampleSize = 1;
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         }
         return null;
     }

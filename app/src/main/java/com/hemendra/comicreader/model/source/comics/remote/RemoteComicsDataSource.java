@@ -38,6 +38,12 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
     private RemoteComicDetailsLoader detailsLoader;
     private RemoteChapterPagesLoader chapterLoader;
 
+    /**
+     * Creates a new instance of {@link RemoteComicsDataSource}
+     * @param context The android application context
+     * @param listener An instance of {@link IComicsDataSourceListener} which in this case,
+     *                 is {@link com.hemendra.comicreader.presenter.ComicsPresenter}
+     */
     public RemoteComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
         comicsLoader = new RemoteComicsLoader(this);
@@ -45,6 +51,9 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
         chapterLoader = new RemoteChapterPagesLoader(this);
     }
 
+    /**
+     * Triggers the background thread which loads comics list from remote server asynchronously.
+     */
     @Override
     public void loadComics() {
         if(Utils.isNetworkAvailable(getContext())) {
@@ -78,6 +87,11 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
             comicsLoader.cancel(true);
     }
 
+    /**
+     * Triggers the background thread which loads comic details and chapters' list from
+     * remote server asynchronously.
+     * @param comic The comic instance for which details are to be loaded.
+     */
     public void loadComicDetails(Comic comic) {
         if(Utils.isNetworkAvailable(getContext())) {
             if(!detailsLoader.isExecuting()) {
@@ -101,6 +115,11 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
         listener.onFailedToLoadComicDetails(reason);
     }
 
+    /**
+     * Triggers the background thread which loads the list of pages from remote server
+     * asynchronously.
+     * @param chapter The chapter instance for which the list of pages are to be loaded.
+     */
     public void loadPages(Chapter chapter) {
         if(Utils.isNetworkAvailable(getContext())) {
             if(!chapterLoader.isExecuting()) {
@@ -124,6 +143,9 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
         listener.onFailedToLoadPages(reason);
     }
 
+    /**
+     * Stops all asynchronous tasks and free up the reference so that GC can collect memory.
+     */
     @Override
     public void dispose() {
         stopLoadingComics();

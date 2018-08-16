@@ -37,8 +37,18 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Parses the list of comics, chapters, or pages from JSON.
+ * @author Hemendra Sharma
+ */
 public class ComicsParser {
 
+    /**
+     * Parses the list of comics from the given {@link InputStream}. It does not consume any
+     * additional memory, and directly converts the stream into object.
+     * @param in The input stream reading the response from server.
+     * @return The instance of {@link Comics} if stream was parse successfully. NULL otherwise.
+     */
     @Nullable
     public static Comics parseComicsFromJSON(@NonNull InputStream in) {
         try{
@@ -138,6 +148,12 @@ public class ComicsParser {
         return null;
     }
 
+    /**
+     * Parses the chapters from given JSON string and loads them up into the given comic object.
+     * @param comic The comic instance whose chapters are being loaded.
+     * @param json Downloaded JSON string from server.
+     * @return An instance of updated {@link Comic} if parsing was successful. NULL otherwise.
+     */
     @Nullable
     public static Comic parseChaptersFromJSON(@NonNull Comic comic, @NonNull String json) {
         try {
@@ -190,6 +206,12 @@ public class ComicsParser {
         return null;
     }
 
+    /**
+     * Parses the pages from given JSON string and loads them up into the given chapter object.
+     * @param chapter The chapter instance whose pages are being loaded.
+     * @param json Downloaded JSON string from server.
+     * @return An instance of updated {@link Chapter} if parsing was successful. NULL otherwise.
+     */
     @Nullable
     public static Chapter parseChapterPagesFromJSON(@NonNull Chapter chapter, @NonNull String json) {
         try {

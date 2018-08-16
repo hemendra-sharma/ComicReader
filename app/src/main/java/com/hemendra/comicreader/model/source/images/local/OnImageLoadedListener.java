@@ -21,9 +21,26 @@ import android.widget.ImageView;
 
 import com.hemendra.comicreader.view.reader.TouchImageView;
 
+/**
+ * Provides an interface for {@link LocalImageLoader} callbacks.
+ */
 interface OnImageLoadedListener {
 
+    /**
+     * Gets called when image or page was loaded successfully.
+     * @param url The URL from which image was loaded
+     * @param bmp The bitmap that was loaded
+     * @param image It was an Image?
+     * @param page It was a Page?
+     */
     void onImageDownloaded(String url, Bitmap bmp, boolean image, boolean page);
+
+    /**
+     * Gets called when it failed to load the image or page.
+     * @param url The URL which was attempted to download
+     * @param iv The view for cover image
+     * @param tiv The view for page
+     */
     void onFailedToDownloadImage(String url, ImageView iv, TouchImageView tiv);
 
 }

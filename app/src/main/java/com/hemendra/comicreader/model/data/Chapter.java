@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * This class holds the information about a single chapter.
+ * Holds the information about a single chapter of comic.
  * @author Hemendra Sharma
  * @see java.io.Serializable
  */

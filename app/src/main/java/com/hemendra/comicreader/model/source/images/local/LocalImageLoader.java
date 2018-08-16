@@ -22,6 +22,9 @@ import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 
+/**
+ * A worker thread to read from local databse and decode the data into Bitmap asynchronously.
+ */
 public class LocalImageLoader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     private LocalImagesDataSource dataSource;
@@ -29,8 +32,8 @@ public class LocalImageLoader extends CustomAsyncTask<Void,Void,Bitmap> {
     private ImageView iv;
     public long startedAt = 0;
 
-    public LocalImageLoader(@NonNull LocalImagesDataSource dataSource,
-                            String imgUrl, ImageView iv) {
+    LocalImageLoader(@NonNull LocalImagesDataSource dataSource,
+                     String imgUrl, ImageView iv) {
         this.dataSource = dataSource;
         this.imgUrl = imgUrl;
         this.iv = iv;
@@ -43,12 +46,7 @@ public class LocalImageLoader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-        try {
-            return dataSource.getImageFromCache(imgUrl);
-        }catch (Throwable ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return dataSource.getImageFromCache(imgUrl);
     }
 
     @Override

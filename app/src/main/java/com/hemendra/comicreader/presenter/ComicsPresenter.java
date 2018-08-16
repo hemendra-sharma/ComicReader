@@ -44,6 +44,11 @@ import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.util.ArrayList;
 
+/**
+ * Handles the communication between the View and Model.
+ * This class is responsible for all the operation related to providing input from user, and
+ * data from model classes.
+ */
 public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
 
     private Context context;

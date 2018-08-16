@@ -34,8 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
- * All the operations which are related to reading / writing comics data to local storage are
- * handled in this class.
+ * Handles the operations which are related to reading / writing comics data to local storage.
  * @author Hemendra Sharma
  */
 public class LocalComicsDataSource extends ComicsDataSource implements OnComicsLoadedListener {
@@ -49,6 +48,12 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     private SortingOption sortingOption = SortingOption.POPULARITY;
     private ArrayList<String> selectedCategories = new ArrayList<>();
 
+    /**
+     * Creates a new instance of {@link LocalComicsDataSource}
+     * @param context The android application context
+     * @param listener An instance of {@link IComicsDataSourceListener} which in this case,
+     *                 is {@link com.hemendra.comicreader.presenter.ComicsPresenter}
+     */
     public LocalComicsDataSource(Context context, IComicsDataSourceListener listener) {
         super(context, listener);
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
@@ -60,7 +65,10 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
     private boolean hasComics() {
         return comicsCacheFile.exists() && comicsCacheFile.length() > 0;
     }
-    
+
+    /**
+     * Triggers the background thread which loads comics list from local internal storage asynchronously.
+     */
     @Override
     public void loadComics() {
         if (hasComics()) {
@@ -79,6 +87,10 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         }
     }
 
+    /**
+     * Triggers the background thread which performs a search on the already-loaded comics list asynchronously.
+     * @param query The search keyword entered by user.
+     */
     public void searchComics(String query) {
         if(comics != null) {
             if(isNotAlreadyLoading()) {
@@ -93,6 +105,15 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         }
     }
 
+    /**
+     * Triggers a background thread which performs the sorting operation on the given list of
+     * comics. The sorting operation is performed asynchronously.
+     * @param comics The data-set on which sorting is supposed to be performed.
+     * @param option What type of sorting needs to be performed. It can be one of the:
+     *               {@link SortingOption}.POPULARITY,
+     *               {@link SortingOption}.LATEST_FIRST,
+     *               {@link SortingOption}.A_TO_Z
+     */
     public void sortComics(Comics comics, SortingOption option) {
         sortingOption = option;
         if(comics != null) {
@@ -108,6 +129,11 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         }
     }
 
+    /**
+     * Triggers a background thread which filters the full data-set of comics by the
+     * given list of categories.
+     * @param selectedCategories List of categories.
+     */
     public void filterComics(ArrayList<String> selectedCategories) {
         this.selectedCategories = selectedCategories;
         if(comics != null) {
@@ -180,16 +206,27 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
             filterer.cancel(true);
     }
 
+    /**
+     * Delete the local copy of the comics data-set.
+     */
     public void deleteCache() {
         Utils.deleteFile(comicsCacheFile);
         comics = null;
     }
 
+    /**
+     * Save the comics data-set as a cache file.
+     * @param comics
+     */
     public void save(@NonNull Comics comics) {
         this.comics = comics;
         new Thread(() -> Utils.writeToFile(this.comics, comicsCacheFile)).start();
     }
 
+    /**
+     * Updates the instance of a particular comic in the local data-set.
+     * @param comic The comic that needs to be updated.
+     */
     public void updateComic(@NonNull Comic comic) {
         boolean updated = false;
         for(int i=0; i<comics.comics.size(); i++) {
@@ -205,6 +242,10 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
         }
     }
 
+    /**
+     * Updates the instance of a particular chapter in the local data-set.
+     * @param chapter The chapter that needs to be updated.
+     */
     public void updateChapter(@NonNull Chapter chapter) {
         boolean updated = false;
         for(Comic comic : comics.comics) {
@@ -220,6 +261,9 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
             save(comics);
     }
 
+    /**
+     * Free-up all the references so that GC can collect the memory.
+     */
     @Override
     public void dispose() {
         stopLoadingComics();

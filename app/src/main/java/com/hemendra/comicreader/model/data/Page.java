@@ -23,7 +23,7 @@ import com.hemendra.comicreader.model.source.RemoteConfig;
 import java.io.Serializable;
 
 /**
- * This class holds the information about a single page.
+ * Holds the information about a single page of chapter.
  * @author Hemendra Sharma
  * @see java.io.Serializable
  */

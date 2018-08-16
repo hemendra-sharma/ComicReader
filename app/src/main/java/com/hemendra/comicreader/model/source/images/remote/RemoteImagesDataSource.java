@@ -29,6 +29,9 @@ import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.util.ArrayList;
 
+/**
+ * Provides the functionality to download the images from remote server.
+ */
 public class RemoteImagesDataSource extends ImagesDataSource implements OnImageDownloadedListener {
 
     private static final int MAX_PARALLEL_DOWNLOADS = 10;
@@ -41,6 +44,12 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     private int maxQueuedDownloads, cover_size_x, cover_size_y;
     private final ArrayList<ImageDownloader> queuedDownloads = new ArrayList<>();
 
+    /**
+     * Creates a new instance of {@link RemoteImagesDataSource}
+     * @param context The Android application context
+     * @param listener An instance of {@link IImagesDataSourceListener}, which in this case, is
+     *                 {@link com.hemendra.comicreader.presenter.ComicsPresenter}
+     */
     public RemoteImagesDataSource(Context context, IImagesDataSourceListener listener) {
         super(context, listener);
         this.listener = listener;
@@ -49,6 +58,11 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         cover_size_y = context.getResources().getDimensionPixelSize(R.dimen.cover_size_y);
     }
 
+    /**
+     * Triggers a background thread to start downloading the image from server.
+     * @param url The image URL
+     * @param iv The visible ImageView on which this image would be used.
+     */
     @Override
     public void loadImage(String url, ImageView iv) {
         if(listener != null) {
@@ -64,6 +78,11 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
+    /**
+     * Triggers a background thread to start downloading the page from server.
+     * @param url The page URL
+     * @param iv The visible TouchImageView on which this image would be used.
+     */
     @Override
     public void loadPage(String url, TouchImageView iv) {
         if(listener != null) {
@@ -79,6 +98,11 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
+    /**
+     * Triggers a background thread to start downloading all the pages of a chapter, from server.
+     * @param chapter The chapter whose pages needs to be downloaded.
+     * @param listener The callback listener.
+     */
     public void downloadChapter(Chapter chapter, OnChapterDownloadListener listener) {
         if(chapterPagesDownloader == null
                 || !chapterPagesDownloader.isExecuting()) {
@@ -89,7 +113,9 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
-
+    /**
+     * Aborts the current ongoing chapter download.
+     */
     public void stopDownloadingChapter() {
         if(chapterPagesDownloader != null && chapterPagesDownloader.isExecuting()) {
             chapterPagesDownloader.cancel(true);
@@ -205,6 +231,10 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
+    /**
+     * Abort the ongoing image download process if there is any.
+     * @param url The URL to search for in the ongoing processes.
+     */
     @Override
     public void stopLoadingImage(String url) {
         boolean aborted = false;
@@ -219,8 +249,14 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
+    /**
+     * Stop ongoing processes, and release any memory so GC can collect it.
+     */
     @Override
     public void dispose() {
+        for(ImageDownloader slot : downloadingSlots) {
+            slot.cancel(true);
+        }
         listener = null;
     }
 }

@@ -28,18 +28,23 @@ import com.hemendra.comicreader.model.utils.CustomAsyncTask;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
+/**
+ * A background worker thread to download and parse the complete data-set of comics.
+ * @author Hemendra Sharma
+ * @see CustomAsyncTask
+ */
 public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
 
     private OnComicsLoadedListener listener;
     private FailureReason reason = FailureReason.UNKNOWN_REMOTE_ERROR;
 
-    public RemoteComicsLoader(OnComicsLoadedListener listener) {
+    RemoteComicsLoader(OnComicsLoadedListener listener) {
         this.listener = listener;
     }
 
     @Override
     protected Comics doInBackground(Void... voids) {
-        InputStream in = ContentDownloader.downloadAsStream(RemoteConfig.buildComicsUrl(-1),
+        InputStream in = ContentDownloader.downloadAsStream(RemoteConfig.buildComicsUrl(),
                 new ConnectionCallback() {
                     @Override
                     public void onResponseCode(int code) {
@@ -58,27 +63,6 @@ public class RemoteComicsLoader extends CustomAsyncTask<Void,Void,Comics> {
                 return comics;
             }
         }
-
-        /*String json = ContentDownloader.downloadAsString(RemoteConfig.buildComicsUrl(-1),
-                new ConnectionCallback() {
-                    @Override
-                    public void onResponseCode(int code) {
-                        switch (code) {
-                            case HttpURLConnection.HTTP_NOT_FOUND:
-                                reason = FailureReason.API_MISSING;
-                                break;
-                            default:
-                                reason = FailureReason.INVALID_RESPONSE_FROM_SERVER;
-                        }
-                    }
-                });
-        if(json != null) {
-            Comics comics = ComicsParser.parseComicsFromJSON(json);
-            if(comics != null) {
-                comics.comics.sort((c1, c2) -> Integer.compare(c2.hits, c1.hits));
-                return comics;
-            }
-        }*/
         return null;
     }
 

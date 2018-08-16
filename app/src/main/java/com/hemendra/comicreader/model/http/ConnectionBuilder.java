@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.hemendra.comicreader.model.http.tls;
+package com.hemendra.comicreader.model.http;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
 /**
- * Some of the HTTPS connections use TLS. So, this class is going to handle the TLS
- * enabled HTTPS connections.
+ * Builds the instance of {@link HttpURLConnection} or {@link HttpsURLConnection} depending
+ * on the input url (http:// or https://).
  */
-public class TlsHttp {
+public class ConnectionBuilder {
 
     /**
      * Get the {@link HttpsURLConnection} object.
@@ -58,7 +61,9 @@ public class TlsHttp {
                 if (httpMethod.equalsIgnoreCase("POST"))
                     conn.setDoOutput(true);
                 conn.setDoInput(true);
-            } catch (Throwable ex) {
+            } catch (NoSuchAlgorithmException
+                    | IOException
+                    | KeyManagementException ex) {
                 ex.printStackTrace();
             }
             return conn;
@@ -83,7 +88,7 @@ public class TlsHttp {
             if(httpMethod.equalsIgnoreCase("POST"))
                 conn.setDoOutput(true);
             conn.setDoInput(true);
-        }catch (Throwable ex){
+        }catch (IOException ex){
             ex.printStackTrace();
         }
         return conn;
