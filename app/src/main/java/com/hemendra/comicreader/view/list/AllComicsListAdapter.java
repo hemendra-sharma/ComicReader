@@ -30,6 +30,7 @@ import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdapter.ComicViewHolder> {
 
@@ -140,7 +141,7 @@ public class AllComicsListAdapter extends RecyclerView.Adapter<AllComicsListAdap
             comicViewHolder.ivStar.setVisibility(View.GONE);
         String url = getComic(position).getImageUrl();
         if (url != null) {
-            presenter.loadImage(url, comicViewHolder.ivCover);
+            presenter.loadImage(url, new ImageAndViewHolder(comicViewHolder.ivCover));
         }
     }
 

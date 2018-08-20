@@ -18,12 +18,14 @@ package com.hemendra.comicreader.model.source.images.remote;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.widget.ImageView;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
 import com.hemendra.comicreader.model.utils.CustomAsyncTask;
-import com.hemendra.comicreader.view.reader.TouchImageView;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 import java.net.HttpURLConnection;
 
@@ -34,23 +36,29 @@ public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     private OnImageDownloadedListener listener;
     public String imgUrl;
-    private ImageView iv;
-    private TouchImageView tiv;
+    private ImageAndViewHolder holder;
     public long startedAt = 0;
     private HttpURLConnection connection = null;
+    private Handler handler = null;
 
     ImageDownloader(OnImageDownloadedListener listener,
-                    String imgUrl, ImageView iv, TouchImageView tiv) {
+                    String imgUrl, ImageAndViewHolder holder) {
         this.listener = listener;
         this.imgUrl = imgUrl;
-        this.iv = iv;
-        this.tiv = tiv;
+        this.holder = holder;
     }
+
+    private Handler.Callback disconnectCallback = message -> {
+        if(connection != null)
+            connection.disconnect();
+        return true;
+    };
 
     @Override
     public void cancel(boolean interrupt) {
-        if(connection != null)
-            connection.disconnect();
+        if(handler != null) {
+            handler.sendMessage(new Message());
+        }
         super.cancel(interrupt);
     }
 
@@ -61,11 +69,13 @@ public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
+        Looper.prepare();
         byte[] bytes = ContentDownloader.downloadAsByteArray(imgUrl,
                 new ConnectionCallback() {
                     @Override
                     public void onConnectionInitialized(HttpURLConnection conn) {
                         connection = conn;
+                        handler = new Handler(disconnectCallback);
                     }
                 });
         if (!isCancelled() && bytes != null && bytes.length > 0) {
@@ -80,16 +90,10 @@ public class ImageDownloader extends CustomAsyncTask<Void,Void,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if(bitmap != null) {
-            if(iv != null)
-                iv.setImageBitmap(bitmap);
-            else if(tiv != null) {
-                tiv.setImageBitmap(bitmap);
-                tiv.setTag(-1);
-            }
-            //
+            holder.setImage(bitmap);
             if (listener != null)
-                listener.onImageDownloaded(imgUrl, bitmap, iv != null, tiv != null);
+                listener.onImageDownloaded(imgUrl, bitmap, holder.isCover(), holder.isPage());
         } else if (listener != null)
-            listener.onFailedToDownloadImage(imgUrl, iv != null, tiv != null);
+            listener.onFailedToDownloadImage(imgUrl, holder.isCover(), holder.isPage());
     }
 }

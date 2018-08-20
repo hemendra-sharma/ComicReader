@@ -216,7 +216,7 @@ public class LocalComicsDataSource extends ComicsDataSource implements OnComicsL
 
     /**
      * Save the comics data-set as a cache file.
-     * @param comics
+     * @param comics The data-set that needs to be cached.
      */
     public void save(@NonNull Comics comics) {
         this.comics = comics;

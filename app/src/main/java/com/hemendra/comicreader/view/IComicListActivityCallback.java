@@ -35,6 +35,7 @@ public interface IComicListActivityCallback {
 
     void onChapterLoadingStarted();
     void onChapterLoaded(Chapter chapter);
+    void refreshChaptersList();
     void onFailedToLoadChapter(String reason);
 
     void onPageLoaded();

@@ -63,10 +63,11 @@
     <string name="next">NEXT</string>
     <string name="details_tutorial_1">Mark this comic as favorite, so that you can come back here quickly.</string>
     <string name="details_tutorial_2">View the Chapters List and Start Reading.</string>
-    <string name="chapter_buffer_tutorial">Buffer the Chapter Offline and Read Without Internet Connection ! Isn\'t it Awesome?</string>
+    <string name="chapter_buffer_tutorial">Click on the \'Download\' Icon to Buffer the Chapter Offline and Read Without Internet Connection ! Isn\'t it Awesome?</string>
     <string name="reader_tutorial_1">Double Tap to Zoom In</string>
     <string name="reader_tutorial_2">Single Tap to Zoom Out</string>
     <string name="reader_tutorial_3">Swipe Left or Right to Flip Pages</string>
+    <string name="details">Details</string>
 
     <string-array name="sorting_options">
         <item>@string/popularity</item>

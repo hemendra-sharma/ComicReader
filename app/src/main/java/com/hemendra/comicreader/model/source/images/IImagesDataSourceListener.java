@@ -18,10 +18,9 @@ package com.hemendra.comicreader.model.source.images;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.source.FailureReason;
-import com.hemendra.comicreader.view.reader.TouchImageView;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 /**
  * Provides an interface for loading the images using any of the
@@ -41,10 +40,10 @@ public interface IImagesDataSourceListener {
      * Gets called when the cover image loading failed.
      * @param reason Any one of the {@link FailureReason}
      * @param url The URL used to load image.
-     * @param iv The visible image view on screen.
+     * @param holder The view holder which will handle this image after getting it.
      */
     void onFailedToLoadImage(@NonNull FailureReason reason,
-                             @NonNull String url, @NonNull ImageView iv);
+                             @NonNull String url, @NonNull ImageAndViewHolder holder);
 
     /**
      * Gets called when the page was loaded successfully.
@@ -57,9 +56,9 @@ public interface IImagesDataSourceListener {
      * Gets called when the page loading failed.
      * @param reason Any one of the {@link FailureReason}
      * @param url The URL used to load image.
-     * @param iv The visible page view on screen.
+     * @param holder The view holder which will handle this image after getting it.
      */
     void onFailedToLoadPage(@NonNull FailureReason reason,
-                            @NonNull String url, @NonNull TouchImageView iv);
+                            @NonNull String url, @NonNull ImageAndViewHolder holder);
 
 }

@@ -79,9 +79,6 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
     private int darkGreen;
     private int darkRed;
 
-    private static final String TUTORIAL_ID = "chapter_download_tutorial";
-    private boolean tutorialCalledOnce = false;
-
     ChaptersListAdapter(Context context, Comic comic,
                         ComicsPresenter presenter,
                         OnChapterItemClickListener listener) {
@@ -144,17 +141,6 @@ public class ChaptersListAdapter extends RecyclerView.Adapter<ChaptersListAdapte
                     dialog.show();
                 }
             });
-        }
-
-        if(i == 0 && !tutorialCalledOnce && context instanceof Activity) {
-            tutorialCalledOnce = true;
-            new MaterialShowcaseView.Builder((Activity) context)
-                    .setTarget(chapterViewHolder.ivDownload)
-                    .setDismissText(context.getString(R.string.got_it))
-                    .setContentText(R.string.chapter_buffer_tutorial)
-                    .setDelay(500)
-                    .singleUse(TUTORIAL_ID)
-                    .show();
         }
     }
 

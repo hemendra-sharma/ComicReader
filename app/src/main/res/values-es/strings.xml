@@ -50,8 +50,9 @@
     <string name="got_it">LO TENGO</string>
     <string name="next">SIGUIENTE</string>
     <string name="details_tutorial_1">Ver la lista de capítulos y comenzar a leer.</string>
-    <string name="chapter_buffer_tutorial">¡Rellene el capítulo sin conexión y lea sin conexión a Internet! ¿No es asombroso?</string>
+    <string name="chapter_buffer_tutorial">¡Haga clic en el icono \'Descargar\' para guardar el capítulo sin conexión y leer sin conexión a Internet! ¿No es asombroso?</string>
     <string name="reader_tutorial_1">Doble toque para acercar</string>
     <string name="reader_tutorial_2">Solo toque para alejar</string>
     <string name="reader_tutorial_3">Desliza hacia la izquierda o hacia la derecha para voltear páginas</string>
+    <string name="details">Detalles</string>
 </resources>

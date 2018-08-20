@@ -39,6 +39,7 @@ import com.hemendra.comicreader.model.source.images.local.LocalImagesDataSource;
 import com.hemendra.comicreader.model.source.images.remote.OnChapterDownloadListener;
 import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSource;
 import com.hemendra.comicreader.view.IComicListActivityCallback;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 import com.hemendra.comicreader.view.list.SortingOption;
 import com.hemendra.comicreader.view.reader.TouchImageView;
 
@@ -49,7 +50,7 @@ import java.util.ArrayList;
  * This class is responsible for all the operation related to providing input from user, and
  * data from model classes.
  */
-public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSourceListener {
+public class ComicsPresenter implements IComicsPresenter, IComicsDataSourceListener, IImagesDataSourceListener {
 
     private Context context;
     private IComicListActivityCallback activityView;
@@ -76,6 +77,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         };
     }
 
+    @Override
     public void permissionGranted() {
         if(pendingAction != null) {
             pendingAction.run();
@@ -88,6 +90,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    @Override
     public void startLoadingComics() {
         if(activityView != null
                 && localComicsDataSource != null && remoteComicsDataSource != null) {
@@ -100,6 +103,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    @Override
     public void performSearch(String query) {
         if(activityView != null
                 && localComicsDataSource != null && remoteComicsDataSource != null) {
@@ -112,6 +116,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    @Override
     public void performSort(Comics comics, SortingOption sortingOption) {
         if(activityView != null
                 && localComicsDataSource != null) {
@@ -124,6 +129,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    @Override
     public void performFilter(ArrayList<String> selectedCategories) {
         if(activityView != null
                 && localComicsDataSource != null) {
@@ -136,11 +142,143 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    @Override
     public void invalidateCacheAndLoadComicsAgain() {
         if(activityView != null
                 && localComicsDataSource != null && remoteComicsDataSource != null) {
             localComicsDataSource.deleteCache();
             startLoadingComics();
+        }
+    }
+
+    @Override
+    public void loadImage(@NonNull String url, @NonNull ImageAndViewHolder holder) {
+        if(activityView != null
+                && localImagesDataSource != null) {
+            localImagesDataSource.loadImage(url, holder);
+        }
+    }
+
+    @Override
+    public void stopLoadingImageOrPage(@NonNull String url) {
+        if(activityView != null
+                && localImagesDataSource != null
+                && remoteImagesDataSource != null) {
+            localImagesDataSource.stopLoadingImage(url);
+            remoteImagesDataSource.stopLoadingImage(url);
+        }
+    }
+
+    @Override
+    public void loadPage(@NonNull String url, @NonNull ImageAndViewHolder holder) {
+        if(activityView != null
+                && localImagesDataSource != null) {
+            localImagesDataSource.loadPage(url, holder);
+        }
+    }
+
+    @Override
+    public boolean isChapterOffline(Chapter chapter) {
+        return localImagesDataSource != null
+                && localImagesDataSource.isChapterOffline(chapter);
+    }
+
+    @Override
+    public Chapter getOfflineChapter(Chapter chapter) {
+        if(localImagesDataSource != null) {
+            return localImagesDataSource.getOfflineChapter(chapter);
+        }
+        return null;
+    }
+
+    @Override
+    public void downloadChapter(Chapter chapter, OnChapterDownloadListener listener) {
+        if(activityView != null
+                && localImagesDataSource != null
+                && remoteImagesDataSource != null) {
+            Chapter ch;
+            if((ch = getOfflineChapter(chapter)) != null) {
+                listener.onChapterDownloaded(ch);
+            } else {
+                remoteImagesDataSource.downloadChapter(chapter, listener);
+            }
+        }
+    }
+
+    @Override
+    public void stopDownloadingChapter() {
+        if(remoteImagesDataSource != null) {
+            remoteImagesDataSource.stopDownloadingChapter();
+        }
+    }
+
+    @Override
+    public void loadComicDetails(Comic comic) {
+        if(activityView != null && remoteComicsDataSource != null) {
+            if(comic.chapters.size() > 0) {
+                activityView.onComicDetailsLoaded(comic);
+            } else {
+                remoteComicsDataSource.loadComicDetails(comic);
+            }
+        }
+    }
+
+    @Override
+    public void setComicFavorite(Comic comic, boolean isFavorite) {
+        if(activityView != null && localComicsDataSource != null) {
+            comic.isFavorite = isFavorite;
+            localComicsDataSource.updateComic(comic);
+        }
+    }
+
+    @Override
+    public Chapter getNextChapterFrom(Chapter ch) {
+        if(activityView != null) {
+            return activityView.getNextChapterFromDetailsFragment(ch);
+        }
+        return null;
+    }
+
+    @Override
+    public void loadPages(Chapter chapter) {
+        if(activityView != null
+                && remoteComicsDataSource != null) {
+            if(chapter.pages.size() > 0) {
+                activityView.onChapterLoaded(chapter);
+            } else {
+                remoteComicsDataSource.loadPages(chapter);
+            }
+        }
+    }
+
+    @Override
+    public void loadPages(Chapter chapter, IComicsDataSourceListener listener) {
+        if(chapter.pages.size() > 0) {
+            activityView.onChapterLoadingStarted();
+            listener.onPagesLoaded(chapter);
+        } else {
+            new RemoteComicsDataSource(context, listener).loadPages(chapter);
+        }
+    }
+
+    @Override
+    public void showProgress() {
+        if(activityView != null)
+            activityView.showProgress();
+    }
+
+    @Override
+    public void hideProgress() {
+        if(activityView != null)
+            activityView.hideProgress();
+    }
+
+    @Override
+    public void updateChapter(Chapter chapter) {
+        if(activityView != null
+                && localComicsDataSource != null) {
+            localComicsDataSource.updateChapter(chapter);
+            activityView.refreshChaptersList();
         }
     }
 
@@ -181,22 +319,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
-    public void loadImage(@NonNull String url, @NonNull ImageView iv) {
-        if(activityView != null
-                && localImagesDataSource != null) {
-            localImagesDataSource.loadImage(url, iv);
-        }
-    }
-
-    public void stopLoadingImageOrPage(@NonNull String url) {
-        if(activityView != null
-                && localImagesDataSource != null
-                && remoteImagesDataSource != null) {
-            localImagesDataSource.stopLoadingImage(url);
-            remoteImagesDataSource.stopLoadingImage(url);
-        }
-    }
-
     @Override
     public void onImageLoaded(String url, Bitmap bmp) {
         if(localImagesDataSource != null) {
@@ -206,17 +328,10 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     @Override
     public void onFailedToLoadImage(@NonNull FailureReason reason, @NonNull String url,
-                                    @NonNull ImageView iv) {
+                                    @NonNull ImageAndViewHolder holder) {
         if(reason == FailureReason.NOT_AVAILABLE_LOCALLY
                 || reason == FailureReason.UNKNOWN_LOCAL_ERROR) {
-            remoteImagesDataSource.loadImage(url, iv);
-        }
-    }
-
-    public void loadPage(@NonNull String url, @NonNull TouchImageView iv) {
-        if(activityView != null
-                && localImagesDataSource != null) {
-            localImagesDataSource.loadPage(url, iv);
+            remoteImagesDataSource.loadImage(url, holder);
         }
     }
 
@@ -232,58 +347,10 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
 
     @Override
     public void onFailedToLoadPage(@NonNull FailureReason reason, @NonNull String url,
-                                   @NonNull TouchImageView iv) {
+                                   @NonNull ImageAndViewHolder holder) {
         if(reason == FailureReason.NOT_AVAILABLE_LOCALLY
                 || reason == FailureReason.UNKNOWN_LOCAL_ERROR) {
-            remoteImagesDataSource.loadPage(url, iv);
-        }
-    }
-
-    public boolean isChapterOffline(Chapter chapter) {
-        return localImagesDataSource != null
-                && localImagesDataSource.isChapterOffline(chapter);
-    }
-
-    public Chapter getOfflineChapter(Chapter chapter) {
-        if(localImagesDataSource != null) {
-            return localImagesDataSource.getOfflineChapter(chapter);
-        }
-        return null;
-    }
-
-    public void downloadChapter(Chapter chapter, OnChapterDownloadListener listener) {
-        if(activityView != null
-                && localImagesDataSource != null
-                && remoteImagesDataSource != null) {
-            Chapter ch;
-            if((ch = getOfflineChapter(chapter)) != null) {
-                listener.onChapterDownloaded(ch);
-            } else {
-                remoteImagesDataSource.downloadChapter(chapter, listener);
-            }
-        }
-    }
-
-    public void stopDownloadingChapter() {
-        if(remoteImagesDataSource != null) {
-            remoteImagesDataSource.stopDownloadingChapter();
-        }
-    }
-
-    public void loadComicDetails(Comic comic) {
-        if(activityView != null && remoteComicsDataSource != null) {
-            if(comic.chapters.size() > 0) {
-                activityView.onComicDetailsLoaded(comic);
-            } else {
-                remoteComicsDataSource.loadComicDetails(comic);
-            }
-        }
-    }
-
-    public void setComicFavorite(Comic comic, boolean isFavorite) {
-        if(activityView != null && localComicsDataSource != null) {
-            comic.isFavorite = isFavorite;
-            localComicsDataSource.updateComic(comic);
+            remoteImagesDataSource.loadPage(url, holder);
         }
     }
 
@@ -324,43 +391,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
-    public Chapter getNextChapterFrom(Chapter ch) {
-        if(activityView != null) {
-            return activityView.getNextChapterFromDetailsFragment(ch);
-        }
-        return null;
-    }
-
-    public void loadPages(Chapter chapter) {
-        if(activityView != null
-                && remoteComicsDataSource != null) {
-            if(chapter.pages.size() > 0) {
-                activityView.onChapterLoaded(chapter);
-            } else {
-                remoteComicsDataSource.loadPages(chapter);
-            }
-        }
-    }
-
-    public void loadPages(Chapter chapter, IComicsDataSourceListener listener) {
-        if(chapter.pages.size() > 0) {
-            activityView.onChapterLoadingStarted();
-            listener.onPagesLoaded(chapter);
-        } else {
-            new RemoteComicsDataSource(context, listener).loadPages(chapter);
-        }
-    }
-
-    public void showProgress() {
-        if(activityView != null)
-            activityView.showProgress();
-    }
-
-    public void hideProgress() {
-        if(activityView != null)
-            activityView.hideProgress();
-    }
-
     @Override
     public void onStartedLoadingPages() {
         if(activityView != null) {
@@ -377,12 +407,6 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
-    public void updateChapter(Chapter chapter) {
-        if(localComicsDataSource != null) {
-            localComicsDataSource.updateChapter(chapter);
-        }
-    }
-
     @Override
     public void onFailedToLoadPages(FailureReason reason) {
         if(activityView != null) {
@@ -396,6 +420,7 @@ public class ComicsPresenter implements IComicsDataSourceListener, IImagesDataSo
         }
     }
 
+    @Override
     public void destroy() {
         activityView = null;
 

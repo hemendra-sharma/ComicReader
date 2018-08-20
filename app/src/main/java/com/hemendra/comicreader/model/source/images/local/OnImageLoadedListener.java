@@ -17,9 +17,8 @@
 package com.hemendra.comicreader.model.source.images.local;
 
 import android.graphics.Bitmap;
-import android.widget.ImageView;
 
-import com.hemendra.comicreader.view.reader.TouchImageView;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 /**
  * Provides an interface for {@link LocalImageLoader} callbacks.
@@ -38,9 +37,8 @@ interface OnImageLoadedListener {
     /**
      * Gets called when it failed to load the image or page.
      * @param url The URL which was attempted to download
-     * @param iv The view for cover image
-     * @param tiv The view for page
+     * @param holder The view holder which will handle this image after getting it.
      */
-    void onFailedToDownloadImage(String url, ImageView iv, TouchImageView tiv);
+    void onFailedToDownloadImage(String url, ImageAndViewHolder holder);
 
 }

@@ -19,6 +19,9 @@ package com.hemendra.comicreader.model.source.images.remote;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Page;
@@ -47,6 +50,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
     private int count = 0;
     private ImagesDB db;
     private HttpURLConnection connection = null;
+    private Handler handler = null;
 
     ChapterPagesDownloader(Context context,
                            OnChapterDownloadListener listener,
@@ -57,21 +61,30 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
         this.db = new ImagesDB(context).open();
     }
 
+    private Handler.Callback disconnectCallback = message -> {
+        if(connection != null)
+            connection.disconnect();
+        return true;
+    };
+
     @Override
     public void cancel(boolean interrupt) {
-        if (connection != null)
-            connection.disconnect();
+        if(handler != null) {
+            handler.sendMessage(new Message());
+        }
         super.cancel(interrupt);
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        Looper.prepare();
         if(chapter.pages.size() == 0) {
             String json = ContentDownloader.downloadAsString(RemoteConfig.buildChapterUrl(chapter.id),
                     new ConnectionCallback() {
                         @Override
                         public void onConnectionInitialized(HttpURLConnection conn) {
                             connection = conn;
+                            handler = new Handler(disconnectCallback);
                         }
 
                         @Override
@@ -87,6 +100,9 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                     });
             if(json != null) {
                 chapter = ComicsParser.parseChapterPagesFromJSON(chapter, json);
+                if(chapter != null && chapter.pages.size() > 0) {
+                    publishProgress(-1);
+                }
             }
         }
         //
@@ -115,6 +131,7 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
                                         @Override
                                         public void onConnectionInitialized(HttpURLConnection conn) {
                                             connection = conn;
+                                            handler = new Handler(disconnectCallback);
                                         }
                                         @Override
                                         public void onProgress(float progress, int totalLength) {
@@ -163,7 +180,11 @@ public class ChapterPagesDownloader extends CustomAsyncTask<Void,Integer,Boolean
 
     @Override
     protected void onProgressUpdate(Integer... progress) {
-        listener.onProgressUpdate(progress);
+        if(progress.length == 1) {
+            listener.onChapterPagesAcquired(chapter);
+        } else {
+            listener.onProgressUpdate(progress);
+        }
     }
 
     @Override

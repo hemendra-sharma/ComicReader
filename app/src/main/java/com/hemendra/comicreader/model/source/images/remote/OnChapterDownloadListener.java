@@ -23,6 +23,14 @@ import com.hemendra.comicreader.model.source.FailureReason;
  * Provides an interface for downloading the images for all pages.
  */
 public interface OnChapterDownloadListener {
+
+    /**
+     * Getss called when the chapter had no page information loaded before starting the download
+     * and then it was aquired while buffering the pages offline.
+     * @param chapter The chapter which needs to be updated.
+     */
+    void onChapterPagesAcquired(Chapter chapter);
+
     /**
      * Gets called when the images for all the pages were downloaded successfully.
      * @param chapter The chapter instance that was downloaded.

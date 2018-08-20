@@ -18,14 +18,13 @@ package com.hemendra.comicreader.model.source.images.remote;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.widget.ImageView;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
-import com.hemendra.comicreader.view.reader.TouchImageView;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 import java.util.ArrayList;
 
@@ -41,7 +40,7 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
 
     private ImageDownloader[] downloadingSlots = new ImageDownloader[MAX_PARALLEL_DOWNLOADS];
 
-    private int maxQueuedDownloads, cover_size_x, cover_size_y;
+    private int maxQueuedDownloads;
     private final ArrayList<ImageDownloader> queuedDownloads = new ArrayList<>();
 
     /**
@@ -54,26 +53,24 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         super(context, listener);
         this.listener = listener;
         maxQueuedDownloads = context.getResources().getInteger(R.integer.max_queued_image_loaders);
-        cover_size_x = context.getResources().getDimensionPixelSize(R.dimen.cover_size_x);
-        cover_size_y = context.getResources().getDimensionPixelSize(R.dimen.cover_size_y);
     }
 
     /**
      * Triggers a background thread to start downloading the image from server.
      * @param url The image URL
-     * @param iv The visible ImageView on which this image would be used.
+     * @param holder The view holder which will handle this image after getting it.
      */
     @Override
-    public void loadImage(String url, ImageView iv) {
+    public void loadImage(String url, ImageAndViewHolder holder) {
         if(listener != null) {
             if(!alreadyDownloading(url)) {
-                if(!fitIntoAnyFreeSlot(url, iv, null)) {
-                    if(!removeOldestAndAddNewDownload(url, iv, null)) {
-                        listener.onFailedToLoadImage(FailureReason.UNKNOWN_REMOTE_ERROR, url, iv);
+                if(!fitIntoAnyFreeSlot(url, holder)) {
+                    if(!removeOldestAndAddNewDownload(url, holder)) {
+                        listener.onFailedToLoadImage(FailureReason.UNKNOWN_REMOTE_ERROR, url, holder);
                     }
                 }
             } else {
-                listener.onFailedToLoadImage(FailureReason.ALREADY_LOADING, url, iv);
+                listener.onFailedToLoadImage(FailureReason.ALREADY_LOADING, url, holder);
             }
         }
     }
@@ -81,19 +78,19 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     /**
      * Triggers a background thread to start downloading the page from server.
      * @param url The page URL
-     * @param iv The visible TouchImageView on which this image would be used.
+     * @param holder The view holder which will handle this image after getting it.
      */
     @Override
-    public void loadPage(String url, TouchImageView iv) {
+    public void loadPage(String url, ImageAndViewHolder holder) {
         if(listener != null) {
             if(!alreadyDownloading(url)) {
-                if(!fitIntoAnyFreeSlot(url, null, iv)) {
-                    if(!removeOldestAndAddNewDownload(url, null, iv)) {
-                        listener.onFailedToLoadPage(FailureReason.UNKNOWN_REMOTE_ERROR, url, iv);
+                if(!fitIntoAnyFreeSlot(url, holder)) {
+                    if(!removeOldestAndAddNewDownload(url, holder)) {
+                        listener.onFailedToLoadPage(FailureReason.UNKNOWN_REMOTE_ERROR, url, holder);
                     }
                 }
             } else {
-                listener.onFailedToLoadPage(FailureReason.ALREADY_LOADING, url, iv);
+                listener.onFailedToLoadPage(FailureReason.ALREADY_LOADING, url, holder);
             }
         }
     }
@@ -165,9 +162,9 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         return false;
     }
 
-    private boolean fitIntoAnyFreeSlot(String url, ImageView iv, TouchImageView tiv) {
-        return fitIntoAnyFreeSlot(new ImageDownloader(this, url, iv, tiv))
-                || queueDownload(url, iv, tiv);
+    private boolean fitIntoAnyFreeSlot(String url, ImageAndViewHolder holder) {
+        return fitIntoAnyFreeSlot(new ImageDownloader(this, url, holder))
+                || queueDownload(url, holder);
     }
 
     private boolean fitIntoAnyFreeSlot(ImageDownloader id) {
@@ -181,7 +178,7 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         return false;
     }
 
-    private boolean removeOldestAndAddNewDownload(String url, ImageView iv, TouchImageView tiv) {
+    private boolean removeOldestAndAddNewDownload(String url, ImageAndViewHolder holder) {
         int index = -1;
         long oldestTimestamp = System.currentTimeMillis();
         for(int i = 0; i< downloadingSlots.length; i++) {
@@ -200,10 +197,10 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
             if(id != null) {
                 // pooped first item from queue... there was already queue downloads.
                 downloadingSlots[index] = id;
-                queueDownload(url, iv, tiv);
+                queueDownload(url, holder);
             } else {
                 // replace the slot with new download
-                downloadingSlots[index] = new ImageDownloader(this, url, iv, tiv);
+                downloadingSlots[index] = new ImageDownloader(this, url, holder);
             }
             downloadingSlots[index].execute();
             return true;
@@ -221,10 +218,10 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
         }
     }
 
-    private boolean queueDownload(String url, ImageView iv, TouchImageView tiv) {
+    private boolean queueDownload(String url, ImageAndViewHolder holder) {
         synchronized (queuedDownloads) {
             if(queuedDownloads.size() < maxQueuedDownloads) {
-                queuedDownloads.add(new ImageDownloader(this, url, iv, tiv));
+                queuedDownloads.add(new ImageDownloader(this, url, holder));
                 return true;
             }
             return false;
@@ -255,7 +252,8 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
     @Override
     public void dispose() {
         for(ImageDownloader slot : downloadingSlots) {
-            slot.cancel(true);
+            if(slot != null)
+                slot.cancel(true);
         }
         listener = null;
     }

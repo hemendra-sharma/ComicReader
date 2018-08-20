@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 
 /**
@@ -88,6 +89,8 @@ public class ContentDownloader {
                     callback.onFailedToInitialize();
                 Log.e(TAG, "Failed to Download URL as String. 'conn' is null.");
             }
+        } catch (InterruptedIOException ignore) {
+            // don't do anything. It was interrupted intentionally.
         } catch(IOException ex){
             Log.e(TAG, "Failed to download content as String. Requested URL '"+url+"'");
             ex.printStackTrace();
@@ -145,6 +148,8 @@ public class ContentDownloader {
                 Log.e(TAG,
                         "Failed to Download URL as String. 'conn' is null.");
             }
+        } catch (InterruptedIOException ignore) {
+            // don't do anything. It was interrupted intentionally.
         } catch(IOException ex){
             Log.e(TAG,"Failed to download content as String. Requested URL '"+url+"'");
             ex.printStackTrace();
@@ -215,6 +220,8 @@ public class ContentDownloader {
                     callback.onFailedToInitialize();
                 Log.e(TAG, "Failed to Download URL as Raw Bytes. 'conn' is null.");
             }
+        } catch (InterruptedIOException ignore) {
+            // don't do anything. It was interrupted intentionally.
         } catch (IOException ex) {
             Log.e(TAG,"Failed to download content as String. Requested URL '"+url+"'");
             ex.printStackTrace();

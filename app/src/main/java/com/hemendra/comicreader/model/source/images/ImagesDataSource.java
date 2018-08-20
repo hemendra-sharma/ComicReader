@@ -17,10 +17,9 @@
 package com.hemendra.comicreader.model.source.images;
 
 import android.content.Context;
-import android.widget.ImageView;
 
 import com.hemendra.comicreader.model.source.DataSource;
-import com.hemendra.comicreader.view.reader.TouchImageView;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 public abstract class ImagesDataSource extends DataSource {
 
@@ -31,9 +30,9 @@ public abstract class ImagesDataSource extends DataSource {
         this.listener = listener;
     }
 
-    public abstract void loadImage(String url, ImageView iv);
+    public abstract void loadImage(String url, ImageAndViewHolder holder);
 
-    public abstract void loadPage(String url, TouchImageView iv);
+    public abstract void loadPage(String url, ImageAndViewHolder holder);
 
     public abstract void stopLoadingImage(String url);
 

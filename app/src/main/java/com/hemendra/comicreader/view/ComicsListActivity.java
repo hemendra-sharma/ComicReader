@@ -83,13 +83,15 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
             if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
                 recoverFromFullScreen();
-                comicDetailsFragment.refreshChaptersList();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 if(comicDetailsFragment.onBackPressed()) return;
                 showSearchView();
                 allComicsListFragment.refreshCurrentView();
+                setTitle(R.string.app_name);
             }
+            //
             getSupportFragmentManager().popBackStack();
+            refreshChaptersList();
         } else {
             finishAffinity();
         }
@@ -196,6 +198,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, allComicsListFragment)
                 .commit();
+        setTitle(R.string.app_name);
     }
 
     private void showComicDetailsFragment(Comic comic) {
@@ -207,6 +210,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
                 .addToBackStack(null)
                 .commit();
         hideSearchView();
+        setTitle(getString(R.string.details));
     }
 
     private void showComicReaderFragment(Chapter chapter) {
@@ -300,6 +304,13 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     public void onChapterLoaded(Chapter chapter) {
         hideProgress();
         showComicReaderFragment(chapter);
+    }
+
+    @Override
+    public void refreshChaptersList() {
+        if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
+            comicDetailsFragment.refreshChaptersList();
+        }
     }
 
     @Override

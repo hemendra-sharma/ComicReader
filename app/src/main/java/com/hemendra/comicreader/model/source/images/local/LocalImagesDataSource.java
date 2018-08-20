@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.widget.ImageView;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
@@ -29,7 +28,7 @@ import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.images.IImagesDataSourceListener;
 import com.hemendra.comicreader.model.source.images.ImagesDataSource;
 import com.hemendra.comicreader.model.utils.Utils;
-import com.hemendra.comicreader.view.reader.TouchImageView;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -70,19 +69,19 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
     /**
      * Triggers a background thread to start loading the image from cache.
      * @param url The image URL
-     * @param iv The visible ImageView on which this image would be used.
+     * @param holder The view holder which will handle this image after getting it.
      */
     @Override
-    public void loadImage(String url, ImageView iv) {
+    public void loadImage(String url, ImageAndViewHolder holder) {
         if(listener != null) {
             if(!alreadyDownloading(url)) {
-                if(!fitIntoAnyFreeSlot(url, iv)) {
-                    if(!removeOldestAndAddNewDownload(url, iv)) {
-                        listener.onFailedToLoadImage(FailureReason.UNKNOWN_LOCAL_ERROR, url, iv);
+                if(!fitIntoAnyFreeSlot(url, holder)) {
+                    if(!removeOldestAndAddNewDownload(url, holder)) {
+                        listener.onFailedToLoadImage(FailureReason.UNKNOWN_LOCAL_ERROR, url, holder);
                     }
                 }
             } else {
-                listener.onFailedToLoadImage(FailureReason.ALREADY_LOADING, url, iv);
+                listener.onFailedToLoadImage(FailureReason.ALREADY_LOADING, url, holder);
             }
         }
     }
@@ -90,17 +89,16 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
     /**
      * Triggers a background thread to start loading the page from cache.
      * @param url The page URL
-     * @param iv The visible TouchImageView on which this image would be used.
+     * @param holder The view holder which will handle this image after getting it.
      */
     @Override
-    public void loadPage(String url, TouchImageView iv) {
+    public void loadPage(String url, ImageAndViewHolder holder) {
         if(listener != null) {
             Bitmap bmp = getPageFromCache(url);
             if(bmp != null) {
-                iv.setImageBitmap(bmp);
-                iv.setTag(-1);
+                holder.setImage(bmp);
             } else {
-                listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
+                listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, holder);
             }
         }
     }
@@ -112,12 +110,12 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
     }
 
     @Override
-    public void onFailedToDownloadImage(String url, ImageView iv, TouchImageView tiv) {
+    public void onFailedToDownloadImage(String url, ImageAndViewHolder holder) {
         if(listener != null) {
-            if (iv != null)
-                listener.onFailedToLoadImage(FailureReason.NOT_AVAILABLE_LOCALLY, url, iv);
-            else if (tiv != null)
-                listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, tiv);
+            if (holder.isCover())
+                listener.onFailedToLoadImage(FailureReason.NOT_AVAILABLE_LOCALLY, url, holder);
+            else if(holder.isPage())
+                listener.onFailedToLoadPage(FailureReason.NOT_AVAILABLE_LOCALLY, url, holder);
             popFromQueueAndFitIntoFreeSlot();
         }
         nullifyInactiveSlots();
@@ -269,9 +267,9 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         return false;
     }
 
-    private boolean fitIntoAnyFreeSlot(String url, ImageView iv) {
-        return fitIntoAnyFreeSlot(new LocalImageLoader(this, url, iv))
-                || queueDownload(url, iv);
+    private boolean fitIntoAnyFreeSlot(String url, ImageAndViewHolder holder) {
+        return fitIntoAnyFreeSlot(new LocalImageLoader(this, url, holder))
+                || queueDownload(url, holder);
     }
 
     private boolean fitIntoAnyFreeSlot(LocalImageLoader id) {
@@ -285,7 +283,7 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         return false;
     }
 
-    private boolean removeOldestAndAddNewDownload(String url, ImageView iv) {
+    private boolean removeOldestAndAddNewDownload(String url, ImageAndViewHolder holder) {
         int index = -1;
         long oldestTimestamp = System.currentTimeMillis();
         for(int i = 0; i< loadingSlots.length; i++) {
@@ -304,10 +302,10 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
             if(id != null) {
                 // pooped first item from queue... there was already queue downloads.
                 loadingSlots[index] = id;
-                queueDownload(url, iv);
+                queueDownload(url, holder);
             } else {
                 // replace the slot with new download
-                loadingSlots[index] = new LocalImageLoader(this, url, iv);
+                loadingSlots[index] = new LocalImageLoader(this, url, holder);
             }
             loadingSlots[index].execute();
             return true;
@@ -325,10 +323,10 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
         }
     }
 
-    private boolean queueDownload(String url, ImageView iv) {
+    private boolean queueDownload(String url, ImageAndViewHolder holder) {
         synchronized (queuedDownloads) {
             if(queuedDownloads.size() < maxQueuedDownloads) {
-                queuedDownloads.add(new LocalImageLoader(this, url, iv));
+                queuedDownloads.add(new LocalImageLoader(this, url, holder));
                 return true;
             }
             return false;
@@ -356,7 +354,8 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
     public void dispose() {
         db.close();
         for(LocalImageLoader slot : loadingSlots) {
-            slot.cancel(true);
+            if(slot != null)
+                slot.cancel(true);
         }
         listener = null;
     }

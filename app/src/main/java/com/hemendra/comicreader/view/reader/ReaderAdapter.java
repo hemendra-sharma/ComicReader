@@ -17,7 +17,6 @@
 package com.hemendra.comicreader.view.reader;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,11 +43,9 @@ import com.hemendra.comicreader.model.source.FailureReason;
 import com.hemendra.comicreader.model.source.comics.ComicsDataSource;
 import com.hemendra.comicreader.model.source.comics.IComicsDataSourceListener;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 import java.util.ArrayList;
-
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
-import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 class ReaderAdapter extends ArrayAdapter<Page> {
 
@@ -250,7 +247,7 @@ class ReaderAdapter extends ArrayAdapter<Page> {
 
         String url = page.getImageUrl();
         if (url != null)
-            presenter.loadPage(url, iv);
+            presenter.loadPage(url, new ImageAndViewHolder(iv));
         return (Integer) iv.getTag() < 0;
     }
 

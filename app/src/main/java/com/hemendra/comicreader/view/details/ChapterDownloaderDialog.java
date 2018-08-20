@@ -117,10 +117,15 @@ class ChapterDownloaderDialog {
             mainRL.getLayoutParams().width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.80);
 
             presenter.downloadChapter(chapter, new OnChapterDownloadListener() {
+
+                @Override
+                public void onChapterPagesAcquired(Chapter chapter) {
+                    presenter.updateChapter(chapter);
+                }
+
                 @Override
                 public void onChapterDownloaded(Chapter chapter) {
-                    if(chapter.equals(ivDownload.getTag()))
-                        ivDownload.setImageResource(R.drawable.ic_check);
+                    ivDownload.setImageResource(R.drawable.ic_check);
                     dialog.dismiss();
                 }
 

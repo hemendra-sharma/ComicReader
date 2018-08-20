@@ -38,8 +38,10 @@ import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
+import com.hemendra.comicreader.view.ImageAndViewHolder;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 @SuppressLint("ClickableViewAccessibility")
@@ -52,10 +54,12 @@ public class ComicDetailsFragment extends Fragment {
     private RelativeLayout rlDetails;
     private Button btnStartReading1;
     private ImageView ivStar;
+    private View v1;
 
     private ChaptersListAdapter adapter = null;
 
-    private static final String TUTORIAL_ID = "details_tutorial";
+    private static final String TUTORIAL_ID = "details_tutorial",
+                CHAPTER_DOWNLOAD_TUTORIAL_ID = "chapter_download_tutorial";
 
     public static ComicDetailsFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicDetailsFragment fragment = new ComicDetailsFragment();
@@ -88,10 +92,11 @@ public class ComicDetailsFragment extends Fragment {
         btnStartReading1 = view.findViewById(R.id.btnStartReading1);
         Button btnStartReading2 = view.findViewById(R.id.btnStartReading2);
         rlDetails = view.findViewById(R.id.rlDetails);
+        v1 = view.findViewById(R.id.v1);
 
         String url = comic.getImageUrl();
         if(url != null)
-            comicsPresenter.loadImage(url, ivCover);
+            comicsPresenter.loadImage(url, new ImageAndViewHolder(ivCover));
 
         if(comic.isFavorite)
             ivStar.setImageResource(R.drawable.star_on);
@@ -156,6 +161,7 @@ public class ComicDetailsFragment extends Fragment {
         if(adapter != null && adapter.getItemCount() > 0) {
             recycler.setVisibility(View.VISIBLE);
             rlDetails.setVisibility(View.GONE);
+            showChapterDownloadTutorial();
         } else {
             Toast.makeText(getContext(), R.string.no_chapters_available_right_now, Toast.LENGTH_SHORT).show();
         }
@@ -207,6 +213,16 @@ public class ComicDetailsFragment extends Fragment {
                 getString(R.string.details_tutorial_2), getString(R.string.got_it));
 
         sequence.start();
+    }
+
+    private void showChapterDownloadTutorial() {
+        new MaterialShowcaseView.Builder(getActivity())
+                .setTarget(v1)
+                .setDismissText(getString(R.string.got_it))
+                .setContentText(R.string.chapter_buffer_tutorial)
+                .setDelay(500)
+                .singleUse(CHAPTER_DOWNLOAD_TUTORIAL_ID)
+                .show();
     }
 
     public void refreshChaptersList() {
