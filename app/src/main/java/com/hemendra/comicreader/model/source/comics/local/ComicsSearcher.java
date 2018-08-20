@@ -60,20 +60,22 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
         else
             parts = new String[]{query};
         //
+        Comics temp = new Comics();
+        temp.comics.addAll(comics.comics);
         // search by query
         Comics filteredComics = new Comics();
-        for (Comic comic : comics.comics) {
-            if (filteredComics.comics.contains(comic))
-                continue;
+        for (int i=0; i<temp.comics.size(); i++) {
+            Comic comic = temp.comics.get(i);
             if(categoryMatch(comic)
                     && comic.title.toLowerCase().contains(query.toLowerCase())) {
                 comic.searchScore = Integer.MAX_VALUE;
                 filteredComics.comics.add(comic);
+                temp.comics.remove(i);
+                i--;
             }
         }
-        for(Comic comic : comics.comics) {
-            if (filteredComics.comics.contains(comic))
-                continue;
+        for (int i=0; i<temp.comics.size(); i++) {
+            Comic comic = temp.comics.get(i);
             if(!categoryMatch(comic))
                 continue;
             int score = 0;
@@ -85,6 +87,8 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
             if(score > 0) {
                 comic.searchScore = score;
                 filteredComics.comics.add(comic);
+                temp.comics.remove(i);
+                i--;
             }
         }
         //

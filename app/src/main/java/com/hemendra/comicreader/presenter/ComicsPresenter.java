@@ -22,7 +22,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.widget.ImageView;
 
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
@@ -41,7 +40,6 @@ import com.hemendra.comicreader.model.source.images.remote.RemoteImagesDataSourc
 import com.hemendra.comicreader.view.IComicListActivityCallback;
 import com.hemendra.comicreader.view.ImageAndViewHolder;
 import com.hemendra.comicreader.view.list.SortingOption;
-import com.hemendra.comicreader.view.reader.TouchImageView;
 
 import java.util.ArrayList;
 

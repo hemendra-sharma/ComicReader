@@ -43,6 +43,10 @@ import com.hemendra.comicreader.view.reader.ComicReaderFragment;
 
 import static com.hemendra.comicreader.view.MessageBox.showMessage;
 
+/**
+ * The main activity of the app. It holds all the child fragments.
+ * @author Hemendra Sharma
+ */
 public class ComicsListActivity extends AppCompatActivity implements IComicListActivityCallback {
 
     private RuntimePermissionManager runtimePermissionManager = null;
@@ -82,6 +86,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         //
         if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
             if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
+                if(comicReaderFragment.onBackPressed()) return;
                 recoverFromFullScreen();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 if(comicDetailsFragment.onBackPressed()) return;
@@ -92,7 +97,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
             //
             getSupportFragmentManager().popBackStack();
             refreshChaptersList();
-        } else {
+        } else if(!allComicsListFragment.onBackPressed()) {
             finishAffinity();
         }
     }

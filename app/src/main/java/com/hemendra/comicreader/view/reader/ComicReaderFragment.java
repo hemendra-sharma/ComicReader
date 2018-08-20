@@ -48,6 +48,7 @@ public class ComicReaderFragment extends Fragment {
     private ImageView ivPageProgress;
     public int currentPosition = 0;
 
+    private boolean isTutorialShowing = false;
     private static final String TUTORIAL_ID = "reader_screen_tutorial";
 
     public static ComicReaderFragment getFragment(ComicsPresenter comicsPresenter) {
@@ -100,6 +101,10 @@ public class ComicReaderFragment extends Fragment {
         refreshUI();
 
         showTutorial(vTutorialTarget);
+    }
+
+    public boolean onBackPressed() {
+        return isTutorialShowing;
     }
 
     public void refreshUI() {
@@ -209,6 +214,16 @@ public class ComicReaderFragment extends Fragment {
         sequence.addSequenceItem(v,
                 getString(R.string.reader_tutorial_3),
                 getString(R.string.got_it));
+
+        sequence.setOnItemShownListener((materialShowcaseView, i) -> {
+            if(i == 0)
+                isTutorialShowing = true;
+        });
+
+        sequence.setOnItemDismissedListener((materialShowcaseView, i) -> {
+            if(i == 2)
+                isTutorialShowing = false;
+        });
 
         sequence.start();
     }

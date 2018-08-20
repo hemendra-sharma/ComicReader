@@ -40,6 +40,7 @@ import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.presenter.ComicsPresenter;
 import com.hemendra.comicreader.view.ImageAndViewHolder;
 
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
@@ -58,6 +59,7 @@ public class ComicDetailsFragment extends Fragment {
 
     private ChaptersListAdapter adapter = null;
 
+    private boolean isTutorialShowing = false;
     private static final String TUTORIAL_ID = "details_tutorial",
                 CHAPTER_DOWNLOAD_TUTORIAL_ID = "chapter_download_tutorial";
 
@@ -168,7 +170,9 @@ public class ComicDetailsFragment extends Fragment {
     };
 
     public boolean onBackPressed() {
-        if(recycler.getVisibility() == View.VISIBLE) {
+        if(isTutorialShowing) {
+            return true;
+        } else if(recycler.getVisibility() == View.VISIBLE) {
             recycler.setVisibility(View.GONE);
             rlDetails.setVisibility(View.VISIBLE);
             return true;
@@ -212,6 +216,16 @@ public class ComicDetailsFragment extends Fragment {
         sequence.addSequenceItem(btnStartReading1,
                 getString(R.string.details_tutorial_2), getString(R.string.got_it));
 
+        sequence.setOnItemShownListener((materialShowcaseView, i) -> {
+            if(i == 0)
+                isTutorialShowing = true;
+        });
+
+        sequence.setOnItemDismissedListener((materialShowcaseView, i) -> {
+            if(i == 1)
+                isTutorialShowing = false;
+        });
+
         sequence.start();
     }
 
@@ -222,6 +236,16 @@ public class ComicDetailsFragment extends Fragment {
                 .setContentText(R.string.chapter_buffer_tutorial)
                 .setDelay(500)
                 .singleUse(CHAPTER_DOWNLOAD_TUTORIAL_ID)
+                .setListener(new IShowcaseListener() {
+                    @Override
+                    public void onShowcaseDisplayed(MaterialShowcaseView materialShowcaseView) {
+                        isTutorialShowing = true;
+                    }
+                    @Override
+                    public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
+                        isTutorialShowing = false;
+                    }
+                })
                 .show();
     }
 

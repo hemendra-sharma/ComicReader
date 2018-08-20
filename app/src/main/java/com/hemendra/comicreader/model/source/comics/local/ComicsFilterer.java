@@ -55,8 +55,6 @@ public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
             filteredComics = comics;
         } else {
             for (Comic comic : comics.comics) {
-                if (filteredComics.comics.contains(comic))
-                    continue;
                 int score = 0;
                 for (String category : selectedCategories) {
                     if (comic.categories.contains(category)) {

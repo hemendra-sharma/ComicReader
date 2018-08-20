@@ -41,6 +41,7 @@ import com.hemendra.comicreader.presenter.ComicsPresenter;
 
 import java.util.ArrayList;
 
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class AllComicsListFragment extends Fragment {
@@ -53,6 +54,8 @@ public class AllComicsListFragment extends Fragment {
     private CheckBox cbFavoritesOnly;
 
     private CardView cardOptions;
+
+    private boolean isTutorialShowing = false;
     private static final String TUTORIAL_ID = "list_tutorial";
 
     private CategorySelectionDialog categorySelectionDialog = null;
@@ -119,6 +122,10 @@ public class AllComicsListFragment extends Fragment {
 
         tvInfo.setText(getString(R.string.found_d_comics, 0));
         tvCategoriesSelector.setText(getString(R.string._d_selected, 0));
+    }
+
+    public boolean onBackPressed() {
+        return isTutorialShowing;
     }
 
     public void refreshCurrentView() {
@@ -188,6 +195,17 @@ public class AllComicsListFragment extends Fragment {
                 .setContentText(R.string.you_can_filter_the_comics_using_these_options)
                 .setDelay(500)
                 .singleUse(TUTORIAL_ID)
+                .setListener(new IShowcaseListener() {
+                    @Override
+                    public void onShowcaseDisplayed(MaterialShowcaseView materialShowcaseView) {
+                        isTutorialShowing = true;
+                    }
+
+                    @Override
+                    public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
+                        isTutorialShowing = false;
+                    }
+                })
                 .show();
     }
 
