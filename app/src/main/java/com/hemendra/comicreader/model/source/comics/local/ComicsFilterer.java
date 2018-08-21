@@ -49,6 +49,10 @@ public class ComicsFilterer extends CustomAsyncTask<Void,Void,Comics> {
 
     @Override
     protected Comics doInBackground(Void... params) {
+        return getFilteredComics();
+    }
+
+    public Comics getFilteredComics() {
         Comics filteredComics = new Comics();
         if(selectedCategories.size() == comics.categories.size()) {
             // selected all... return all

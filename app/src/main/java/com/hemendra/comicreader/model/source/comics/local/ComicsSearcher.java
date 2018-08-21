@@ -51,6 +51,10 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
     @Override
     protected Comics doInBackground(String... strings) {
         String query = strings[0];
+        return getFilteredComics(query);
+    }
+
+    public Comics getFilteredComics(String query) {
         query = query.trim().toLowerCase();
         while(query.contains("  "))
             query = query.replace("  ", " ");
@@ -62,6 +66,9 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
         //
         Comics temp = new Comics();
         temp.comics.addAll(comics.comics);
+        //
+        if(query.length() == 0)
+            return temp;
         // search by query
         Comics filteredComics = new Comics();
         for (int i=0; i<temp.comics.size(); i++) {
@@ -98,6 +105,9 @@ public class ComicsSearcher extends CustomAsyncTask<String,Void,Comics> {
     }
 
     private boolean categoryMatch(Comic comic) {
+        if(selectedCategories.size() == 0
+                || selectedCategories.size() == comics.categories.size())
+            return true;
         for(String category : selectedCategories) {
             if(comic.categories.contains(category))
                 return true;
