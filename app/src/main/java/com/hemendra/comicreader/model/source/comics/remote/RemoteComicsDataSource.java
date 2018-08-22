@@ -56,29 +56,33 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
      */
     @Override
     public void loadComics() {
-        if(Utils.isNetworkAvailable(getContext())) {
-            if(!comicsLoader.isExecuting()) {
-                comicsLoader.execute();
-                listener.onStartedLoadingComics();
+        if(listener != null) {
+            if (Utils.isNetworkAvailable(getContext())) {
+                if (!comicsLoader.isExecuting()) {
+                    comicsLoader.execute();
+                    listener.onStartedLoadingComics();
+                } else {
+                    listener.onFailedToLoadComics(FailureReason.ALREADY_LOADING);
+                }
             } else {
-                listener.onFailedToLoadComics(FailureReason.ALREADY_LOADING);
+                listener.onFailedToLoadComics(FailureReason.NETWORK_UNAVAILABLE);
             }
-        } else {
-            listener.onFailedToLoadComics(FailureReason.NETWORK_UNAVAILABLE);
         }
     }
 
     @Override
     public void onComicsLoaded(Comics comics, SourceType sourceType) {
-        if(comics != null)
-            listener.onComicsLoaded(comics, sourceType);
-        else
-            listener.onFailedToLoadComics(FailureReason.UNKNOWN_REMOTE_ERROR);
+        if(listener != null) {
+            if (comics != null)
+                listener.onComicsLoaded(comics, sourceType);
+            else
+                listener.onFailedToLoadComics(FailureReason.UNKNOWN_REMOTE_ERROR);
+        }
     }
 
     @Override
     public void onFailedToLoadComics(FailureReason reason) {
-        listener.onFailedToLoadComics(reason);
+        if(listener != null) listener.onFailedToLoadComics(reason);
     }
 
     @Override
@@ -93,26 +97,28 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
      * @param comic The comic instance for which details are to be loaded.
      */
     public void loadComicDetails(Comic comic) {
-        if(Utils.isNetworkAvailable(getContext())) {
-            if(!detailsLoader.isExecuting()) {
-                detailsLoader.execute(comic);
-                listener.onStartedLoadingComicDetails();
+        if(listener != null) {
+            if (Utils.isNetworkAvailable(getContext())) {
+                if (!detailsLoader.isExecuting()) {
+                    detailsLoader.execute(comic);
+                    listener.onStartedLoadingComicDetails();
+                } else {
+                    listener.onFailedToLoadComicDetails(FailureReason.ALREADY_LOADING);
+                }
             } else {
-                listener.onFailedToLoadComicDetails(FailureReason.ALREADY_LOADING);
+                listener.onFailedToLoadComicDetails(FailureReason.NETWORK_UNAVAILABLE);
             }
-        } else {
-            listener.onFailedToLoadComicDetails(FailureReason.NETWORK_UNAVAILABLE);
         }
     }
 
     @Override
     public void onComicDetailsLoaded(Comic comic) {
-        listener.onComicDetailsLoaded(comic);
+        if(listener != null) listener.onComicDetailsLoaded(comic);
     }
 
     @Override
     public void onFailedToLoadComicDetails(FailureReason reason) {
-        listener.onFailedToLoadComicDetails(reason);
+        if(listener != null) listener.onFailedToLoadComicDetails(reason);
     }
 
     /**
@@ -121,26 +127,28 @@ public class RemoteComicsDataSource extends ComicsDataSource implements OnComics
      * @param chapter The chapter instance for which the list of pages are to be loaded.
      */
     public void loadPages(Chapter chapter) {
-        if(Utils.isNetworkAvailable(getContext())) {
-            if(!chapterLoader.isExecuting()) {
-                chapterLoader.execute(chapter);
-                listener.onStartedLoadingPages();
+        if(listener != null) {
+            if (Utils.isNetworkAvailable(getContext())) {
+                if (!chapterLoader.isExecuting()) {
+                    chapterLoader.execute(chapter);
+                    listener.onStartedLoadingPages();
+                } else {
+                    listener.onFailedToLoadComicDetails(FailureReason.ALREADY_LOADING);
+                }
             } else {
-                listener.onFailedToLoadComicDetails(FailureReason.ALREADY_LOADING);
+                listener.onFailedToLoadComicDetails(FailureReason.NETWORK_UNAVAILABLE);
             }
-        } else {
-            listener.onFailedToLoadComicDetails(FailureReason.NETWORK_UNAVAILABLE);
         }
     }
 
     @Override
     public void onPagesLoaded(Chapter chapter) {
-        listener.onPagesLoaded(chapter);
+        if(listener != null) listener.onPagesLoaded(chapter);
     }
 
     @Override
     public void onFailedToLoadPages(FailureReason reason) {
-        listener.onFailedToLoadPages(reason);
+        if(listener != null) listener.onFailedToLoadPages(reason);
     }
 
     /**

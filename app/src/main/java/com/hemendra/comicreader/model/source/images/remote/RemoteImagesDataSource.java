@@ -101,12 +101,14 @@ public class RemoteImagesDataSource extends ImagesDataSource implements OnImageD
      * @param listener The callback listener.
      */
     public void downloadChapter(Chapter chapter, OnChapterDownloadListener listener) {
-        if(chapterPagesDownloader == null
-                || !chapterPagesDownloader.isExecuting()) {
-            chapterPagesDownloader = new ChapterPagesDownloader(getContext(), listener, chapter);
-            chapterPagesDownloader.execute();
-        } else {
-            listener.onFailedToDownloadChapter(FailureReason.ALREADY_LOADING);
+        if(listener != null) {
+            if (chapterPagesDownloader == null
+                    || !chapterPagesDownloader.isExecuting()) {
+                chapterPagesDownloader = new ChapterPagesDownloader(getContext(), listener, chapter);
+                chapterPagesDownloader.execute();
+            } else {
+                listener.onFailedToDownloadChapter(FailureReason.ALREADY_LOADING);
+            }
         }
     }
 

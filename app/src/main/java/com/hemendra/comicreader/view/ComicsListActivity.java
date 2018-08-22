@@ -79,16 +79,16 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     @Override
     public void onBackPressed() {
-        if(isProgressVisible()) {
-            Toast.makeText(this, R.string.please_wait, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        //
         if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
+            if(isProgressVisible()) {
+                Toast.makeText(this, R.string.please_wait, Toast.LENGTH_SHORT).show();
+                return;
+            } else if(getSupportFragmentManager().getBackStackEntryCount() == 2) {
+                // currently showing reader
                 if(comicReaderFragment.onBackPressed()) return;
                 recoverFromFullScreen();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
+                // currently showing details
                 if(comicDetailsFragment.onBackPressed()) return;
                 showSearchView();
                 allComicsListFragment.refreshCurrentView();
@@ -98,6 +98,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
             getSupportFragmentManager().popBackStack();
             refreshChaptersList();
         } else if(!allComicsListFragment.onBackPressed()) {
+            // currently showing comics list
             finishAffinity();
         }
     }
@@ -198,35 +199,35 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicsListFragment() {
-        if(allComicsListFragment.isAdded())
+        if(comicsPresenter == null || allComicsListFragment.isAdded())
             return;
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, allComicsListFragment)
-                .commit();
+                .commitAllowingStateLoss();
         setTitle(R.string.app_name);
     }
 
     private void showComicDetailsFragment(Comic comic) {
-        if(comicDetailsFragment.isAdded())
+        if(comicsPresenter == null || comicDetailsFragment.isAdded())
             return;
         comicDetailsFragment.setComic(comic);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, comicDetailsFragment)
                 .addToBackStack(null)
-                .commit();
+                .commitAllowingStateLoss();
         hideSearchView();
         setTitle(getString(R.string.details));
     }
 
     private void showComicReaderFragment(Chapter chapter) {
-        if(comicReaderFragment.isAdded())
+        if(comicsPresenter == null || comicReaderFragment.isAdded())
             return;
         makeFullScreen();
         comicReaderFragment.setChapter(chapter);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, comicReaderFragment)
                 .addToBackStack(null)
-                .commit();
+                .commitAllowingStateLoss();
         hideSearchView();
     }
 
