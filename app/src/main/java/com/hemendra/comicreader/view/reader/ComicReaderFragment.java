@@ -70,6 +70,9 @@ public class ComicReaderFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        if(chapter == null)
+            return;
+
         view.setBackgroundColor(Color.BLACK);
 
         RelativeLayout container = view.findViewById(R.id.container);

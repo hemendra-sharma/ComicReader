@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
+import com.crashlytics.android.Crashlytics;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.data.Comics;
@@ -137,11 +138,13 @@ public class ComicsParser {
 
             return comics;
         } catch (IOException e) {
+            Crashlytics.logException(e);
             e.printStackTrace();
         } finally {
             try {
                 in.close();
             } catch (IOException e) {
+                Crashlytics.logException(e);
                 e.printStackTrace();
             }
         }
@@ -201,6 +204,7 @@ public class ComicsParser {
                 return comic;
             }
         } catch (JSONException e) {
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
         return null;
@@ -240,6 +244,7 @@ public class ComicsParser {
                 return chapter;
             }
         } catch (JSONException e) {
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
         return null;

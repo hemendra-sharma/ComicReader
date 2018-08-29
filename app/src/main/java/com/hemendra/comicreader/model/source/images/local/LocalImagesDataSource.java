@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 
+import com.crashlytics.android.Crashlytics;
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Page;
@@ -177,6 +178,7 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
             db.insertImage(url, out.toByteArray());
             out.close();
         } catch (IOException e) {
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
     }
@@ -193,6 +195,7 @@ public class LocalImagesDataSource extends ImagesDataSource implements OnImageLo
             db.insertPage(url, out.toByteArray());
             out.close();
         } catch (IOException e) {
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
     }

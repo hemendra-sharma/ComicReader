@@ -129,7 +129,8 @@ public class ImagesDB {
             String countQuery = "SELECT count(*) FROM " + TAB_IMAGES + " WHERE url='" + url.trim() + "'";
             Cursor c = db.rawQuery(countQuery, null);
             if (c != null) {
-                if (c.moveToFirst()) {
+                if (c.moveToFirst() && c.getColumnCount() > 0
+                        && !c.isNull(0)) {
                     count = c.getInt(0);
                 }
                 c.close();
@@ -158,14 +159,16 @@ public class ImagesDB {
         String countQuery = "SELECT count(*) FROM "+TAB_IMAGES;
         Cursor c = db.rawQuery(countQuery, null);
         if(c != null) {
-            if(c.moveToFirst()) {
+            if(c.moveToFirst() && c.getColumnCount() > 0
+                    && !c.isNull(0)) {
                 int totalImages = c.getInt(0);
                 c.close();
                 if(totalImages > MAX_CACHED_IMAGES) {
                     String query = "SELECT _id FROM " + TAB_IMAGES + " ORDER BY _id ASC";
                     c = db.rawQuery(query, null);
                     if (c != null) {
-                        if (c.moveToFirst()) {
+                        if (c.moveToFirst() && c.getColumnCount() > 0
+                                && !c.isNull(0)) {
                             int diff = totalImages - MAX_CACHED_IMAGES;
                             int count = 0;
                             do {
@@ -191,7 +194,8 @@ public class ImagesDB {
         if(url != null && url.trim().length() > 0) {
             Cursor c = db.rawQuery("select * from " + TAB_IMAGES + " WHERE url='" + url.trim() + "'", null);
             if (c != null) {
-                if (c.moveToFirst()) {
+                if (c.moveToFirst() && c.getColumnCount() >= 3
+                        && !c.isNull(2)) {
                     bytes = c.getBlob(2);
                 }
                 c.close();
@@ -212,7 +216,8 @@ public class ImagesDB {
             String countQuery = "SELECT count(*) FROM " + TAB_PAGES + " WHERE url='" + url.trim() + "'";
             Cursor c = db.rawQuery(countQuery, null);
             if (c != null) {
-                if (c.moveToFirst()) {
+                if (c.moveToFirst() && c.getColumnCount() > 0
+                        && !c.isNull(0)) {
                     count = c.getInt(0);
                 }
                 c.close();
@@ -241,14 +246,16 @@ public class ImagesDB {
         String countQuery = "SELECT count(*) FROM "+TAB_PAGES;
         Cursor c = db.rawQuery(countQuery, null);
         if(c != null) {
-            if(c.moveToFirst()) {
+            if(c.moveToFirst() && c.getColumnCount() > 0
+                    && !c.isNull(0)) {
                 int totalImages = c.getInt(0);
                 c.close();
                 if(totalImages > MAX_CACHED_PAGES) {
                     String query = "SELECT _id FROM " + TAB_PAGES + " ORDER BY _id ASC";
                     c = db.rawQuery(query, null);
                     if (c != null) {
-                        if (c.moveToFirst()) {
+                        if (c.moveToFirst() && c.getColumnCount() > 0
+                                && !c.isNull(0)) {
                             int diff = totalImages - MAX_CACHED_PAGES;
                             int count = 0;
                             do {
@@ -274,7 +281,8 @@ public class ImagesDB {
         if(url != null && url.trim().length() > 0) {
             Cursor c = db.rawQuery("select * from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
             if (c != null) {
-                if (c.moveToFirst()) {
+                if (c.moveToFirst() && c.getColumnCount() >= 3
+                        && !c.isNull(2)) {
                     bytes = c.getBlob(2);
                 }
                 c.close();
@@ -288,7 +296,8 @@ public class ImagesDB {
         if(url != null && url.trim().length() > 0) {
             Cursor c = db.rawQuery("select count(*) from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
             if (c != null) {
-                if (c.moveToFirst()) {
+                if (c.moveToFirst() && c.getColumnCount() > 0
+                        && !c.isNull(0)) {
                     count = c.getInt(0);
                 }
                 c.close();

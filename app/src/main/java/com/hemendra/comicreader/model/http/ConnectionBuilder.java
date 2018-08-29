@@ -19,6 +19,8 @@ package com.hemendra.comicreader.model.http;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -63,8 +65,9 @@ public class ConnectionBuilder {
                 conn.setDoInput(true);
             } catch (NoSuchAlgorithmException
                     | IOException
-                    | KeyManagementException ex) {
-                ex.printStackTrace();
+                    | KeyManagementException e) {
+                Crashlytics.logException(e);
+                e.printStackTrace();
             }
             return conn;
         } else {
@@ -88,8 +91,9 @@ public class ConnectionBuilder {
             if(httpMethod.equalsIgnoreCase("POST"))
                 conn.setDoOutput(true);
             conn.setDoInput(true);
-        }catch (IOException ex){
-            ex.printStackTrace();
+        }catch (IOException e){
+            Crashlytics.logException(e);
+            e.printStackTrace();
         }
         return conn;
     }

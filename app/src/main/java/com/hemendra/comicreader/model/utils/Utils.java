@@ -24,6 +24,8 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -87,8 +89,9 @@ public class Utils {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
             deleteFile(file);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            Crashlytics.logException(e);
+            e.printStackTrace();
         } finally {
             try {
                 //releasing the FileInputStream and ObjectInput
@@ -99,6 +102,7 @@ public class Utils {
                 if(in != null)
                     in.close();
             } catch (IOException e) {
+                Crashlytics.logException(e);
                 e.printStackTrace();
             }
         }
@@ -120,15 +124,17 @@ public class Utils {
             out = new ObjectOutputStream(bos);
             out.writeObject(obj);
             bytes = bos.toByteArray();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            Crashlytics.logException(e);
+            e.printStackTrace();
         } finally {
             try {
                 bos.close();
                 if (out != null)
                     out.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e) {
+                Crashlytics.logException(e);
+                e.printStackTrace();
             }
         }
         return bytes;
@@ -164,13 +170,15 @@ public class Utils {
                     return true;
                 }
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            Crashlytics.logException(e);
+            e.printStackTrace();
         } finally {
             try {
                 if(fout != null)
                     fout.close();
             } catch (IOException e) {
+                Crashlytics.logException(e);
                 e.printStackTrace();
             }
         }

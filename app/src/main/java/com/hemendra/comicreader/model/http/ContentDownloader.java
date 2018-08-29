@@ -19,6 +19,8 @@ package com.hemendra.comicreader.model.http;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -89,11 +91,12 @@ public class ContentDownloader {
                     callback.onFailedToInitialize();
                 Log.e(TAG, "Failed to Download URL as String. 'conn' is null.");
             }
-        } catch (InterruptedIOException ignore) {
+        } catch (InterruptedIOException e) {
             // don't do anything. It was interrupted intentionally.
-        } catch(IOException ex){
+        } catch(IOException e){
             Log.e(TAG, "Failed to download content as String. Requested URL '"+url+"'");
-            ex.printStackTrace();
+            Crashlytics.logException(e);
+            e.printStackTrace();
         } finally {
             try {
                 if(conn != null)
@@ -103,6 +106,7 @@ public class ContentDownloader {
                 if(output != null)
                     output.close();
             } catch (IOException e) {
+                Crashlytics.logException(e);
                 e.printStackTrace();
             }
         }
@@ -148,11 +152,12 @@ public class ContentDownloader {
                 Log.e(TAG,
                         "Failed to Download URL as String. 'conn' is null.");
             }
-        } catch (InterruptedIOException ignore) {
+        } catch (InterruptedIOException e) {
             // don't do anything. It was interrupted intentionally.
-        } catch(IOException ex){
+        } catch(IOException e){
             Log.e(TAG,"Failed to download content as String. Requested URL '"+url+"'");
-            ex.printStackTrace();
+            Crashlytics.logException(e);
+            e.printStackTrace();
         }
         return null;
     }
@@ -220,11 +225,12 @@ public class ContentDownloader {
                     callback.onFailedToInitialize();
                 Log.e(TAG, "Failed to Download URL as Raw Bytes. 'conn' is null.");
             }
-        } catch (InterruptedIOException ignore) {
+        } catch (InterruptedIOException e) {
             // don't do anything. It was interrupted intentionally.
-        } catch (IOException ex) {
+        } catch (IOException e) {
             Log.e(TAG,"Failed to download content as String. Requested URL '"+url+"'");
-            ex.printStackTrace();
+            Crashlytics.logException(e);
+            e.printStackTrace();
         } finally {
             try {
                 if(conn != null)
@@ -234,6 +240,7 @@ public class ContentDownloader {
                 if(outStream != null)
                     outStream.close();
             } catch (IOException e) {
+                Crashlytics.logException(e);
                 e.printStackTrace();
             }
         }

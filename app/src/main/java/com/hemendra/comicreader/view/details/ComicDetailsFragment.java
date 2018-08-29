@@ -81,6 +81,9 @@ public class ComicDetailsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        if(comic == null)
+            return;
+
         ImageView ivCover = view.findViewById(R.id.ivCover);
         ivStar = view.findViewById(R.id.ivStar);
         TextView tvTitle = view.findViewById(R.id.tvTitle);

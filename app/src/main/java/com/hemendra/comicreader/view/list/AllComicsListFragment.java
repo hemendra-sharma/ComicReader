@@ -71,6 +71,9 @@ public class AllComicsListFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        if(comicsPresenter == null)
+            return;
+
         comicsPresenter.startLoadingComics();
 
         tvInfo = view.findViewById(R.id.tvInfo);
