@@ -184,22 +184,28 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
      * Hide the search view on the action bar.
      */
     private void hideSearchView() {
-        searchView.setIconified(true);
-        searchView.clearFocus();
-        searchView.setVisibility(View.GONE);
+        if(searchView != null) {
+            searchView.setIconified(true);
+            searchView.clearFocus();
+            searchView.setVisibility(View.GONE);
+        }
     }
 
     /**
      * Show back the search view on the action bar.
      */
     private void showSearchView() {
-        searchView.setVisibility(View.VISIBLE);
-        searchView.setIconified(true);
-        searchView.clearFocus();
+        if(searchView != null) {
+            searchView.setVisibility(View.VISIBLE);
+            searchView.setIconified(true);
+            searchView.clearFocus();
+        }
     }
 
     private void showComicsListFragment() {
-        if(comicsPresenter == null || allComicsListFragment.isAdded())
+        if(comicsPresenter == null
+                || allComicsListFragment == null
+                || allComicsListFragment.isAdded())
             return;
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.place_holder, allComicsListFragment)
@@ -208,7 +214,9 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicDetailsFragment(Comic comic) {
-        if(comicsPresenter == null || comicDetailsFragment.isAdded())
+        if(comicsPresenter == null
+                || comicDetailsFragment == null
+                || comicDetailsFragment.isAdded())
             return;
         comicDetailsFragment.setComic(comic);
         getSupportFragmentManager().beginTransaction()
@@ -220,7 +228,9 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     }
 
     private void showComicReaderFragment(Chapter chapter) {
-        if(comicsPresenter == null || comicReaderFragment.isAdded())
+        if(comicsPresenter == null
+                || comicReaderFragment == null
+                || comicReaderFragment.isAdded())
             return;
         makeFullScreen();
         comicReaderFragment.setChapter(chapter);
@@ -266,7 +276,8 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
     public void onComicsLoaded(Comics comics) {
         showSearchView();
         hideProgress();
-        allComicsListFragment.onComicsLoaded(comics);
+        if(allComicsListFragment != null)
+            allComicsListFragment.onComicsLoaded(comics);
     }
 
     @Override
@@ -290,7 +301,8 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     @Override
     public void onComicUpdated(Comic comic) {
-        allComicsListFragment.onComicUpdated(comic);
+        if(allComicsListFragment != null)
+            allComicsListFragment.onComicUpdated(comic);
     }
 
     @Override
@@ -314,7 +326,8 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     @Override
     public void refreshChaptersList() {
-        if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
+        if(getSupportFragmentManager().getBackStackEntryCount() == 1
+                && comicDetailsFragment != null) {
             comicDetailsFragment.refreshChaptersList();
         }
     }
@@ -327,26 +340,31 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     @Override
     public void onPageLoaded() {
-        comicReaderFragment.refreshFlipView();
+        if(comicReaderFragment != null)
+            comicReaderFragment.refreshFlipView();
     }
 
     @Override
     public Chapter getNextChapterFromDetailsFragment(Chapter ch) {
+        if(comicDetailsFragment == null)
+            return null;
         return comicDetailsFragment.getNextChapterFrom(ch);
     }
 
     private boolean isProgressVisible() {
-        return rlProgress.getVisibility() == View.VISIBLE;
+        return rlProgress != null && rlProgress.getVisibility() == View.VISIBLE;
     }
 
     @Override
     public void showProgress() {
-        rlProgress.setVisibility(View.VISIBLE);
+        if(rlProgress != null)
+            rlProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        rlProgress.setVisibility(View.GONE);
+        if(rlProgress != null)
+            rlProgress.setVisibility(View.GONE);
     }
 
 }

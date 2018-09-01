@@ -159,7 +159,8 @@ public class ComicReaderFragment extends Fragment {
                 else
                     bmp.setPixel(i, 0, Color.BLACK);
             }
-            tvPageProgress.setText(getString(R.string.page_d_d, currentPage, totalPages));
+            if(getActivity() != null && getContext() != null && isAdded())
+                tvPageProgress.setText(getString(R.string.page_d_d, currentPage, totalPages));
             ivPageProgress.setImageBitmap(bmp);
         }
     }
