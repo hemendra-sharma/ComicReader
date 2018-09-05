@@ -168,8 +168,10 @@ public class ComicReaderFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        flipView.onPause();
-        updateChapterProgress();
+        if(flipView != null) {
+            flipView.onPause();
+            updateChapterProgress();
+        }
     }
 
     public void updateChapterProgress() {
@@ -181,8 +183,10 @@ public class ComicReaderFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        flipView.onResume();
-        refreshFlipView();
+        if(flipView != null) {
+            flipView.onResume();
+            refreshFlipView();
+        }
     }
 
     public void refreshFlipView() {
