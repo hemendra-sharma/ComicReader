@@ -57,7 +57,7 @@ public class RemoteComicDetailsLoader extends CustomAsyncTask<Comic,Void,Comic> 
                         }
                     }
                 });
-        if(json != null) {
+        if(json != null && json.length() > 0) {
             return ComicsParser.parseChaptersFromJSON(comics[0], json);
         }
         return null;

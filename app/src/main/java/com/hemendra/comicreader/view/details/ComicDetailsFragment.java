@@ -175,7 +175,7 @@ public class ComicDetailsFragment extends Fragment {
     public boolean onBackPressed() {
         if(isTutorialShowing) {
             return true;
-        } else if(recycler.getVisibility() == View.VISIBLE) {
+        } else if(recycler != null && recycler.getVisibility() == View.VISIBLE) {
             recycler.setVisibility(View.GONE);
             rlDetails.setVisibility(View.VISIBLE);
             return true;

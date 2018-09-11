@@ -194,6 +194,11 @@ public class ContentDownloader {
                     callback.onResponseCode(conn.getResponseCode());
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     int total = conn.getContentLength();
+                    int _5_mb = 5 * 1024 * 1024;
+                    if(total > _5_mb) {
+                        Crashlytics.logException(new HugeDownloadException(url, total));
+                        return bytes;
+                    }
                     int totalRead = 0;
                     reader = new BufferedInputStream(conn.getInputStream());
                     outStream = new ByteArrayOutputStream();

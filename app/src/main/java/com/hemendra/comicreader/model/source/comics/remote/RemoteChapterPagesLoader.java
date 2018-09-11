@@ -56,7 +56,7 @@ public class RemoteChapterPagesLoader extends CustomAsyncTask<Chapter,Void,Chapt
                         }
                     }
                 });
-        if(json != null) {
+        if(json != null && json.length() > 0) {
             return ComicsParser.parseChapterPagesFromJSON(params[0], json);
         }
         return null;

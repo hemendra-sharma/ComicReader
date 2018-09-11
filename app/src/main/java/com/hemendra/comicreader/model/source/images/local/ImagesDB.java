@@ -57,11 +57,13 @@ public class ImagesDB {
             + "url text, "                              // the URL can be assumed unique
             + "data blob );";                           // byte array image data
 
-    private DatabaseHelper DBHelper;
+    private Context context;
+    private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
 
     public ImagesDB(Context ctx) {
-        DBHelper = new DatabaseHelper(ctx);
+        this.context = ctx;
+        dbHelper = new DatabaseHelper(ctx);
     }
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -103,8 +105,8 @@ public class ImagesDB {
      * @return a new instance of {@link ImagesDB}
      */
     public ImagesDB open() {
-        if (DBHelper != null) {
-            db = DBHelper.getWritableDatabase();
+        if (dbHelper != null) {
+            db = dbHelper.getWritableDatabase();
             return this;
         }
         return null;
@@ -191,7 +193,8 @@ public class ImagesDB {
      */
     public byte[] getImage(String url) {
         byte[] bytes = null;
-        if(url != null && url.trim().length() > 0) {
+        if(url != null && url.trim().length() > 0
+                && context.getDatabasePath(DATABASE_NAME).exists()) {
             Cursor c = db.rawQuery("select * from " + TAB_IMAGES + " WHERE url='" + url.trim() + "'", null);
             if (c != null) {
                 if (c.moveToFirst() && c.getColumnCount() >= 3
@@ -211,7 +214,8 @@ public class ImagesDB {
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     public long insertPage(String url, byte[] data) {
-        if (url != null && url.trim().length() > 0) {
+        if (url != null && url.trim().length() > 0
+                && context.getDatabasePath(DATABASE_NAME).exists()) {
             int count = 0;
             String countQuery = "SELECT count(*) FROM " + TAB_PAGES + " WHERE url='" + url.trim() + "'";
             Cursor c = db.rawQuery(countQuery, null);
@@ -278,7 +282,8 @@ public class ImagesDB {
      */
     public byte[] getPage(String url) {
         byte[] bytes = null;
-        if(url != null && url.trim().length() > 0) {
+        if(url != null && url.trim().length() > 0
+                && context.getDatabasePath(DATABASE_NAME).exists()) {
             Cursor c = db.rawQuery("select * from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
             if (c != null) {
                 if (c.moveToFirst() && c.getColumnCount() >= 3
@@ -293,7 +298,8 @@ public class ImagesDB {
 
     public boolean hasPage(String url) {
         int count = 0;
-        if(url != null && url.trim().length() > 0) {
+        if(url != null && url.trim().length() > 0
+                && context.getDatabasePath(DATABASE_NAME).exists()) {
             Cursor c = db.rawQuery("select count(*) from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
             if (c != null) {
                 if (c.moveToFirst() && c.getColumnCount() > 0
