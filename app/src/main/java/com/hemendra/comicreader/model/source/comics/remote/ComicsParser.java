@@ -217,12 +217,15 @@ public class ComicsParser {
      * @return An instance of updated {@link Chapter} if parsing was successful. NULL otherwise.
      */
     @Nullable
-    public static Chapter parseChapterPagesFromJSON(@NonNull Chapter chapter, @NonNull String json) {
+    public static Chapter parseChapterPagesFromJSON(@NonNull Chapter chapter,
+                                                    @NonNull String json) {
         try {
-            if(new JSONTokener(json).nextValue() instanceof JSONObject) {
+            if(json.length() > 0
+                    && new JSONTokener(json).nextValue() instanceof JSONObject) {
                 JSONObject jsonObject = new JSONObject(json);
                 if(jsonObject.has("images")
-                        && new JSONTokener(jsonObject.getString("images")).nextValue() instanceof JSONArray) {
+                        && new JSONTokener(jsonObject.getString("images")).nextValue()
+                                    instanceof JSONArray) {
                     JSONArray imagesArray = jsonObject.getJSONArray("images");
                     int count = imagesArray.length();
                     chapter.pages.clear();

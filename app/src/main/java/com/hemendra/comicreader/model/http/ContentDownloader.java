@@ -218,10 +218,11 @@ public class ContentDownloader {
                     bytes = outStream.toByteArray();
                     if(callback != null)
                         callback.onFinishedReadingResponse();
-                    reader.close();
-                    reader = null;
-                    outStream.close();
-                    outStream = null;
+                    //
+                    if(bytes.length > _5_mb) {
+                        Crashlytics.logException(new HugeDownloadException(url, total));
+                        return new byte[0];
+                    }
                 } else {
                     Log.e(TAG, "Failed to Download URL as Raw Bytes. Response code: " + conn.getResponseCode());
                 }
