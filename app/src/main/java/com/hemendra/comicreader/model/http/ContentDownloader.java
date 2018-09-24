@@ -16,6 +16,8 @@
 
 package com.hemendra.comicreader.model.http;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
@@ -249,6 +251,15 @@ public class ContentDownloader {
                 Crashlytics.logException(e);
                 e.printStackTrace();
             }
+        }
+        return bytes;
+    }
+
+    private static byte[] getSmallerImageData(byte[] data) {
+        byte[] bytes = null;
+        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+        if(bmp != null) {
+            
         }
         return bytes;
     }

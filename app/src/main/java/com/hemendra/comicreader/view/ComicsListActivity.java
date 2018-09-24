@@ -202,7 +202,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         }
     }
 
-    private void showComicsListFragment() {
+    private synchronized void showComicsListFragment() {
         if(comicsPresenter == null
                 || allComicsListFragment == null
                 || allComicsListFragment.isAdded())
@@ -213,7 +213,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         setTitle(R.string.app_name);
     }
 
-    private void showComicDetailsFragment(Comic comic) {
+    private synchronized void showComicDetailsFragment(Comic comic) {
         if(comicsPresenter == null
                 || comicDetailsFragment == null
                 || comicDetailsFragment.isAdded())
@@ -227,7 +227,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         setTitle(getString(R.string.details));
     }
 
-    private void showComicReaderFragment(Chapter chapter) {
+    private synchronized void showComicReaderFragment(Chapter chapter) {
         if(comicsPresenter == null
                 || comicReaderFragment == null
                 || comicReaderFragment.isAdded())

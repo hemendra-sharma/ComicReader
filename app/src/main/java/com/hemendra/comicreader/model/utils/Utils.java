@@ -76,7 +76,7 @@ public class Utils {
         BufferedInputStream bufferIn = null;
         ObjectInput in = null;
         try {
-            if (!file.exists())
+            if (!file.exists() || file.length() == 0)
                 return null;
             instr = new FileInputStream(file);
             bufferIn = new BufferedInputStream(instr);
@@ -149,7 +149,7 @@ public class Utils {
      */
     public static boolean writeToFile(@NonNull Object obj, @NonNull File file) {
         byte[] data = getSerializedData(obj);
-        return data != null && writeToFile(data, file);
+        return data != null && data.length > 0 && writeToFile(data, file);
     }
 
     /**

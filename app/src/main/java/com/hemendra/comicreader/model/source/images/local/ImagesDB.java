@@ -130,7 +130,7 @@ public class ImagesDB {
             int count = 0;
             String countQuery = "SELECT count(*) FROM " + TAB_IMAGES + " WHERE url='" + url.trim() + "'";
             Cursor c = db.rawQuery(countQuery, null);
-            if (c != null) {
+            if (c != null && db.isOpen()) {
                 if (c.moveToFirst() && c.getColumnCount() > 0
                         && !c.isNull(0)) {
                     count = c.getInt(0);
@@ -160,7 +160,7 @@ public class ImagesDB {
     private void keepLastMaxImagesOnly() {
         String countQuery = "SELECT count(*) FROM "+TAB_IMAGES;
         Cursor c = db.rawQuery(countQuery, null);
-        if(c != null) {
+        if(c != null && db.isOpen()) {
             if(c.moveToFirst() && c.getColumnCount() > 0
                     && !c.isNull(0)) {
                 int totalImages = c.getInt(0);
@@ -168,7 +168,7 @@ public class ImagesDB {
                 if(totalImages > MAX_CACHED_IMAGES) {
                     String query = "SELECT _id FROM " + TAB_IMAGES + " ORDER BY _id ASC";
                     c = db.rawQuery(query, null);
-                    if (c != null) {
+                    if (c != null && db.isOpen()) {
                         if (c.moveToFirst() && c.getColumnCount() > 0
                                 && !c.isNull(0)) {
                             int diff = totalImages - MAX_CACHED_IMAGES;
@@ -196,7 +196,7 @@ public class ImagesDB {
         if(url != null && url.trim().length() > 0
                 && context.getDatabasePath(DATABASE_NAME).exists()) {
             Cursor c = db.rawQuery("select * from " + TAB_IMAGES + " WHERE url='" + url.trim() + "'", null);
-            if (c != null) {
+            if (c != null && db.isOpen()) {
                 if (c.moveToFirst() && c.getColumnCount() >= 3
                         && !c.isNull(2)) {
                     bytes = c.getBlob(2);
@@ -219,7 +219,7 @@ public class ImagesDB {
             int count = 0;
             String countQuery = "SELECT count(*) FROM " + TAB_PAGES + " WHERE url='" + url.trim() + "'";
             Cursor c = db.rawQuery(countQuery, null);
-            if (c != null) {
+            if (c != null && db.isOpen()) {
                 if (c.moveToFirst() && c.getColumnCount() > 0
                         && !c.isNull(0)) {
                     count = c.getInt(0);
@@ -249,7 +249,7 @@ public class ImagesDB {
     private void keepLastMaxPagesOnly() {
         String countQuery = "SELECT count(*) FROM "+TAB_PAGES;
         Cursor c = db.rawQuery(countQuery, null);
-        if(c != null) {
+        if(c != null && db.isOpen()) {
             if(c.moveToFirst() && c.getColumnCount() > 0
                     && !c.isNull(0)) {
                 int totalImages = c.getInt(0);
@@ -257,7 +257,7 @@ public class ImagesDB {
                 if(totalImages > MAX_CACHED_PAGES) {
                     String query = "SELECT _id FROM " + TAB_PAGES + " ORDER BY _id ASC";
                     c = db.rawQuery(query, null);
-                    if (c != null) {
+                    if (c != null && db.isOpen()) {
                         if (c.moveToFirst() && c.getColumnCount() > 0
                                 && !c.isNull(0)) {
                             int diff = totalImages - MAX_CACHED_PAGES;
@@ -285,7 +285,7 @@ public class ImagesDB {
         if(url != null && url.trim().length() > 0
                 && context.getDatabasePath(DATABASE_NAME).exists()) {
             Cursor c = db.rawQuery("select * from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
-            if (c != null) {
+            if (c != null && db.isOpen()) {
                 if (c.moveToFirst() && c.getColumnCount() >= 3
                         && !c.isNull(2)) {
                     bytes = c.getBlob(2);
@@ -301,7 +301,7 @@ public class ImagesDB {
         if(url != null && url.trim().length() > 0
                 && context.getDatabasePath(DATABASE_NAME).exists()) {
             Cursor c = db.rawQuery("select count(*) from " + TAB_PAGES + " WHERE url='" + url.trim() + "'", null);
-            if (c != null) {
+            if (c != null && db.isOpen()) {
                 if (c.moveToFirst() && c.getColumnCount() > 0
                         && !c.isNull(0)) {
                     count = c.getInt(0);
