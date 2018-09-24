@@ -7,6 +7,7 @@ A comic book reader Android app.
   - MVP Architecture
   - JAVA Design Patterns
   - Image Cache Management
+  - Tests using JUnit and Mockito
   - Serializable API
   - Material Design
   - JSON Parsing
