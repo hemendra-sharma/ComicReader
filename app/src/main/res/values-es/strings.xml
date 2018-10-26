@@ -55,4 +55,6 @@
     <string name="reader_tutorial_2">Solo toque para alejar</string>
     <string name="reader_tutorial_3">Desliza hacia la izquierda o hacia la derecha para voltear páginas</string>
     <string name="details">Detalles</string>
+    <string name="share">Compartir</string>
+    <string name="rating_dialog_msg">Parece que estás disfrutando de los cómics. ¿Quieres puntuar esta aplicación 5 estrellas?</string>
 </resources>

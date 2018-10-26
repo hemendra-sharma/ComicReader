@@ -7,4 +7,8 @@
           appcompat:actionViewClass="android.support.v7.widget.SearchView"
           appcompat:showAsAction="always" />
 
+    <item android:id="@+id/action_share"
+          android:title="@string/share"
+          android:icon="@drawable/ic_share_black_24dp"
+          appcompat:showAsAction="ifRoom" />
 </menu>

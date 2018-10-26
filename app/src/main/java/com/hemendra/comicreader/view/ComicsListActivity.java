@@ -27,6 +27,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -87,6 +88,9 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
                 // currently showing reader
                 if(comicReaderFragment.onBackPressed()) return;
                 recoverFromFullScreen();
+
+                if(comicReaderFragment.shouldShowRatingDialog())
+                    new RatingDialog(this).show();
             } else if(getSupportFragmentManager().getBackStackEntryCount() == 1) {
                 // currently showing details
                 if(comicDetailsFragment.onBackPressed()) return;
@@ -140,6 +144,25 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         showComicsListFragment();
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.action_share) {
+            String url = "https://play.google.com/store/apps/details?id=" + getPackageName();
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
+            intent.putExtra(Intent.EXTRA_TEXT, url);
+            if(intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(Intent.createChooser(intent, getString(R.string.share)));
+            } else {
+                Toast.makeText(this, "No App Found to Share !", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

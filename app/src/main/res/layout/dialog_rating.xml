@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainRL"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bordered_rectangle_primary_color"
+    android:padding="3dp"
+    style="?android:attr/buttonBarStyle">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/rating_dialog_msg"
+        android:gravity="center"
+        android:textSize="@dimen/textSize18"
+        android:padding="10dp"
+        android:textColor="@color/textColor"/>
+
+    <LinearLayout
+        android:id="@+id/llStars"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/tvTitle"
+        android:padding="20dp">
+
+        <ImageView
+            android:id="@+id/ivStar1"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/star_off"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/star"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:tag="1"/>
+
+        <ImageView
+            android:id="@+id/ivStar2"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/star_off"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/star"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:tag="2"/>
+
+        <ImageView
+            android:id="@+id/ivStar3"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/star_off"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/star"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:tag="3"/>
+
+        <ImageView
+            android:id="@+id/ivStar4"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/star_off"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/star"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:tag="4"/>
+
+        <ImageView
+            android:id="@+id/ivStar5"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/star_off"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/star"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:tag="5"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llStars"
+        android:layout_margin="3dp"
+        android:textColor="@color/textColorInverse"
+        android:textSize="@dimen/textSize16"
+        android:background="@drawable/btn_selector_orange"
+        android:text="@string/cancel"
+        style="?android:attr/buttonBarButtonStyle"/>
+
+</RelativeLayout>

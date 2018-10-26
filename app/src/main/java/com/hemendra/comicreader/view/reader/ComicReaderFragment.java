@@ -16,6 +16,8 @@
 
 package com.hemendra.comicreader.view.reader;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
@@ -51,6 +53,8 @@ public class ComicReaderFragment extends Fragment {
     private boolean isTutorialShowing = false;
     private static final String TUTORIAL_ID = "reader_screen_tutorial";
 
+    private boolean shouldShowRatingDialog = false;
+
     public static ComicReaderFragment getFragment(ComicsPresenter comicsPresenter) {
         ComicReaderFragment fragment = new ComicReaderFragment();
         fragment.comicsPresenter = comicsPresenter;
@@ -72,6 +76,8 @@ public class ComicReaderFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         if(chapter == null)
             return;
+
+        shouldShowRatingDialog = false;
 
         view.setBackgroundColor(Color.BLACK);
 
@@ -130,6 +136,9 @@ public class ComicReaderFragment extends Fragment {
             tvTitle.setVisibility(View.GONE);
             currentPosition = position;
             updateProgress();
+
+            if(position > adapter.getCount() / 2)
+                shouldShowRatingDialog = true;
         });
 
         updateProgress();
@@ -198,6 +207,24 @@ public class ComicReaderFragment extends Fragment {
             flipView.refreshPage(currentPosition);
         if(currentPosition < adapter.getCount()-1)
             flipView.refreshPage(currentPosition+1);
+    }
+
+    public boolean shouldShowRatingDialog() {
+        if(shouldShowRatingDialog) {
+            Context ctx = getContext();
+            if(ctx != null) {
+                SharedPreferences pref = ctx.getSharedPreferences("rating_dialog",
+                        Context.MODE_PRIVATE);
+                long last = pref.getLong("last_shown_at", 0);
+                long now = System.currentTimeMillis();
+                long _72_hours = 72L * 60L * 60L * 1000L;
+                if(now - last >= _72_hours) {
+                    pref.edit().putLong("last_shown_at", now).apply();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void showTutorial(View v) {
