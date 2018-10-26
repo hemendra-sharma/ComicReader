@@ -37,7 +37,7 @@ public class ChapterTest {
     public void getCopyWithoutRawPageData() {
         Chapter chapter = new Chapter("384923", 312, "Title-1", 73823L);
 
-        Page page1 = new Page(0, "0");
+        Page page1 = new Page(0, "0", 0, 0);
         page1.rawImageData = new byte[10];
         chapter.pages.add(page1);
 

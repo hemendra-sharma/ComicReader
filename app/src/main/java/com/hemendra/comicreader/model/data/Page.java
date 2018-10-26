@@ -42,6 +42,22 @@ public class Page implements Serializable {
      * The unique page ID obtained from remote API
      */
     private String id;
+
+    /**
+     * The page image width.
+     */
+    private int width = 0;
+
+    /**
+     * The page image height.
+     */
+    private int height = 0;
+
+    /**
+     * The maximum allowed image size.
+     */
+    private static final int MAX_WIDTH = 800, MAX_HEIGHT = 1100;
+
     /**
      * The raw page image data downloaded as byte array
      */
@@ -52,9 +68,11 @@ public class Page implements Serializable {
      * @param number The page sequence number. This is used to arraneg all the pages in the ascending order.
      * @param id The raw page image data downloaded as byte array
      */
-    public Page(int number, String id) {
+    public Page(int number, String id, int width, int height) {
         this.number = number;
         this.id = id;
+        this.width = width;
+        this.height = height;
     }
 
     /**
@@ -62,7 +80,7 @@ public class Page implements Serializable {
      * @return A new instance of {@link Page} with same data as this instance.
      */
     public Page getCopyWithoutRawImageData() {
-        return new Page(number, id);
+        return new Page(number, id, width, height);
     }
 
     /**
@@ -72,7 +90,17 @@ public class Page implements Serializable {
     @Nullable
     public String getImageUrl() {
         if(id.length() > 0) {
-            return RemoteConfig.buildImageUrl(id);
+            if(width > MAX_WIDTH || height > MAX_HEIGHT) {
+                int w = MAX_WIDTH, h = MAX_HEIGHT;
+                if(width > height) {
+                    h = (int) (((float) MAX_WIDTH / (float) width) * (float) height);
+                } else {
+                    w = (int) (((float) MAX_HEIGHT / (float) height) * (float) width);
+                }
+                return RemoteConfig.buildResizingImageUrl(id, w, h);
+            } else {
+                return RemoteConfig.buildImageUrl(id);
+            }
         }
         return null;
     }

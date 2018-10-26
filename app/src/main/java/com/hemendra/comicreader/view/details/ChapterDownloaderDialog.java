@@ -126,7 +126,9 @@ class ChapterDownloaderDialog {
                 @Override
                 public void onChapterDownloaded(Chapter chapter) {
                     ivDownload.setImageResource(R.drawable.ic_check);
-                    dialog.dismiss();
+                    try {
+                        dialog.dismiss();
+                    }catch (IllegalArgumentException ignore){}
                 }
 
                 @Override

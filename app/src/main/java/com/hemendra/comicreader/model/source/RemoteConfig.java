@@ -18,6 +18,8 @@ package com.hemendra.comicreader.model.source;
 
 import android.support.annotation.NonNull;
 
+import java.net.URLEncoder;
+
 /**
  * Builds the URLs for downloading comics, chapters, and pages.
  */
@@ -27,6 +29,8 @@ public final class RemoteConfig {
     private static final String COMIC_DETAILS_URL = "https://www.mangaeden.com/api/manga/";
     private static final String CHAPTER_URL = "https://www.mangaeden.com/api/chapter/";
     private static final String IMAGE_URL = "https://cdn.mangaeden.com/mangasimg/";
+    private static final String RESIZING_IMAGE_URL
+            = "https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus";
 
     /**
      * Returns the URL for downloading the list of comics.
@@ -64,6 +68,14 @@ public final class RemoteConfig {
     public static String buildImageUrl(@NonNull String image_path) {
         return IMAGE_URL +
                 image_path;
+    }
+
+    @NonNull
+    public static String buildResizingImageUrl(@NonNull String image_path, int width, int height) {
+        return RESIZING_IMAGE_URL +
+                "&url=" + URLEncoder.encode(buildImageUrl(image_path)) +
+                "&resize_w=" + width +
+                "&resize_h=" + height;
     }
 
 }

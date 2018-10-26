@@ -236,7 +236,9 @@ public class ComicsParser {
                             if(arr.length() >= 4) {
                                 int number = arr.getInt(0);
                                 String id = arr.getString(1);
-                                chapter.pages.add(new Page(number, id));
+                                int width = arr.getInt(2);
+                                int height = arr.getInt(3);
+                                chapter.pages.add(new Page(number, id, width, height));
                             }
                         }
                     }

@@ -24,7 +24,7 @@ public class PageTest {
 
     @Test
     public void getCopyWithoutRawImageData() {
-        Page page = new Page(0, "0");
+        Page page = new Page(0, "0", 0, 0);
         page.rawImageData = new byte[10];
 
         Page pageCopy = page.getCopyWithoutRawImageData();
@@ -33,10 +33,10 @@ public class PageTest {
 
     @Test
     public void getImageUrl() {
-        Page page1 = new Page(232, "");
+        Page page1 = new Page(232, "", 0, 0);
         assertEquals("Page URL must be NULL at this point", null, page1.getImageUrl());
 
-        Page page2 = new Page(232, "123");
+        Page page2 = new Page(232, "123", 0, 0);
         String url = page2.getImageUrl();
         assert url != null && url.length() > 0;
     }
