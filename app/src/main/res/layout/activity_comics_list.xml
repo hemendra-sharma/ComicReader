@@ -9,7 +9,8 @@
     <FrameLayout
         android:id="@+id/place_holder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/adView">
 
     </FrameLayout>
 
@@ -17,8 +18,9 @@
         android:id="@+id/rlProgress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#cc000000"
+        android:background="#ddffffff"
         android:focusableInTouchMode="true"
+        android:layout_above="@+id/adView"
         android:focusable="true"
         android:clickable="true"
         android:visibility="gone">
@@ -40,5 +42,17 @@
             android:layout_centerHorizontal="true"/>
 
     </RelativeLayout>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id"
+        android:visibility="gone">
+    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

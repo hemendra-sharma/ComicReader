@@ -33,6 +33,10 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.hemendra.comicreader.R;
 import com.hemendra.comicreader.model.data.Chapter;
 import com.hemendra.comicreader.model.data.Comic;
@@ -62,6 +66,8 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
 
     private int savedNavigationBarColor = 0;
 
+    private AdView adView = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +82,26 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         allComicsListFragment = AllComicsListFragment.getFragment(comicsPresenter);
         comicDetailsFragment = ComicDetailsFragment.getFragment(comicsPresenter);
         comicReaderFragment = ComicReaderFragment.getFragment(comicsPresenter);
+
+        MobileAds.initialize(this, getString(R.string.banner_ad_id));
+
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("8D2C48868FBEF43DC5CA4EA9DCE986B2")
+                .build();
+        adView = findViewById(R.id.adView);
+        adView.setAdListener(adListener);
+        adView.loadAd(adRequest);
     }
+
+    private AdListener adListener = new AdListener() {
+        @Override
+        public void onAdLoaded() {
+            if(adView != null && !isFinishing() && !isDestroyed()) {
+                adView.setVisibility(View.VISIBLE);
+            }
+            super.onAdLoaded();
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -118,6 +143,7 @@ public class ComicsListActivity extends AppCompatActivity implements IComicListA
         comicReaderFragment = null;
         searchView = null;
         rlProgress = null;
+        adView = null;
 
         super.onDestroy();
     }

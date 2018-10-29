@@ -57,4 +57,5 @@
     <string name="details">Detalles</string>
     <string name="share">Compartir</string>
     <string name="rating_dialog_msg">Parece que estás disfrutando de los cómics. ¿Quieres puntuar esta aplicación 5 estrellas?</string>
+    <string name="content_not_available">Contenido no disponible</string>
 </resources>

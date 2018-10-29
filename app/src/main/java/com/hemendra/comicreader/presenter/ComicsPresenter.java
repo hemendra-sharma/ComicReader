@@ -311,6 +311,8 @@ public class ComicsPresenter implements IComicsPresenter, IComicsDataSourceListe
                 activityView.onFailedToLoadComics(context.getString(R.string.no_internet_connection));
             } else if (reason == FailureReason.NETWORK_TIMEOUT) {
                 activityView.onFailedToLoadComics(context.getString(R.string.connection_timeout));
+            } else if (reason == FailureReason.API_MISSING) {
+                activityView.onFailedToLoadComics(context.getString(R.string.content_not_available));
             } else if (reason != FailureReason.ALREADY_LOADING) {
                 activityView.onFailedToLoadComics(context.getString(R.string.unknown));
             }
@@ -383,6 +385,8 @@ public class ComicsPresenter implements IComicsPresenter, IComicsDataSourceListe
                 activityView.onFailedToLoadComicDetails(context.getString(R.string.no_internet_connection));
             } else if(reason == FailureReason.NETWORK_TIMEOUT) {
                 activityView.onFailedToLoadComicDetails(context.getString(R.string.connection_timeout));
+            } else if (reason == FailureReason.API_MISSING) {
+                activityView.onFailedToLoadComicDetails(context.getString(R.string.content_not_available));
             } else if (reason != FailureReason.ALREADY_LOADING) {
                 activityView.onFailedToLoadComicDetails(context.getString(R.string.unknown));
             }
@@ -412,6 +416,8 @@ public class ComicsPresenter implements IComicsPresenter, IComicsDataSourceListe
                 activityView.onFailedToLoadComicDetails(context.getString(R.string.no_internet_connection));
             } else if(reason == FailureReason.NETWORK_TIMEOUT) {
                 activityView.onFailedToLoadComicDetails(context.getString(R.string.connection_timeout));
+            } else if(reason != FailureReason.API_MISSING) {
+                activityView.onFailedToLoadComicDetails(context.getString(R.string.content_not_available));
             } else if(reason != FailureReason.ALREADY_LOADING) {
                 activityView.onFailedToLoadComicDetails(context.getString(R.string.unknown));
             }

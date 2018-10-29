@@ -45,3 +45,4 @@ obj/
 *~
 *.swp
 app/google-services.json
+app/src/main/res/values/admob.xml

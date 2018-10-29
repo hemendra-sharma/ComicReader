@@ -16,6 +16,8 @@
 
 package com.hemendra.comicreader.model.source.comics.remote;
 
+import android.util.Log;
+
 import com.hemendra.comicreader.model.data.Comic;
 import com.hemendra.comicreader.model.http.ConnectionCallback;
 import com.hemendra.comicreader.model.http.ContentDownloader;
@@ -48,6 +50,7 @@ public class RemoteComicDetailsLoader extends CustomAsyncTask<Comic,Void,Comic> 
                 new ConnectionCallback() {
                     @Override
                     public void onResponseCode(int code) {
+                        Log.d("code", "==================== "+code);
                         switch (code) {
                             case HttpURLConnection.HTTP_NOT_FOUND:
                                 reason = FailureReason.API_MISSING;

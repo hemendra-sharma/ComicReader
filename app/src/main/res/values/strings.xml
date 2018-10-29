@@ -73,10 +73,12 @@
     <string name="share">Share</string>
     <string name="star">Star</string>
     <string name="rating_dialog_msg">Looks like you are enjoying the comics. Want to rate this app 5 stars?</string>
+    <string name="content_not_available">Content Not Available</string>
 
     <string-array name="sorting_options">
         <item>@string/popularity</item>
         <item>@string/latest_first</item>
         <item>@string/a_to_z</item>
     </string-array>
+
 </resources>
